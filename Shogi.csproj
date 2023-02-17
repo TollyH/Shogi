@@ -8,7 +8,7 @@
     <Company>Tolly Hill</Company>
     <Authors>Tolly Hill</Authors>
     <Copyright>Copyright © 2023  Ptolemy Hill</Copyright>
-    <Description>Chess game written in C# with WPF</Description>
+    <Description>Shogi game written in C# with WPF</Description>
   </PropertyGroup>
 
   <ItemGroup>

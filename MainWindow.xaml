@@ -1,12 +1,12 @@
-﻿<Window x:Class="Chess.MainWindow"
+﻿<Window x:Class="Shogi.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Chess"
+        xmlns:local="clr-namespace:Shogi"
         xmlns:sm="clr-namespace:SliderMenu"
         mc:Ignorable="d"
-        Title="Chess" Height="770" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing">
+        Title="Shogi" Height="770" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -201,7 +201,7 @@
                 <Label x:Name="whiteCaptures" Content="0" Foreground="Crimson"/>
             </Viewbox>
             <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-                <Grid x:Name="chessBoardBackground">
+                <Grid x:Name="shogiBoardBackground">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
@@ -256,7 +256,7 @@
                     <Rectangle Fill="{Binding Fill, ElementName=rectSizeReference}" Grid.Column="7" Grid.Row="6"/>
                 </Grid>
             </Border>
-            <Canvas Grid.Column="1" Grid.Row="1" x:Name="chessGameCanvas" Margin="1"/>
+            <Canvas Grid.Column="1" Grid.Row="1" x:Name="shogiGameCanvas" Margin="1"/>
         </Grid>
         <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ScrollViewer x:Name="movesScroll">

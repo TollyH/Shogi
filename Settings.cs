@@ -2,7 +2,7 @@
 using System;
 using System.Windows.Media;
 
-namespace Chess
+namespace Shogi
 {
     [Serializable]
     public class Settings

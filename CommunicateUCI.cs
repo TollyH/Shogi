@@ -6,17 +6,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Chess
+namespace Shogi
 {
     public static class CommunicateUCI
     {
         /// <summary>
-        /// Communicate with a chess engine at the given path over the UCI protocol
+        /// Communicate with a shogi engine at the given path over the UCI protocol
         /// to find the best move that can be made in the current game.
         /// </summary>
         /// <param name="depth">The maximum number of half-moves to search</param>
         /// <returns>The best move that can be played according to the engine, or null if an error occured</returns>
-        public static async Task<BoardAnalysis.PossibleMove?> GetBestMove(ChessGame game, string enginePath, uint depth,
+        public static async Task<BoardAnalysis.PossibleMove?> GetBestMove(ShogiGame game, string enginePath, uint depth,
             CancellationToken cancellationToken)
         {
             System.Diagnostics.Process engine = new();
@@ -85,7 +85,7 @@ namespace Chess
             List<(Point, Point, Type)> bestLine = new();
             foreach(string move in moveInfo.Groups[3].Value.Split(' '))
             {
-                bestLine.Add((move[..2].FromChessCoordinate(), move[2..4].FromChessCoordinate(),
+                bestLine.Add((move[..2].FromShogiCoordinate(), move[2..4].FromShogiCoordinate(),
                     move.Length == 5 ? move[4] switch
                     {
                         'q' => typeof(Pieces.Queen),
@@ -96,7 +96,7 @@ namespace Chess
                     } : typeof(Pieces.Queen)));
             }
 
-            return new BoardAnalysis.PossibleMove(bestMove[..2].FromChessCoordinate(), bestMove[2..4].FromChessCoordinate(),
+            return new BoardAnalysis.PossibleMove(bestMove[..2].FromShogiCoordinate(), bestMove[2..4].FromShogiCoordinate(),
                 blackMateFound ? double.PositiveInfinity : whiteMateFound ? double.NegativeInfinity : game.CurrentTurnWhite ? moveValue : -moveValue,
                 // Multiply mate depth by 2 as PossibleMove expects depth in half-moves, engine gives it in full-moves
                 whiteMateFound, blackMateFound, whiteMateFound ? Math.Abs((int)moveValue) * 2 : 0,

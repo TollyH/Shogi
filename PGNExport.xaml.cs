@@ -14,18 +14,18 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Chess
+namespace Shogi
 {
     /// <summary>
     /// Interaction logic for PGNExport.xaml
     /// </summary>
     public partial class PGNExport : Window
     {
-        private readonly ChessGame game;
+        private readonly ShogiGame game;
         private readonly bool whiteIsComputer;
         private readonly bool blackIsComputer;
 
-        public PGNExport(ChessGame game, bool whiteIsComputer, bool blackIsComputer)
+        public PGNExport(ShogiGame game, bool whiteIsComputer, bool blackIsComputer)
         {
             this.game = game;
             this.whiteIsComputer = whiteIsComputer;

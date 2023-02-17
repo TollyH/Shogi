@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Drawing;
 
-namespace Chess.Pieces
+namespace Shogi.Pieces
 {
     public abstract class Piece
     {
@@ -20,7 +20,7 @@ namespace Chess.Pieces
         public abstract HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality);
 
         /// <summary>
-        /// Create a clone of a chess piece, allowing modification of the clone without affecting the original
+        /// Create a clone of a shogi piece, allowing modification of the clone without affecting the original
         /// </summary>
         public abstract Piece Clone();
 

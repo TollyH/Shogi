@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Chess
+namespace Shogi
 {
     public static class BoardAnalysis
     {
@@ -337,7 +337,7 @@ namespace Chess
         /// Use <see cref="EvaluatePossibleMoves"/> to find the best possible move in the current state of the game
         /// </summary>
         /// <param name="maxDepth">The maximum number of half-moves in the future to search</param>
-        public static async Task<PossibleMove> EstimateBestPossibleMove(ChessGame game, int maxDepth, CancellationToken cancellationToken)
+        public static async Task<PossibleMove> EstimateBestPossibleMove(ShogiGame game, int maxDepth, CancellationToken cancellationToken)
         {
             PossibleMove[] moves = await EvaluatePossibleMoves(game, maxDepth, cancellationToken);
             PossibleMove bestMove = new(default, default,
@@ -379,7 +379,7 @@ namespace Chess
         /// </summary>
         /// <param name="maxDepth">The maximum number of half-moves in the future to search</param>
         /// <returns>An array of all possible moves, with information on board value and ability to checkmate</returns>
-        public static async Task<PossibleMove[]> EvaluatePossibleMoves(ChessGame game, int maxDepth, CancellationToken cancellationToken)
+        public static async Task<PossibleMove[]> EvaluatePossibleMoves(ShogiGame game, int maxDepth, CancellationToken cancellationToken)
         {
             ConcurrentBag<PossibleMove> possibleMoves = new();
             int remainingThreads = 0;
@@ -398,7 +398,7 @@ namespace Chess
                         remainingThreads++;
                         Point thisPosition = piece.Position;
                         Point thisValidMove = validMove;
-                        ChessGame gameClone = game.Clone();
+                        ShogiGame gameClone = game.Clone();
                         List<(Point, Point, Type)> thisLine = new() { (piece.Position, validMove, typeof(Pieces.Queen)) };
                         _ = gameClone.MovePiece(piece.Position, validMove, true,
                             promotionType: typeof(Pieces.Queen), updateMoveText: false);
@@ -436,7 +436,7 @@ namespace Chess
             return possibleMoves.ToArray();
         }
 
-        private static HashSet<Point> GetValidMovesForEval(ChessGame game, Pieces.Piece piece)
+        private static HashSet<Point> GetValidMovesForEval(ShogiGame game, Pieces.Piece piece)
         {
             HashSet<Point> allValidMoves = piece.GetValidMoves(game.Board, true);
 
@@ -464,7 +464,7 @@ namespace Chess
             return allValidMoves;
         }
 
-        private static PossibleMove MinimaxMove(ChessGame game, double alpha, double beta, int depth, int maxDepth,
+        private static PossibleMove MinimaxMove(ShogiGame game, double alpha, double beta, int depth, int maxDepth,
             List<(Point, Point, Type)> currentLine, CancellationToken cancellationToken)
         {
             (Point, Point) lastMove = game.Moves.Last();
@@ -506,7 +506,7 @@ namespace Chess
 
                     foreach (Point validMove in GetValidMovesForEval(game, piece))
                     {
-                        ChessGame gameClone = game.Clone();
+                        ShogiGame gameClone = game.Clone();
                         List<(Point, Point, Type)> newLine = new(currentLine) { (piece.Position, validMove, typeof(Pieces.Queen)) };
                         _ = gameClone.MovePiece(piece.Position, validMove, true,
                             promotionType: typeof(Pieces.Queen), updateMoveText: false);

@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Chess
+namespace Shogi
 {
     /// <summary>
     /// Interaction logic for CustomGame.xaml
@@ -15,7 +15,7 @@ namespace Chess
         public Pieces.Piece?[,] Board { get; private set; }
         public System.Drawing.Point? EnPassantSquare { get; private set; }
 
-        public ChessGame? GeneratedGame { get; private set; }
+        public ShogiGame? GeneratedGame { get; private set; }
         public bool WhiteIsComputer { get; private set; }
         public bool BlackIsComputer { get; private set; }
 
@@ -36,10 +36,10 @@ namespace Chess
 
         public void UpdateBoard()
         {
-            tileWidth = chessGameCanvas.ActualWidth / Board.GetLength(0);
-            tileHeight = chessGameCanvas.ActualHeight / Board.GetLength(1);
+            tileWidth = shogiGameCanvas.ActualWidth / Board.GetLength(0);
+            tileHeight = shogiGameCanvas.ActualHeight / Board.GetLength(1);
 
-            chessGameCanvas.Children.Clear();
+            shogiGameCanvas.Children.Clear();
 
             if (EnPassantSquare is not null)
             {
@@ -49,7 +49,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = Brushes.OrangeRed
                 };
-                _ = chessGameCanvas.Children.Add(enPassantHighlight);
+                _ = shogiGameCanvas.Children.Add(enPassantHighlight);
                 Canvas.SetBottom(enPassantHighlight, EnPassantSquare.Value.Y * tileHeight);
                 Canvas.SetLeft(enPassantHighlight, EnPassantSquare.Value.X * tileWidth);
             }
@@ -71,7 +71,7 @@ namespace Chess
                             Width = tileWidth,
                             Height = tileHeight
                         };
-                        _ = chessGameCanvas.Children.Add(newPiece);
+                        _ = shogiGameCanvas.Children.Add(newPiece);
                         Canvas.SetBottom(newPiece, y * tileHeight);
                         Canvas.SetLeft(newPiece, x * tileWidth);
                     }
@@ -141,8 +141,8 @@ namespace Chess
             BlackIsComputer = computerSelectBlack.IsChecked ?? false;
             bool currentTurnWhite = turnSelectWhite.IsChecked ?? false;
             // For the PGN standard, if black moves first then a single move "..." is added to the start of the move text list
-            GeneratedGame = new ChessGame(Board, currentTurnWhite,
-                ChessGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnWhite)),
+            GeneratedGame = new ShogiGame(Board, currentTurnWhite,
+                ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnWhite)),
                 new(), currentTurnWhite ? new() : new() { "..." }, new(), EnPassantSquare, castleWhiteKingside.IsChecked ?? false,
                 castleWhiteQueenside.IsChecked ?? false, castleBlackKingside.IsChecked ?? false,
                 castleBlackQueenside.IsChecked ?? false, 0, new(), null);
@@ -156,16 +156,16 @@ namespace Chess
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Point mousePoint = Mouse.GetPosition(chessGameCanvas);
+            Point mousePoint = Mouse.GetPosition(shogiGameCanvas);
             if (mousePoint.X < 0 || mousePoint.Y < 0
-                || mousePoint.X > chessGameCanvas.ActualWidth || mousePoint.Y > chessGameCanvas.ActualHeight)
+                || mousePoint.X > shogiGameCanvas.ActualWidth || mousePoint.Y > shogiGameCanvas.ActualHeight)
             {
                 return;
             }
 
-            // Canvas coordinates are relative to top-left, whereas chess' are from bottom-left, so y is inverted
+            // Canvas coordinates are relative to top-left, whereas shogi's are from bottom-left, so y is inverted
             System.Drawing.Point coord = new((int)(mousePoint.X / tileWidth),
-                (int)((chessGameCanvas.ActualHeight - mousePoint.Y) / tileHeight));
+                (int)((shogiGameCanvas.ActualHeight - mousePoint.Y) / tileHeight));
             if (coord.X < 0 || coord.Y < 0 || coord.X >= Board.GetLength(0) || coord.Y >= Board.GetLength(1))
             {
                 return;
@@ -246,7 +246,7 @@ namespace Chess
             BlackIsComputer = computerSelectBlack.IsChecked ?? false;
             try
             {
-                GeneratedGame = ChessGame.FromForsythEdwards(fenInput.Text);
+                GeneratedGame = ShogiGame.FromForsythEdwards(fenInput.Text);
                 Close();
             }
             catch (Exception ex)

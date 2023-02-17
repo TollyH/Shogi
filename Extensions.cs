@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Chess
+namespace Shogi
 {
     public static class Extensions
     {
@@ -17,12 +17,12 @@ namespace Chess
 
         private const string files = "abcdefgh";
         private const string ranks = "12345678";
-        public static string ToChessCoordinate(this Point point)
+        public static string ToShogiCoordinate(this Point point)
         {
             return $"{files[point.X]}{ranks[point.Y]}";
         }
 
-        public static Point FromChessCoordinate(this string coordinate)
+        public static Point FromShogiCoordinate(this string coordinate)
         {
             return new Point(files.IndexOf(coordinate[0]), ranks.IndexOf(coordinate[1]));
         }

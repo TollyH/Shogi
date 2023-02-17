@@ -12,14 +12,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace Chess
+namespace Shogi
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ChessGame game = new();
+        private ShogiGame game = new();
         private readonly Settings config;
 
         private Pieces.Piece? grabbedPiece = null;
@@ -54,7 +54,7 @@ namespace Chess
 
         public MainWindow()
         {
-            string jsonPath = System.IO.Path.Join(AppDomain.CurrentDomain.BaseDirectory, "chess-settings.json");
+            string jsonPath = System.IO.Path.Join(AppDomain.CurrentDomain.BaseDirectory, "shogi-settings.json");
             config = File.Exists(jsonPath)
                 ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(jsonPath)) ?? new Settings()
                 : new Settings();
@@ -74,7 +74,7 @@ namespace Chess
             InitializeComponent();
 
             rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
-            chessBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
+            shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
             autoQueenItem.IsChecked = config.AutoQueen;
             moveListSymbolsItem.IsChecked = config.UseSymbolsOnMoveList;
             flipBoardItem.IsChecked = config.FlipBoard;
@@ -92,13 +92,13 @@ namespace Chess
             {
                 return;
             }
-            chessGameCanvas.Children.Clear();
+            shogiGameCanvas.Children.Clear();
             pieceViews.Clear();
 
             bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnWhite && !blackIsComputer) || (whiteIsComputer && !blackIsComputer));
 
-            tileWidth = chessGameCanvas.ActualWidth / game.Board.GetLength(0);
-            tileHeight = chessGameCanvas.ActualHeight / game.Board.GetLength(1);
+            tileWidth = shogiGameCanvas.ActualWidth / game.Board.GetLength(0);
+            tileHeight = shogiGameCanvas.ActualHeight / game.Board.GetLength(1);
 
             whiteCaptures.Content = 0;
             whiteCaptures.ToolTip = "";
@@ -225,7 +225,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.CheckMateHighlightColor)
                 };
-                _ = chessGameCanvas.Children.Add(mateHighlight);
+                _ = shogiGameCanvas.Children.Add(mateHighlight);
                 Canvas.SetBottom(mateHighlight, (boardFlipped ? 7 - kingPosition.Y : kingPosition.Y) * tileHeight);
                 Canvas.SetLeft(mateHighlight, (boardFlipped ? 7 - kingPosition.X : kingPosition.X) * tileWidth);
             }
@@ -240,7 +240,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.LastMoveSourceColor)
                 };
-                _ = chessGameCanvas.Children.Add(sourceMoveHighlight);
+                _ = shogiGameCanvas.Children.Add(sourceMoveHighlight);
                 Canvas.SetBottom(sourceMoveHighlight, (boardFlipped ? 7 - lastMoveSource.Y : lastMoveSource.Y) * tileHeight);
                 Canvas.SetLeft(sourceMoveHighlight, (boardFlipped ? 7 - lastMoveSource.X : lastMoveSource.X) * tileWidth);
 
@@ -250,7 +250,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.LastMoveDestinationColor)
                 };
-                _ = chessGameCanvas.Children.Add(destinationMoveHighlight);
+                _ = shogiGameCanvas.Children.Add(destinationMoveHighlight);
                 Canvas.SetBottom(destinationMoveHighlight, (boardFlipped ? 7 - lastMoveDestination.Y : lastMoveDestination.Y) * tileHeight);
                 Canvas.SetLeft(destinationMoveHighlight, (boardFlipped ? 7 - lastMoveDestination.X : lastMoveDestination.X) * tileWidth);
 
@@ -266,7 +266,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.BestMoveSourceColor)
                 };
-                _ = chessGameCanvas.Children.Add(bestMoveSrcHighlight);
+                _ = shogiGameCanvas.Children.Add(bestMoveSrcHighlight);
                 Canvas.SetBottom(bestMoveSrcHighlight,
                     (boardFlipped ? 7 - currentBestMove.Value.Source.Y : currentBestMove.Value.Source.Y) * tileHeight);
                 Canvas.SetLeft(bestMoveSrcHighlight,
@@ -278,7 +278,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.BestMoveDestinationColor)
                 };
-                _ = chessGameCanvas.Children.Add(bestMoveDstHighlight);
+                _ = shogiGameCanvas.Children.Add(bestMoveDstHighlight);
                 Canvas.SetBottom(bestMoveDstHighlight,
                     (boardFlipped ? 7 - currentBestMove.Value.Destination.Y : currentBestMove.Value.Destination.Y) * tileHeight);
                 Canvas.SetLeft(bestMoveDstHighlight,
@@ -305,7 +305,7 @@ namespace Chess
                         Height = tileHeight,
                         Fill = fillBrush
                     };
-                    _ = chessGameCanvas.Children.Add(newRect);
+                    _ = shogiGameCanvas.Children.Add(newRect);
                     Canvas.SetBottom(newRect, (boardFlipped ? 7 - validMove.Y : validMove.Y) * tileHeight);
                     Canvas.SetLeft(newRect, (boardFlipped ? 7 - validMove.X : validMove.X) * tileWidth);
                 }
@@ -323,7 +323,7 @@ namespace Chess
                     Height = tileHeight,
                     Fill = new SolidColorBrush(config.AvailableEnPassantColor)
                 };
-                _ = chessGameCanvas.Children.Add(enPassantHighlight);
+                _ = shogiGameCanvas.Children.Add(enPassantHighlight);
                 Canvas.SetBottom(enPassantHighlight,
                     (boardFlipped ? 7 - game.EnPassantSquare.Value.Y : game.EnPassantSquare.Value.Y) * tileHeight);
                 Canvas.SetLeft(enPassantHighlight,
@@ -341,7 +341,7 @@ namespace Chess
                         Height = tileHeight,
                         Fill = new SolidColorBrush(config.AvailableCastleColor)
                     };
-                    _ = chessGameCanvas.Children.Add(castleHighlight);
+                    _ = shogiGameCanvas.Children.Add(castleHighlight);
                     Canvas.SetBottom(castleHighlight, (boardFlipped ? 7 - yPos : yPos) * tileHeight);
                     Canvas.SetLeft(castleHighlight, (boardFlipped ? 1 : 6) * tileWidth);
                 }
@@ -353,7 +353,7 @@ namespace Chess
                         Height = tileHeight,
                         Fill = new SolidColorBrush(config.AvailableCastleColor)
                     };
-                    _ = chessGameCanvas.Children.Add(castleHighlight);
+                    _ = shogiGameCanvas.Children.Add(castleHighlight);
                     Canvas.SetBottom(castleHighlight, (boardFlipped ? 7 - yPos : yPos) * tileHeight);
                     Canvas.SetLeft(castleHighlight, (boardFlipped ? 5 : 2) * tileWidth);
                 }
@@ -368,7 +368,7 @@ namespace Chess
                     Width = tileWidth * 0.8,
                     Height = tileHeight * 0.8
                 };
-                _ = chessGameCanvas.Children.Add(ellipse);
+                _ = shogiGameCanvas.Children.Add(ellipse);
                 Canvas.SetBottom(ellipse, ((boardFlipped ? 7 - square.Y : square.Y) * tileHeight) + (tileHeight * 0.1));
                 Canvas.SetLeft(ellipse, (boardFlipped ? 7 - square.X : square.X) * tileWidth + (tileWidth * 0.1));
             }
@@ -390,7 +390,7 @@ namespace Chess
                     Y1 = (boardFlipped ? lineStart.Y : 7 - lineStart.Y) * tileHeight + (tileHeight / 2),
                     Y2 = (boardFlipped ? lineEnd.Y : 7 - lineEnd.Y) * tileHeight + (tileHeight / 2)
                 };
-                _ = chessGameCanvas.Children.Add(line);
+                _ = shogiGameCanvas.Children.Add(line);
             }
 
             for (int x = 0; x < game.Board.GetLength(0); x++)
@@ -426,7 +426,7 @@ namespace Chess
                             Height = tileHeight
                         };
                         pieceViews[piece] = newPiece;
-                        _ = chessGameCanvas.Children.Add(newPiece);
+                        _ = shogiGameCanvas.Children.Add(newPiece);
                         Canvas.SetBottom(newPiece, (boardFlipped ? 7 - y : y) * tileHeight);
                         Canvas.SetLeft(newPiece, (boardFlipped ? 7 - x : x) * tileWidth);
                     }
@@ -446,7 +446,7 @@ namespace Chess
                 Mouse.OverrideCursor = Cursors.ScrollAll;
                 return;
             }
-            Pieces.Piece? checkPiece = GetPieceAtCanvasPoint(Mouse.GetPosition(chessGameCanvas));
+            Pieces.Piece? checkPiece = GetPieceAtCanvasPoint(Mouse.GetPosition(shogiGameCanvas));
             if (checkPiece is not null && ((checkPiece.IsWhite && game.CurrentTurnWhite && !whiteIsComputer)
                 || (!checkPiece.IsWhite && !game.CurrentTurnWhite && !blackIsComputer)))
             {
@@ -502,7 +502,7 @@ namespace Chess
             }
 
             string convertedBestLine = "";
-            ChessGame moveStringGenerator = game.Clone();
+            ShogiGame moveStringGenerator = game.Clone();
             foreach ((System.Drawing.Point source, System.Drawing.Point destination, Type promotionType) in bestMove.Value.BestLine)
             {
                 _ = moveStringGenerator.MovePiece(source, destination, true, promotionType);
@@ -564,15 +564,15 @@ namespace Chess
         private System.Drawing.Point GetCoordFromCanvasPoint(Point position)
         {
             bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnWhite && !blackIsComputer) || (whiteIsComputer && !blackIsComputer));
-            // Canvas coordinates are relative to top-left, whereas chess' are from bottom-left, so y is inverted
-            return new System.Drawing.Point((int)((boardFlipped ? chessGameCanvas.ActualWidth - position.X : position.X) / tileWidth),
-                (int)((!boardFlipped ? chessGameCanvas.ActualHeight - position.Y : position.Y) / tileHeight));
+            // Canvas coordinates are relative to top-left, whereas shogi's are from bottom-left, so y is inverted
+            return new System.Drawing.Point((int)((boardFlipped ? shogiGameCanvas.ActualWidth - position.X : position.X) / tileWidth),
+                (int)((!boardFlipped ? shogiGameCanvas.ActualHeight - position.Y : position.Y) / tileHeight));
         }
 
         private Pieces.Piece? GetPieceAtCanvasPoint(Point position)
         {
             if (position.X < 0 || position.Y < 0
-                || position.X > chessGameCanvas.ActualWidth || position.Y > chessGameCanvas.ActualHeight)
+                || position.X > shogiGameCanvas.ActualWidth || position.Y > shogiGameCanvas.ActualHeight)
             {
                 return null;
             }
@@ -586,7 +586,7 @@ namespace Chess
         {
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            game = new ChessGame();
+            game = new ShogiGame();
             currentBestMove = null;
             manuallyEvaluating = false;
             grabbedPiece = null;
@@ -613,15 +613,15 @@ namespace Chess
         {
             if (grabbedPiece is not null && !highlightGrabbedMoves)
             {
-                Canvas.SetBottom(pieceViews[grabbedPiece], chessGameCanvas.ActualHeight - Mouse.GetPosition(chessGameCanvas).Y - (tileHeight / 2));
-                Canvas.SetLeft(pieceViews[grabbedPiece], Mouse.GetPosition(chessGameCanvas).X - (tileWidth / 2));
+                Canvas.SetBottom(pieceViews[grabbedPiece], shogiGameCanvas.ActualHeight - Mouse.GetPosition(shogiGameCanvas).Y - (tileHeight / 2));
+                Canvas.SetLeft(pieceViews[grabbedPiece], Mouse.GetPosition(shogiGameCanvas).X - (tileWidth / 2));
             }
             UpdateCursor();
         }
 
         private async void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Point mousePos = Mouse.GetPosition(chessGameCanvas);
+            Point mousePos = Mouse.GetPosition(shogiGameCanvas);
             if (e.ChangedButton == MouseButton.Left)
             {
                 squareHighlights.Clear();
@@ -676,7 +676,7 @@ namespace Chess
             else
             {
                 if (mousePos.X < 0 || mousePos.Y < 0
-                || mousePos.X > chessGameCanvas.ActualWidth || mousePos.Y > chessGameCanvas.ActualHeight)
+                || mousePos.X > shogiGameCanvas.ActualWidth || mousePos.Y > shogiGameCanvas.ActualHeight)
                 {
                     return;
                 }
@@ -696,7 +696,7 @@ namespace Chess
                 }
                 if (grabbedPiece is not null)
                 {
-                    System.Drawing.Point destination = GetCoordFromCanvasPoint(Mouse.GetPosition(chessGameCanvas));
+                    System.Drawing.Point destination = GetCoordFromCanvasPoint(Mouse.GetPosition(shogiGameCanvas));
                     if (destination == grabbedPiece.Position)
                     {
                         highlightGrabbedMoves = true;
@@ -726,9 +726,9 @@ namespace Chess
             }
             else
             {
-                Point mousePos = Mouse.GetPosition(chessGameCanvas);
+                Point mousePos = Mouse.GetPosition(shogiGameCanvas);
                 if (mousePos.X < 0 || mousePos.Y < 0
-                || mousePos.X > chessGameCanvas.ActualWidth || mousePos.Y > chessGameCanvas.ActualHeight)
+                || mousePos.X > shogiGameCanvas.ActualWidth || mousePos.Y > shogiGameCanvas.ActualHeight)
                 {
                     return;
                 }
@@ -820,7 +820,7 @@ namespace Chess
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             cancelMoveComputation.Cancel();
-            string jsonPath = System.IO.Path.Join(AppDomain.CurrentDomain.BaseDirectory, "chess-settings.json");
+            string jsonPath = System.IO.Path.Join(AppDomain.CurrentDomain.BaseDirectory, "shogi-settings.json");
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(config));
         }
 
@@ -892,7 +892,7 @@ namespace Chess
         {
             _ = new Customisation(config).ShowDialog();
             rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
-            chessBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
+            shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
             UpdateGameDisplay();
         }
 

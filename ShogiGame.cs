@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace Chess
+namespace Shogi
 {
     /// <remarks>
     /// CheckWhite and CheckMateWhite mean that the check is against white,
@@ -24,7 +24,7 @@ namespace Chess
         CheckMateBlack
     }
 
-    public class ChessGame
+    public class ShogiGame
     {
         public static readonly ImmutableHashSet<GameState> EndingStates = new HashSet<GameState>()
         {
@@ -65,9 +65,9 @@ namespace Chess
         public Dictionary<string, int> BoardCounts { get; }
 
         /// <summary>
-        /// Create a new standard chess game with all values at their defaults
+        /// Create a new standard shogi game with all values at their defaults
         /// </summary>
-        public ChessGame()
+        public ShogiGame()
         {
             CurrentTurnWhite = true;
             GameOver = false;
@@ -105,9 +105,9 @@ namespace Chess
         }
 
         /// <summary>
-        /// Create a new instance of a chess game, setting each game parameter to a non-default value
+        /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
-        public ChessGame(Pieces.Piece?[,] board, bool currentTurnWhite, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
+        public ShogiGame(Pieces.Piece?[,] board, bool currentTurnWhite, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
             List<Pieces.Piece> capturedPieces, Point? enPassantSquare, bool whiteMayCastleKingside, bool whiteMayCastleQueenside,
             bool blackMayCastleKingside, bool blackMayCastleQueenside, int staleMoveCounter, Dictionary<string, int> boardCounts,
             string? initialState)
@@ -151,9 +151,9 @@ namespace Chess
         }
 
         /// <summary>
-        /// Create a deep copy of all parameters to this chess game
+        /// Create a deep copy of all parameters to this shogi game
         /// </summary>
-        public ChessGame Clone()
+        public ShogiGame Clone()
         {
             Pieces.Piece?[,] boardClone = new Pieces.Piece?[Board.GetLength(0), Board.GetLength(1)];
             for (int x = 0; x < boardClone.GetLength(0); x++)
@@ -164,7 +164,7 @@ namespace Chess
                 }
             }
 
-            return new ChessGame(boardClone, CurrentTurnWhite, GameOver, new(Moves), new(MoveText),
+            return new ShogiGame(boardClone, CurrentTurnWhite, GameOver, new(Moves), new(MoveText),
                 CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, WhiteMayCastleKingside,
                 WhiteMayCastleQueenside, BlackMayCastleKingside, BlackMayCastleQueenside, StaleMoveCounter,
                 new(BoardCounts), InitialState);
@@ -268,7 +268,7 @@ namespace Chess
             }
 
             // Used for generating new move text
-            ChessGame? oldGame = null;
+            ShogiGame? oldGame = null;
             if (updateMoveText)
             {
                 oldGame = Clone();
@@ -419,13 +419,13 @@ namespace Chess
 
                 if (updateMoveText)
                 {
-                    string newMove = destination.ToChessCoordinate();
+                    string newMove = destination.ToShogiCoordinate();
                     if (oldGame!.Board[source.X, source.Y] is Pieces.Pawn)
                     {
                         if (oldGame!.Board[destination.X, destination.Y] is not null
                             || destination == oldGame.EnPassantSquare)
                         {
-                            newMove = source.ToChessCoordinate()[0] + "x" + newMove;
+                            newMove = source.ToShogiCoordinate()[0] + "x" + newMove;
                         }
                         if (destination.Y == (piece.IsWhite ? 7 : 0))
                         {
@@ -460,7 +460,7 @@ namespace Chess
                         if (canReachDest.Any())
                         {
                             bool success = false;
-                            string coordinate = source.ToChessCoordinate();
+                            string coordinate = source.ToShogiCoordinate();
                             // Other pieces on same file, disambiguate with rank
                             if (canReachDest.Where(p => p.Position.X == source.X).Any())
                             {
@@ -585,7 +585,7 @@ namespace Chess
 
             _ = EnPassantSquare is null
                 ? result.Append(" -")
-                : result.Append(' ').Append(EnPassantSquare.Value.ToChessCoordinate());
+                : result.Append(' ').Append(EnPassantSquare.Value.ToShogiCoordinate());
 
             _ = omitMoveCounts ? null : result.Append(' ').Append(StaleMoveCounter).Append(' ').Append((Moves.Count / 2) + 1);
 
@@ -593,7 +593,7 @@ namespace Chess
         }
 
         /// <summary>
-        /// Convert this game to a PGN file for use in other chess programs
+        /// Convert this game to a PGN file for use in other shogi programs
         /// </summary>
         public string ToPGN(string? eventName, string? siteName, DateOnly? startDate, string whiteName, string blackName,
             bool whiteIsComputer, bool blackIsComputer)
@@ -609,7 +609,7 @@ namespace Chess
                 $"[WhiteType \"{(whiteIsComputer ? "program" : "human")}\"]\n" +
                 $"[BlackType \"{(blackIsComputer ? "program" : "human")}\"]\n\n";
 
-            // Include initial state if not a standard chess game
+            // Include initial state if not a standard shogi game
             if (InitialState != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
             {
                 // Strip last newline
@@ -632,9 +632,9 @@ namespace Chess
         }
 
         /// <summary>
-        /// Convert Forsyth–Edwards Notation to a chess game instance.
+        /// Convert Forsyth–Edwards Notation to a shogi game instance.
         /// </summary>
-        public static ChessGame FromForsythEdwards(string forsythEdwards)
+        public static ShogiGame FromForsythEdwards(string forsythEdwards)
         {
             string[] fields = forsythEdwards.Split(' ');
             if (fields.Length != 6)
@@ -742,13 +742,13 @@ namespace Chess
                 }
             }
 
-            Point? enPassant = fields[3] == "-" ? null : fields[3].FromChessCoordinate();
+            Point? enPassant = fields[3] == "-" ? null : fields[3].FromShogiCoordinate();
 
             int staleMoves = int.Parse(fields[4]);
 
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             // For the PGN standard, if black moves first then a single move "..." is added to the start of the move text list
-            return new ChessGame(board, currentTurnWhite, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnWhite)),
+            return new ShogiGame(board, currentTurnWhite, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnWhite)),
                 new(), currentTurnWhite ? new() : new() { "..." }, new(), enPassant, whiteKingside, whiteQueenside, blackKingside, blackQueenside,
                 staleMoves, new(), null);
         }

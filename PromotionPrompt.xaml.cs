@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows;
 
-namespace Chess
+namespace Shogi
 {
     /// <summary>
     /// Interaction logic for PromotionPrompt.xaml
