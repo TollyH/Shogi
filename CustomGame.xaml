@@ -22,113 +22,126 @@
                 <RowDefinition Height="12*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
-            <StackPanel Grid.Column="1" Grid.Row="0" Orientation="Horizontal">
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="a"/>
+            <DockPanel x:Name="filesTop" Grid.Column="1" Grid.Row="0">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
+                    <Label Content="9"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="b"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="c"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="d"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="e"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="f"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="g"/>
-                </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="h"/>
-                </Viewbox>
-            </StackPanel>
-            <StackPanel Grid.Column="0" Grid.Row="1" Orientation="Vertical">
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="8"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="7"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="6"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="5"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="4"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="3"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="2"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="1"/>
                 </Viewbox>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="a"/>
+            </DockPanel>
+            <DockPanel x:Name="ranksLeft" Grid.Column="0" Grid.Row="1">
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="一"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="b"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="二"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="c"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="三"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="d"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="四"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="e"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="五"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="f"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="六"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="g"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="七"/>
                 </Viewbox>
-                <Viewbox Width="{Binding ActualWidth, ElementName=rectSizeReference, Mode=OneWay}">
-                    <Label Content="h"/>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="八"/>
                 </Viewbox>
-            </StackPanel>
-            <StackPanel Grid.Column="2" Grid.Row="1" Orientation="Vertical">
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="九"/>
+                </Viewbox>
+            </DockPanel>
+            <DockPanel x:Name="filesBottom" Grid.Column="1" Grid.Row="2">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
+                    <Label Content="9"/>
+                </Viewbox>
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="8"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="7"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="6"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="5"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="4"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="3"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="2"/>
                 </Viewbox>
-                <Viewbox Height="{Binding ActualHeight, ElementName=rectSizeReference, Mode=OneWay}">
+                <Viewbox Width="{Binding ActualWidth, ElementName=columnWidthReference, Mode=OneWay}">
                     <Label Content="1"/>
                 </Viewbox>
-            </StackPanel>
+            </DockPanel>
+            <DockPanel x:Name="ranksRight" Grid.Column="2" Grid.Row="1">
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="一"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="二"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="三"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="四"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="五"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="六"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="七"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="八"/>
+                </Viewbox>
+                <Viewbox Height="{Binding ActualHeight, ElementName=rowHeightReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="九"/>
+                </Viewbox>
+            </DockPanel>
             <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
-                <Grid>
+                <Grid Background="#FFF9B853">
                     <Grid.RowDefinitions>
+                        <RowDefinition x:Name="rowHeightReference" Height="1*"/>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
                         <RowDefinition Height="1*"/>
@@ -139,6 +152,7 @@
                         <RowDefinition Height="1*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition x:Name="columnWidthReference" Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
@@ -148,38 +162,22 @@
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    <Rectangle x:Name="rectSizeReference" Fill="#FFBF8245" Grid.Column="0" Grid.Row="1"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="0" Grid.Row="3"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="0" Grid.Row="5"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="0" Grid.Row="7"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="1" Grid.Row="0"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="1" Grid.Row="2"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="1" Grid.Row="4"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="1" Grid.Row="6"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="2" Grid.Row="1"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="2" Grid.Row="3"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="2" Grid.Row="5"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="2" Grid.Row="7"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="3" Grid.Row="0"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="3" Grid.Row="2"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="3" Grid.Row="4"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="3" Grid.Row="6"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="4" Grid.Row="1"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="4" Grid.Row="3"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="4" Grid.Row="5"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="4" Grid.Row="7"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="5" Grid.Row="0"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="5" Grid.Row="2"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="5" Grid.Row="4"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="5" Grid.Row="6"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="6" Grid.Row="1"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="6" Grid.Row="3"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="6" Grid.Row="5"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="6" Grid.Row="7"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="7" Grid.Row="0"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="7" Grid.Row="2"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="7" Grid.Row="4"/>
-                    <Rectangle Fill="#FFBF8245" Grid.Column="7" Grid.Row="6"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="4" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="5" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="6" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.RowSpan="9" Grid.Column="7" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding ActualHeight, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="4" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="5" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="6" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    <Rectangle Grid.ColumnSpan="9" Grid.Row="7" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding ActualWidth, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
                 </Grid>
             </Border>
             <Canvas x:Name="shogiGameCanvas" Grid.Column="1" Grid.Row="1" Margin="1"/>

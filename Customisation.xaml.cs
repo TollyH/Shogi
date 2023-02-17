@@ -17,8 +17,7 @@ namespace Shogi
             Config = config;
             InitializeComponent();
 
-            lightSquarePicker.SelectedColor = Config.LightSquareColor;
-            darkSquarePicker.SelectedColor = Config.DarkSquareColor;
+            boardPicker.SelectedColor = Config.BoardColor;
             defaultPiecePicker.SelectedColor = Config.DefaultPieceColor;
             checkKingPicker.SelectedColor = Config.CheckedKingColor;
             selectedPiecePicker.SelectedColor = Config.SelectedPieceColor;
@@ -41,8 +40,7 @@ namespace Shogi
             {
                 return;
             }
-            Config.LightSquareColor = lightSquarePicker.SelectedColor ?? default;
-            Config.DarkSquareColor = darkSquarePicker.SelectedColor ?? default;
+            Config.BoardColor = boardPicker.SelectedColor ?? default;
             Config.DefaultPieceColor = defaultPiecePicker.SelectedColor ?? default;
             Config.CheckedKingColor = checkKingPicker.SelectedColor ?? default;
             Config.SelectedPieceColor = selectedPiecePicker.SelectedColor ?? default;

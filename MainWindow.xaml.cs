@@ -53,8 +53,7 @@ namespace Shogi
 
             InitializeComponent();
 
-            rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
-            shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
+            shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
             moveListSymbolsItem.IsChecked = config.UseSymbolsOnMoveList;
             flipBoardItem.IsChecked = config.FlipBoard;
             updateEvalAfterBotItem.IsChecked = config.UpdateEvalAfterBot;
@@ -835,8 +834,7 @@ namespace Shogi
         private void CustomiseItem_Click(object sender, RoutedEventArgs e)
         {
             _ = new Customisation(config).ShowDialog();
-            rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
-            shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
+            shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
             UpdateGameDisplay();
         }
     }

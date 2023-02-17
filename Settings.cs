@@ -11,8 +11,7 @@ namespace Shogi
         public bool FlipBoard { get; set; }
         public bool UpdateEvalAfterBot { get; set; }
 
-        public Color LightSquareColor { get; set; }
-        public Color DarkSquareColor { get; set; }
+        public Color BoardColor { get; set; }
         public Color DefaultPieceColor { get; set; }
         public Color CheckedKingColor { get; set; }
         public Color SelectedPieceColor { get; set; }
@@ -32,8 +31,7 @@ namespace Shogi
             FlipBoard = false;
             UpdateEvalAfterBot = true;
 
-            LightSquareColor = Brushes.White.Color;
-            DarkSquareColor = Color.FromRgb(191, 130, 69);
+            BoardColor = Color.FromRgb(249, 184, 83);
             DefaultPieceColor = Brushes.Black.Color;
             CheckedKingColor = Brushes.Red.Color;
             SelectedPieceColor = Brushes.Blue.Color;
@@ -50,7 +48,7 @@ namespace Shogi
 
         [JsonConstructor]
         public Settings(bool useSymbolsOnMoveList, bool flipBoard, bool updateEvalAfterBot,
-            Color lightSquareColor, Color darkSquareColor, Color defaultPieceColor,
+            Color boardColor, Color defaultPieceColor,
             Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor, Color lastMoveSourceColor, Color lastMoveDestinationColor,
             Color bestMoveSourceColor, Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor, Color availableEnPassantColor,
             Color availableCastleColor)
@@ -58,8 +56,7 @@ namespace Shogi
             UseSymbolsOnMoveList = useSymbolsOnMoveList;
             FlipBoard = flipBoard;
             UpdateEvalAfterBot = updateEvalAfterBot;
-            LightSquareColor = lightSquareColor;
-            DarkSquareColor = darkSquareColor;
+            BoardColor = boardColor;
             DefaultPieceColor = defaultPieceColor;
             CheckedKingColor = checkedKingColor;
             SelectedPieceColor = selectedPieceColor;
