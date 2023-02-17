@@ -7,14 +7,9 @@ namespace Shogi
     [Serializable]
     public class Settings
     {
-        public bool AutoQueen { get; set; }
         public bool UseSymbolsOnMoveList { get; set; }
         public bool FlipBoard { get; set; }
         public bool UpdateEvalAfterBot { get; set; }
-        public bool ExternalEngineWhite { get; set; }
-        public bool ExternalEngineBlack { get; set; }
-        public uint ExternalEngineWhiteDepth { get; set; }
-        public uint ExternalEngineBlackDepth { get; set; }
 
         public Color LightSquareColor { get; set; }
         public Color DarkSquareColor { get; set; }
@@ -33,14 +28,9 @@ namespace Shogi
 
         public Settings()
         {
-            AutoQueen = false;
             UseSymbolsOnMoveList = false;
             FlipBoard = false;
             UpdateEvalAfterBot = true;
-            ExternalEngineWhite = false;
-            ExternalEngineBlack = false;
-            ExternalEngineWhiteDepth = 24;
-            ExternalEngineBlackDepth = 24;
 
             LightSquareColor = Brushes.White.Color;
             DarkSquareColor = Color.FromRgb(191, 130, 69);
@@ -59,20 +49,15 @@ namespace Shogi
         }
 
         [JsonConstructor]
-        public Settings(bool autoQueen, bool useSymbolsOnMoveList, bool flipBoard, bool externalEngineWhite, bool externalEngineBlack, bool updateEvalAfterBot,
-            uint externalEngineWhiteDepth, uint externalEngineBlackDepth, Color lightSquareColor, Color darkSquareColor, Color defaultPieceColor,
+        public Settings(bool useSymbolsOnMoveList, bool flipBoard, bool updateEvalAfterBot,
+            Color lightSquareColor, Color darkSquareColor, Color defaultPieceColor,
             Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor, Color lastMoveSourceColor, Color lastMoveDestinationColor,
             Color bestMoveSourceColor, Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor, Color availableEnPassantColor,
             Color availableCastleColor)
         {
-            AutoQueen = autoQueen;
             UseSymbolsOnMoveList = useSymbolsOnMoveList;
             FlipBoard = flipBoard;
             UpdateEvalAfterBot = updateEvalAfterBot;
-            ExternalEngineWhite = externalEngineWhite;
-            ExternalEngineBlack = externalEngineBlack;
-            ExternalEngineWhiteDepth = externalEngineWhiteDepth;
-            ExternalEngineBlackDepth = externalEngineBlackDepth;
             LightSquareColor = lightSquareColor;
             DarkSquareColor = darkSquareColor;
             DefaultPieceColor = defaultPieceColor;

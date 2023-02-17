@@ -9,8 +9,7 @@ A shogi game with a computer player made in C# with WPF
 - Exporting to Portable Game Notation (PGN) and Forsyth–Edwards Notation (FEN)
 - Custom position editor with FEN import support
 - A computer player that can play as white, black, both, or neither
-- Support for external chess engines using the UCI protocol (such as Stockfish)
-- Quality of life features such as auto queen promotion, automatic board flipping, and line/square highlighting
+- Quality of life features such as automatic board flipping and line/square highlighting
 - Colour scheme customisation
 
 ---

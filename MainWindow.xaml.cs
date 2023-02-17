@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -38,16 +37,9 @@ namespace Shogi
         private BoardAnalysis.PossibleMove? currentBestMove = null;
         private bool manuallyEvaluating = false;
 
-        private bool updateDepthSliders = false;
-
         private readonly Dictionary<Pieces.Piece, Viewbox> pieceViews = new();
 
         private CancellationTokenSource cancelMoveComputation = new();
-
-        /// <summary>
-        /// <see langword="null"/> if an engine isn't found and built-in one should be used
-        /// </summary>
-        private string? enginePath = null;
 
         private double tileWidth;
         private double tileHeight;
@@ -59,31 +51,13 @@ namespace Shogi
                 ? JsonConvert.DeserializeObject<Settings>(File.ReadAllText(jsonPath)) ?? new Settings()
                 : new Settings();
 
-            if (config.ExternalEngineWhite || config.ExternalEngineBlack)
-            {
-                foreach (string filename in Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.exe"))
-                {
-                    if (System.IO.Path.GetFileNameWithoutExtension(filename) != Process.GetCurrentProcess().ProcessName)
-                    {
-                        enginePath = filename;
-                        break;
-                    }
-                }
-            }
-
             InitializeComponent();
 
             rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
             shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
-            autoQueenItem.IsChecked = config.AutoQueen;
             moveListSymbolsItem.IsChecked = config.UseSymbolsOnMoveList;
             flipBoardItem.IsChecked = config.FlipBoard;
             updateEvalAfterBotItem.IsChecked = config.UpdateEvalAfterBot;
-            externalEngineWhiteItem.IsChecked = config.ExternalEngineWhite;
-            externalEngineBlackItem.IsChecked = config.ExternalEngineBlack;
-            whiteDepthItem.Value = config.ExternalEngineWhiteDepth;
-            blackDepthItem.Value = config.ExternalEngineBlackDepth;
-            updateDepthSliders = true;
         }
 
         public void UpdateGameDisplay()
@@ -517,16 +491,6 @@ namespace Shogi
         private async Task<BoardAnalysis.PossibleMove> GetEngineMove(CancellationToken cancellationToken)
         {
             BoardAnalysis.PossibleMove? bestMove = null;
-            if (enginePath is not null && ((config.ExternalEngineWhite && game.CurrentTurnWhite)
-                || (config.ExternalEngineBlack && !game.CurrentTurnWhite)))
-            {
-                bestMove = await CommunicateUCI.GetBestMove(game, enginePath,
-                    game.CurrentTurnWhite ? config.ExternalEngineWhiteDepth : config.ExternalEngineBlackDepth, cancellationToken);
-            }
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return default;
-            }
             bestMove ??= await BoardAnalysis.EstimateBestPossibleMove(game, 4, cancellationToken);
             return bestMove.Value;
         }
@@ -635,8 +599,7 @@ namespace Shogi
                 if (grabbedPiece is not null && highlightGrabbedMoves)
                 {
                     System.Drawing.Point destination = GetCoordFromCanvasPoint(mousePos);
-                    bool success = game.MovePiece(grabbedPiece.Position, destination,
-                        promotionType: config.AutoQueen ? typeof(Pieces.Queen) : null);
+                    bool success = game.MovePiece(grabbedPiece.Position, destination, promotionType: null);
                     if (success)
                     {
                         highlightGrabbedMoves = false;
@@ -704,8 +667,7 @@ namespace Shogi
                         UpdateGameDisplay();
                         return;
                     }
-                    bool success = game.MovePiece(grabbedPiece.Position, destination,
-                        promotionType: config.AutoQueen ? typeof(Pieces.Queen) : null);
+                    bool success = game.MovePiece(grabbedPiece.Position, destination, promotionType: null);
                     if (success)
                     {
                         grabbedPiece = null;
@@ -858,28 +820,10 @@ namespace Shogi
 
         private void SettingsCheckItem_Click(object sender, RoutedEventArgs e)
         {
-            config.AutoQueen = autoQueenItem.IsChecked;
             config.UseSymbolsOnMoveList = moveListSymbolsItem.IsChecked;
             config.FlipBoard = flipBoardItem.IsChecked;
             config.UpdateEvalAfterBot = updateEvalAfterBotItem.IsChecked;
-            config.ExternalEngineWhite = externalEngineWhiteItem.IsChecked;
-            config.ExternalEngineBlack = externalEngineBlackItem.IsChecked;
 
-            if (config.ExternalEngineWhite || config.ExternalEngineBlack)
-            {
-                foreach (string filename in Directory.EnumerateFiles(AppDomain.CurrentDomain.BaseDirectory, "*.exe"))
-                {
-                    if (System.IO.Path.GetFileNameWithoutExtension(filename) != Process.GetCurrentProcess().ProcessName)
-                    {
-                        enginePath = filename;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                enginePath = null;
-            }
             UpdateGameDisplay();
         }
 
@@ -894,24 +838,6 @@ namespace Shogi
             rectSizeReference.Fill = new SolidColorBrush(config.DarkSquareColor);
             shogiBoardBackground.Background = new SolidColorBrush(config.LightSquareColor);
             UpdateGameDisplay();
-        }
-
-        private void whiteDepthBackingSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (!updateDepthSliders)
-            {
-                return;
-            }
-            config.ExternalEngineWhiteDepth = (uint)whiteDepthItem.Value;
-        }
-
-        private void blackDepthBackingSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            if (!updateDepthSliders)
-            {
-                return;
-            }
-            config.ExternalEngineBlackDepth = (uint)blackDepthItem.Value;
         }
     }
 }
