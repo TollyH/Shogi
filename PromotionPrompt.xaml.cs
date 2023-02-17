@@ -13,16 +13,16 @@ namespace Shogi
         /// </remarks>
         public Type ChosenPieceType { get; private set; }
 
-        public PromotionPrompt(bool isWhite)
+        public PromotionPrompt(bool isSente)
         {
             ChosenPieceType = typeof(Pieces.Queen);
 
             InitializeComponent();
 
-            queenButtonLabel.Content = isWhite ? "♕" : "♛";
-            rookButtonLabel.Content = isWhite ? "♖" : "♜";
-            bishopButtonLabel.Content = isWhite ? "♗" : "♝";
-            knightButtonLabel.Content = isWhite ? "♘" : "♞";
+            queenButtonLabel.Content = isSente ? "♕" : "♛";
+            rookButtonLabel.Content = isSente ? "♖" : "♜";
+            bishopButtonLabel.Content = isSente ? "♗" : "♝";
+            knightButtonLabel.Content = isSente ? "♘" : "♞";
         }
 
         private void queenButton_Click(object sender, RoutedEventArgs e)

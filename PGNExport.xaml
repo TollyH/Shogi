@@ -26,10 +26,10 @@
         <TextBox x:Name="locationNameBox" Grid.Column="1" Grid.Row="1" Margin="10" Width="180" Text="Computer"/>
         <Label Grid.Column="0" Grid.Row="2" Margin="10" Content="Date"/>
         <DatePicker x:Name="dateBox" Grid.Column="1" Grid.Row="2" Margin="10" Width="180" SelectedDate="{x:Static sys:DateTime.Now}"/>
-        <Label Grid.Column="0" Grid.Row="3" Margin="10" Content="White player name"/>
-        <TextBox x:Name="whiteNameBox" Grid.Column="1" Grid.Row="3" Margin="10" Width="180" Text="Player 1"/>
-        <Label Grid.Column="0" Grid.Row="4" Margin="10" Content="Black player name"/>
-        <TextBox x:Name="blackNameBox" Grid.Column="1" Grid.Row="4" Margin="10" Width="180" Text="Player 2"/>
+        <Label Grid.Column="0" Grid.Row="3" Margin="10" Content="Sente player name"/>
+        <TextBox x:Name="senteNameBox" Grid.Column="1" Grid.Row="3" Margin="10" Width="180" Text="Player 1"/>
+        <Label Grid.Column="0" Grid.Row="4" Margin="10" Content="Gote player name"/>
+        <TextBox x:Name="goteNameBox" Grid.Column="1" Grid.Row="4" Margin="10" Width="180" Text="Player 2"/>
         <Button Grid.Column="1" Grid.Row="5" HorizontalAlignment="Right" Padding="20,1,20,1" Margin="5,5,10,5" Content="Export" Click="Button_Click"/>
     </Grid>
 </Window>

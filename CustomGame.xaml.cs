@@ -16,11 +16,11 @@ namespace Shogi
         public System.Drawing.Point? EnPassantSquare { get; private set; }
 
         public ShogiGame? GeneratedGame { get; private set; }
-        public bool WhiteIsComputer { get; private set; }
-        public bool BlackIsComputer { get; private set; }
+        public bool SenteIsComputer { get; private set; }
+        public bool GoteIsComputer { get; private set; }
 
-        private Pieces.King? whiteKing = null;
-        private Pieces.King? blackKing = null;
+        private Pieces.King? senteKing = null;
+        private Pieces.King? goteKing = null;
 
         private double tileWidth;
         private double tileHeight;
@@ -78,54 +78,54 @@ namespace Shogi
                 }
             }
 
-            startButton.IsEnabled = whiteKing is not null && blackKing is not null;
+            startButton.IsEnabled = senteKing is not null && goteKing is not null;
 
-            if (whiteKing is null || whiteKing.Position != new System.Drawing.Point(4, 0))
+            if (senteKing is null || senteKing.Position != new System.Drawing.Point(4, 0))
             {
-                castleWhiteKingside.IsChecked = false;
-                castleWhiteKingside.IsEnabled = false;
-                castleWhiteQueenside.IsChecked = false;
-                castleWhiteQueenside.IsEnabled = false;
+                castleSenteKingside.IsChecked = false;
+                castleSenteKingside.IsEnabled = false;
+                castleSenteQueenside.IsChecked = false;
+                castleSenteQueenside.IsEnabled = false;
             }
             else
             {
-                castleWhiteKingside.IsEnabled = true;
-                castleWhiteQueenside.IsEnabled = true;
+                castleSenteKingside.IsEnabled = true;
+                castleSenteQueenside.IsEnabled = true;
             }
 
-            if (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsWhite)
+            if (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsSente)
             {
-                castleWhiteQueenside.IsChecked = false;
-                castleWhiteQueenside.IsEnabled = false;
+                castleSenteQueenside.IsChecked = false;
+                castleSenteQueenside.IsEnabled = false;
             }
-            if (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsWhite)
+            if (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsSente)
             {
-                castleWhiteKingside.IsChecked = false;
-                castleWhiteKingside.IsEnabled = false;
+                castleSenteKingside.IsChecked = false;
+                castleSenteKingside.IsEnabled = false;
             }
 
-            if (blackKing is null || blackKing.Position != new System.Drawing.Point(4, 7))
+            if (goteKing is null || goteKing.Position != new System.Drawing.Point(4, 7))
             {
-                castleWhiteKingside.IsChecked = false;
-                castleBlackKingside.IsEnabled = false;
-                castleBlackQueenside.IsChecked = false;
-                castleBlackQueenside.IsEnabled = false;
+                castleGoteKingside.IsChecked = false;
+                castleGoteKingside.IsEnabled = false;
+                castleGoteQueenside.IsChecked = false;
+                castleGoteQueenside.IsEnabled = false;
             }
             else
             {
-                castleBlackKingside.IsEnabled = true;
-                castleBlackQueenside.IsEnabled = true;
+                castleGoteKingside.IsEnabled = true;
+                castleGoteQueenside.IsEnabled = true;
             }
 
-            if (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsWhite)
+            if (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsSente)
             {
-                castleBlackQueenside.IsChecked = false;
-                castleBlackQueenside.IsEnabled = false;
+                castleGoteQueenside.IsChecked = false;
+                castleGoteQueenside.IsEnabled = false;
             }
-            if (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsWhite)
+            if (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsSente)
             {
-                castleBlackKingside.IsChecked = false;
-                castleBlackKingside.IsEnabled = false;
+                castleGoteKingside.IsChecked = false;
+                castleGoteKingside.IsEnabled = false;
             }
         }
 
@@ -137,15 +137,15 @@ namespace Shogi
 
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
-            WhiteIsComputer = computerSelectWhite.IsChecked ?? false;
-            BlackIsComputer = computerSelectBlack.IsChecked ?? false;
-            bool currentTurnWhite = turnSelectWhite.IsChecked ?? false;
-            // For the PGN standard, if black moves first then a single move "..." is added to the start of the move text list
-            GeneratedGame = new ShogiGame(Board, currentTurnWhite,
-                ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnWhite)),
-                new(), currentTurnWhite ? new() : new() { "..." }, new(), EnPassantSquare, castleWhiteKingside.IsChecked ?? false,
-                castleWhiteQueenside.IsChecked ?? false, castleBlackKingside.IsChecked ?? false,
-                castleBlackQueenside.IsChecked ?? false, 0, new(), null);
+            SenteIsComputer = computerSelectSente.IsChecked ?? false;
+            GoteIsComputer = computerSelectGote.IsChecked ?? false;
+            bool currentTurnSente = turnSelectSente.IsChecked ?? false;
+            // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
+            GeneratedGame = new ShogiGame(Board, currentTurnSente,
+                ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
+                new(), currentTurnSente ? new() : new() { "..." }, new(), EnPassantSquare, castleSenteKingside.IsChecked ?? false,
+                castleSenteQueenside.IsChecked ?? false, castleGoteKingside.IsChecked ?? false,
+                castleGoteQueenside.IsChecked ?? false, 0, new(), null);
             Close();
         }
 
@@ -179,53 +179,53 @@ namespace Shogi
             {
                 if (Board[coord.X, coord.Y] is null)
                 {
-                    bool white = e.ChangedButton == MouseButton.Left;
+                    bool sente = e.ChangedButton == MouseButton.Left;
                     if (pieceSelectKing.IsChecked ?? false)
                     {
                         // Only allow one king of each colour
-                        if (white && whiteKing is null)
+                        if (sente && senteKing is null)
                         {
-                            whiteKing = new Pieces.King(coord, true);
-                            Board[coord.X, coord.Y] = whiteKing;
+                            senteKing = new Pieces.King(coord, true);
+                            Board[coord.X, coord.Y] = senteKing;
                         }
-                        else if (!white && blackKing is null)
+                        else if (!sente && goteKing is null)
                         {
-                            blackKing = new Pieces.King(coord, false);
-                            Board[coord.X, coord.Y] = blackKing;
+                            goteKing = new Pieces.King(coord, false);
+                            Board[coord.X, coord.Y] = goteKing;
                         }
                     }
                     else if (pieceSelectQueen.IsChecked ?? false)
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Queen(coord, white);
+                        Board[coord.X, coord.Y] = new Pieces.Queen(coord, sente);
                     }
                     else if (pieceSelectRook.IsChecked ?? false)
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Rook(coord, white);
+                        Board[coord.X, coord.Y] = new Pieces.Rook(coord, sente);
                     }
                     else if (pieceSelectBishop.IsChecked ?? false)
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Bishop(coord, white);
+                        Board[coord.X, coord.Y] = new Pieces.Bishop(coord, sente);
                     }
                     else if (pieceSelectKnight.IsChecked ?? false)
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Knight(coord, white);
+                        Board[coord.X, coord.Y] = new Pieces.Knight(coord, sente);
                     }
                     else if (pieceSelectPawn.IsChecked ?? false)
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Pawn(coord, white);
+                        Board[coord.X, coord.Y] = new Pieces.Pawn(coord, sente);
                     }
                 }
                 else
                 {
                     if (Board[coord.X, coord.Y] is Pieces.King king)
                     {
-                        if (king.IsWhite)
+                        if (king.IsSente)
                         {
-                            whiteKing = null;
+                            senteKing = null;
                         }
                         else
                         {
-                            blackKing = null;
+                            goteKing = null;
                         }
                     }
                     Board[coord.X, coord.Y] = null;
@@ -242,8 +242,8 @@ namespace Shogi
 
         private void submitFenButton_Click(object sender, RoutedEventArgs e)
         {
-            WhiteIsComputer = computerSelectWhite.IsChecked ?? false;
-            BlackIsComputer = computerSelectBlack.IsChecked ?? false;
+            SenteIsComputer = computerSelectSente.IsChecked ?? false;
+            GoteIsComputer = computerSelectGote.IsChecked ?? false;
             try
             {
                 GeneratedGame = ShogiGame.FromForsythEdwards(fenInput.Text);

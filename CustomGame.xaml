@@ -187,7 +187,7 @@
         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1,0,0,0">
             <StackPanel>
                 <Label Content="Piece Selection (Click on Board)" Margin="5,5,5,1" Padding="0,0,0,0" FontSize="14"/>
-                <Label Content="Left Click = White, Right Click = Black" Margin="5,1,5,5" Padding="0,0,0,0" FontSize="11"/>
+                <Label Content="Left Click = Sente, Right Click = Gote" Margin="5,1,5,5" Padding="0,0,0,0" FontSize="11"/>
                 <RadioButton x:Name="pieceSelectKing" Margin="5,2,5,2" Content="King" GroupName="Piece" IsChecked="True"/>
                 <RadioButton x:Name="pieceSelectQueen" Margin="5,2,5,2" Content="Queen" GroupName="Piece"/>
                 <RadioButton x:Name="pieceSelectRook" Margin="5,2,5,2" Content="Rook" GroupName="Piece"/>
@@ -197,19 +197,19 @@
                 <Separator/>
                 <Label Content="Current Turn" Margin="5" Padding="0,0,0,0" FontSize="14"/>
                 <Grid>
-                    <RadioButton x:Name="turnSelectWhite" Margin="5,2,5,2" Content="White" GroupName="CurrentTurn" IsChecked="True"/>
-                    <CheckBox x:Name="computerSelectWhite" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
+                    <RadioButton x:Name="turnSelectSente" Margin="5,2,5,2" Content="Sente" GroupName="CurrentTurn" IsChecked="True"/>
+                    <CheckBox x:Name="computerSelectSente" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
                 </Grid>
                 <Grid>
-                    <RadioButton x:Name="turnSelectBlack" Margin="5,2,5,5" Content="Black" GroupName="CurrentTurn"/>
-                    <CheckBox x:Name="computerSelectBlack" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
+                    <RadioButton x:Name="turnSelectGote" Margin="5,2,5,5" Content="Gote" GroupName="CurrentTurn"/>
+                    <CheckBox x:Name="computerSelectGote" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
                 </Grid>
                 <Separator/>
                 <Label Content="Castling Status" Margin="5" Padding="0,0,0,0" FontSize="14"/>
-                <CheckBox x:Name="castleWhiteKingside" Margin="5,2,5,2" Content="White May Castle Kingside" IsEnabled="False"/>
-                <CheckBox x:Name="castleWhiteQueenside" Margin="5,2,5,2" Content="White May Castle Queenside" IsEnabled="False"/>
-                <CheckBox x:Name="castleBlackKingside" Margin="5,2,5,2" Content="Black May Castle Kingside" IsEnabled="False"/>
-                <CheckBox x:Name="castleBlackQueenside" Margin="5,2,5,5" Content="Black May Castle Queenside" IsEnabled="False"/>
+                <CheckBox x:Name="castleSenteKingside" Margin="5,2,5,2" Content="Sente May Castle Kingside" IsEnabled="False"/>
+                <CheckBox x:Name="castleSenteQueenside" Margin="5,2,5,2" Content="Sente May Castle Queenside" IsEnabled="False"/>
+                <CheckBox x:Name="castleGoteKingside" Margin="5,2,5,2" Content="Gote May Castle Kingside" IsEnabled="False"/>
+                <CheckBox x:Name="castleGoteQueenside" Margin="5,2,5,5" Content="Gote May Castle Queenside" IsEnabled="False"/>
                 <Separator/>
                 <Label Content="En Passant Square" Margin="5" Padding="0,0,0,0" FontSize="14"/>
                 <CheckBox x:Name="enPassantSelect" Margin="5,2,5,5" Content="Select Square With Left Click"/>

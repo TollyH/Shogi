@@ -8,8 +8,8 @@ using System.Text;
 namespace Shogi
 {
     /// <remarks>
-    /// CheckWhite and CheckMateWhite mean that the check is against white,
-    /// or that white has lost respectively, and vice versa.
+    /// CheckSente and CheckMateSente mean that the check is against sente,
+    /// or that sente has lost respectively, and vice versa.
     /// </remarks>
     public enum GameState
     {
@@ -18,10 +18,10 @@ namespace Shogi
         DrawFiftyMove,
         DrawThreeFold,
         DrawInsufficientMaterial,
-        CheckWhite,
-        CheckBlack,
-        CheckMateWhite,
-        CheckMateBlack
+        CheckSente,
+        CheckGote,
+        CheckMateSente,
+        CheckMateGote
     }
 
     public class ShogiGame
@@ -32,17 +32,17 @@ namespace Shogi
             GameState.DrawStalemate,
             GameState.DrawThreeFold,
             GameState.DrawInsufficientMaterial,
-            GameState.CheckMateWhite,
-            GameState.CheckMateBlack
+            GameState.CheckMateSente,
+            GameState.CheckMateGote
         }.ToImmutableHashSet();
 
         public Pieces.Piece?[,] Board { get; }
         public string InitialState { get; }
 
-        public Pieces.King WhiteKing { get; }
-        public Pieces.King BlackKing { get; }
+        public Pieces.King SenteKing { get; }
+        public Pieces.King GoteKing { get; }
 
-        public bool CurrentTurnWhite { get; private set; }
+        public bool CurrentTurnSente { get; private set; }
         public bool GameOver { get; private set; }
         public bool AwaitingPromotionResponse { get; private set; }
 
@@ -54,10 +54,10 @@ namespace Shogi
         public List<Pieces.Piece> CapturedPieces { get; }
 
         public Point? EnPassantSquare { get; private set; }
-        public bool WhiteMayCastleKingside { get; private set; }
-        public bool WhiteMayCastleQueenside { get; private set; }
-        public bool BlackMayCastleKingside { get; private set; }
-        public bool BlackMayCastleQueenside { get; private set; }
+        public bool SenteMayCastleKingside { get; private set; }
+        public bool SenteMayCastleQueenside { get; private set; }
+        public bool GoteMayCastleKingside { get; private set; }
+        public bool GoteMayCastleQueenside { get; private set; }
 
         // Used for the 50-move rule
         public int StaleMoveCounter { get; private set; }
@@ -69,22 +69,22 @@ namespace Shogi
         /// </summary>
         public ShogiGame()
         {
-            CurrentTurnWhite = true;
+            CurrentTurnSente = true;
             GameOver = false;
             AwaitingPromotionResponse = false;
 
-            WhiteKing = new Pieces.King(new Point(4, 0), true);
-            BlackKing = new Pieces.King(new Point(4, 7), false);
+            SenteKing = new Pieces.King(new Point(4, 0), true);
+            GoteKing = new Pieces.King(new Point(4, 7), false);
 
             Moves = new List<(Point, Point)>();
             MoveText = new List<string>();
             CapturedPieces = new List<Pieces.Piece>();
 
             EnPassantSquare = null;
-            WhiteMayCastleKingside = true;
-            WhiteMayCastleQueenside = true;
-            BlackMayCastleKingside = true;
-            BlackMayCastleQueenside = true;
+            SenteMayCastleKingside = true;
+            SenteMayCastleQueenside = true;
+            GoteMayCastleKingside = true;
+            GoteMayCastleQueenside = true;
 
             StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
@@ -95,7 +95,7 @@ namespace Shogi
                 { new Pieces.Knight(new Point(1, 0), true), new Pieces.Pawn(new Point(1, 1), true), null, null, null, null, new Pieces.Pawn(new Point(1, 6), false), new Pieces.Knight(new Point(1, 7), false) },
                 { new Pieces.Bishop(new Point(2, 0), true), new Pieces.Pawn(new Point(2, 1), true), null, null, null, null, new Pieces.Pawn(new Point(2, 6), false), new Pieces.Bishop(new Point(2, 7), false) },
                 { new Pieces.Queen(new Point(3, 0), true), new Pieces.Pawn(new Point(3, 1), true), null, null, null, null, new Pieces.Pawn(new Point(3, 6), false), new Pieces.Queen(new Point(3, 7), false) },
-                { WhiteKing, new Pieces.Pawn(new Point(4, 1), true), null, null, null, null, new Pieces.Pawn(new Point(4, 6), false), BlackKing },
+                { SenteKing, new Pieces.Pawn(new Point(4, 1), true), null, null, null, null, new Pieces.Pawn(new Point(4, 6), false), GoteKing },
                 { new Pieces.Bishop(new Point(5, 0), true), new Pieces.Pawn(new Point(5, 1), true), null, null, null, null, new Pieces.Pawn(new Point(5, 6), false), new Pieces.Bishop(new Point(5, 7), false) },
                 { new Pieces.Knight(new Point(6, 0), true), new Pieces.Pawn(new Point(6, 1), true), null, null, null, null, new Pieces.Pawn(new Point(6, 6), false), new Pieces.Knight(new Point(6, 7), false) },
                 { new Pieces.Rook(new Point(7, 0), true), new Pieces.Pawn(new Point(7, 1), true), null, null, null, null, new Pieces.Pawn(new Point(7, 6), false), new Pieces.Rook(new Point(7, 7), false) }
@@ -107,9 +107,9 @@ namespace Shogi
         /// <summary>
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
-        public ShogiGame(Pieces.Piece?[,] board, bool currentTurnWhite, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
-            List<Pieces.Piece> capturedPieces, Point? enPassantSquare, bool whiteMayCastleKingside, bool whiteMayCastleQueenside,
-            bool blackMayCastleKingside, bool blackMayCastleQueenside, int staleMoveCounter, Dictionary<string, int> boardCounts,
+        public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
+            List<Pieces.Piece> capturedPieces, Point? enPassantSquare, bool senteMayCastleKingside, bool senteMayCastleQueenside,
+            bool goteMayCastleKingside, bool goteMayCastleQueenside, int staleMoveCounter, Dictionary<string, int> boardCounts,
             string? initialState)
         {
             if (board.GetLength(0) != 8 || board.GetLength(1) != 8)
@@ -118,32 +118,32 @@ namespace Shogi
             }
 
             Board = board;
-            WhiteKing = Board.OfType<Pieces.King>().Where(k => k.IsWhite).First();
-            BlackKing = Board.OfType<Pieces.King>().Where(k => !k.IsWhite).First();
+            SenteKing = Board.OfType<Pieces.King>().Where(k => k.IsSente).First();
+            GoteKing = Board.OfType<Pieces.King>().Where(k => !k.IsSente).First();
 
-            if ((whiteMayCastleKingside && (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsWhite
-                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsWhite))
-                || (whiteMayCastleQueenside && (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsWhite
-                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsWhite))
-                || (blackMayCastleKingside && (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsWhite
-                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsWhite))
-                || (blackMayCastleQueenside && (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsWhite
-                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsWhite)))
+            if ((senteMayCastleKingside && (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsSente
+                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsSente))
+                || (senteMayCastleQueenside && (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsSente
+                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsSente))
+                || (goteMayCastleKingside && (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsSente
+                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsSente))
+                || (goteMayCastleQueenside && (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsSente
+                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsSente)))
             {
                 throw new ArgumentException(
                     "At least one castling allowed flag was set to true without a valid position for performing it");
             }
 
-            CurrentTurnWhite = currentTurnWhite;
+            CurrentTurnSente = currentTurnSente;
             GameOver = gameOver;
             Moves = moves;
             MoveText = moveText;
             CapturedPieces = capturedPieces;
             EnPassantSquare = enPassantSquare;
-            WhiteMayCastleKingside = whiteMayCastleKingside;
-            WhiteMayCastleQueenside = whiteMayCastleQueenside;
-            BlackMayCastleKingside = blackMayCastleKingside;
-            BlackMayCastleQueenside = blackMayCastleQueenside;
+            SenteMayCastleKingside = senteMayCastleKingside;
+            SenteMayCastleQueenside = senteMayCastleQueenside;
+            GoteMayCastleKingside = goteMayCastleKingside;
+            GoteMayCastleQueenside = goteMayCastleQueenside;
             StaleMoveCounter = staleMoveCounter;
             BoardCounts = boardCounts;
 
@@ -164,9 +164,9 @@ namespace Shogi
                 }
             }
 
-            return new ShogiGame(boardClone, CurrentTurnWhite, GameOver, new(Moves), new(MoveText),
-                CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, WhiteMayCastleKingside,
-                WhiteMayCastleQueenside, BlackMayCastleKingside, BlackMayCastleQueenside, StaleMoveCounter,
+            return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
+                CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, SenteMayCastleKingside,
+                SenteMayCastleQueenside, GoteMayCastleKingside, GoteMayCastleQueenside, StaleMoveCounter,
                 new(BoardCounts), InitialState);
         }
 
@@ -179,8 +179,8 @@ namespace Shogi
         /// </remarks>
         public GameState DetermineGameState()
         {
-            GameState staticState = BoardAnalysis.DetermineGameState(Board, CurrentTurnWhite,
-                WhiteKing.Position, BlackKing.Position);
+            GameState staticState = BoardAnalysis.DetermineGameState(Board, CurrentTurnSente,
+                SenteKing.Position, GoteKing.Position);
             if (EndingStates.Contains(staticState))
             {
                 return staticState;
@@ -214,28 +214,28 @@ namespace Shogi
 
             if (kingside)
             {
-                if (CurrentTurnWhite && !WhiteMayCastleKingside)
+                if (CurrentTurnSente && !SenteMayCastleKingside)
                 {
                     return false;
                 }
-                if (!CurrentTurnWhite && !BlackMayCastleKingside)
+                if (!CurrentTurnSente && !GoteMayCastleKingside)
                 {
                     return false;
                 }
             }
             else
             {
-                if (CurrentTurnWhite && !WhiteMayCastleQueenside)
+                if (CurrentTurnSente && !SenteMayCastleQueenside)
                 {
                     return false;
                 }
-                if (!CurrentTurnWhite && !BlackMayCastleQueenside)
+                if (!CurrentTurnSente && !GoteMayCastleQueenside)
                 {
                     return false;
                 }
             }
 
-            return BoardAnalysis.IsCastlePossible(Board, CurrentTurnWhite, kingside);
+            return BoardAnalysis.IsCastlePossible(Board, CurrentTurnSente, kingside);
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Shogi
             {
                 return false;
             }
-            if (!forceMove && piece.IsWhite != CurrentTurnWhite)
+            if (!forceMove && piece.IsSente != CurrentTurnSente)
             {
                 return false;
             }
@@ -275,7 +275,7 @@ namespace Shogi
             }
 
             bool pieceMoved;
-            int homeY = CurrentTurnWhite ? 0 : 7;
+            int homeY = CurrentTurnSente ? 0 : 7;
             if (piece is Pieces.King && source.X == 4 && destination.Y == homeY
                 && ((destination.X == 6 && (forceMove || IsCastlePossible(true)))
                     || (destination.X == 2 && (forceMove || IsCastlePossible(false)))))
@@ -291,8 +291,8 @@ namespace Shogi
                 Board[rookXPos, homeY] = null;
             }
             else if (piece is Pieces.Pawn && destination == EnPassantSquare && (forceMove ||
-                (Math.Abs(source.X - destination.X) == 1 && source.Y == (CurrentTurnWhite ? 4 : 3)
-                && !BoardAnalysis.IsKingReachable(Board.AfterMove(source, destination), CurrentTurnWhite))))
+                (Math.Abs(source.X - destination.X) == 1 && source.Y == (CurrentTurnSente ? 4 : 3)
+                && !BoardAnalysis.IsKingReachable(Board.AfterMove(source, destination), CurrentTurnSente))))
             {
                 pieceMoved = true;
                 _ = piece.Move(Board, destination, true);
@@ -318,19 +318,19 @@ namespace Shogi
                     {
                         if (destination == new Point(0, 0))
                         {
-                            WhiteMayCastleQueenside = false;
+                            SenteMayCastleQueenside = false;
                         }
                         else if (destination == new Point(7, 0))
                         {
-                            WhiteMayCastleKingside = false;
+                            SenteMayCastleKingside = false;
                         }
                         else if (destination == new Point(0, 7))
                         {
-                            BlackMayCastleQueenside = false;
+                            GoteMayCastleQueenside = false;
                         }
                         else if (destination == new Point(7, 7))
                         {
-                            BlackMayCastleKingside = false;
+                            GoteMayCastleKingside = false;
                         }
                     }
                     CapturedPieces.Add(Board[destination.X, destination.Y]!);
@@ -343,20 +343,20 @@ namespace Shogi
                     StaleMoveCounter = 0;
                     if (Math.Abs(destination.Y - source.Y) > 1)
                     {
-                        EnPassantSquare = new Point(source.X, source.Y + (piece.IsWhite ? 1 : -1));
+                        EnPassantSquare = new Point(source.X, source.Y + (piece.IsSente ? 1 : -1));
                     }
-                    if (destination.Y == (piece.IsWhite ? 7 : 0))
+                    if (destination.Y == (piece.IsSente ? 7 : 0))
                     {
                         if (promotionType is not null)
                         {
-                            piece = (Pieces.Piece)Activator.CreateInstance(promotionType, piece.Position, piece.IsWhite)!;
+                            piece = (Pieces.Piece)Activator.CreateInstance(promotionType, piece.Position, piece.IsSente)!;
                         }
                         else
                         {
                             AwaitingPromotionResponse = true;
-                            PromotionPrompt prompt = new(CurrentTurnWhite);
+                            PromotionPrompt prompt = new(CurrentTurnSente);
                             _ = prompt.ShowDialog();
-                            piece = (Pieces.Piece)Activator.CreateInstance(prompt.ChosenPieceType, piece.Position, piece.IsWhite)!;
+                            piece = (Pieces.Piece)Activator.CreateInstance(prompt.ChosenPieceType, piece.Position, piece.IsSente)!;
                             AwaitingPromotionResponse = false;
                         }
                         Board[source.X, source.Y] = piece;
@@ -364,39 +364,39 @@ namespace Shogi
                 }
                 else if (piece is Pieces.King)
                 {
-                    if (piece.IsWhite)
+                    if (piece.IsSente)
                     {
-                        WhiteMayCastleKingside = false;
-                        WhiteMayCastleQueenside = false;
+                        SenteMayCastleKingside = false;
+                        SenteMayCastleQueenside = false;
                     }
                     else
                     {
-                        BlackMayCastleKingside = false;
-                        BlackMayCastleQueenside = false;
+                        GoteMayCastleKingside = false;
+                        GoteMayCastleQueenside = false;
                     }
                 }
                 else if (piece is Pieces.Rook)
                 {
-                    if (piece.IsWhite)
+                    if (piece.IsSente)
                     {
                         if (source.X == 0)
                         {
-                            WhiteMayCastleQueenside = false;
+                            SenteMayCastleQueenside = false;
                         }
                         else if (source.X == 7)
                         {
-                            WhiteMayCastleKingside = false;
+                            SenteMayCastleKingside = false;
                         }
                     }
                     else
                     {
                         if (source.X == 0)
                         {
-                            BlackMayCastleQueenside = false;
+                            GoteMayCastleQueenside = false;
                         }
                         else if (source.X == 7)
                         {
-                            BlackMayCastleKingside = false;
+                            GoteMayCastleKingside = false;
                         }
                     }
                 }
@@ -404,7 +404,7 @@ namespace Shogi
                 Board[destination.X, destination.Y] = piece;
                 Board[source.X, source.Y] = null;
 
-                CurrentTurnWhite = !CurrentTurnWhite;
+                CurrentTurnSente = !CurrentTurnSente;
 
                 string newBoardString = ToString(true);
                 if (BoardCounts.ContainsKey(newBoardString))
@@ -427,7 +427,7 @@ namespace Shogi
                         {
                             newMove = source.ToShogiCoordinate()[0] + "x" + newMove;
                         }
-                        if (destination.Y == (piece.IsWhite ? 7 : 0))
+                        if (destination.Y == (piece.IsSente ? 7 : 0))
                         {
                             newMove += "=" + piece.SymbolLetter;
                         }
@@ -455,7 +455,7 @@ namespace Shogi
 
                         // Disambiguate moving piece if two pieces of the same type can reach destination
                         IEnumerable<Pieces.Piece> canReachDest = oldGame.Board.OfType<Pieces.Piece>().Where(
-                            p => piece.GetType() == p.GetType() && p.Position != source && p.IsWhite == piece.IsWhite
+                            p => piece.GetType() == p.GetType() && p.Position != source && p.IsSente == piece.IsSente
                                 && p.GetValidMoves(oldGame.Board, true).Contains(destination));
                         if (canReachDest.Any())
                         {
@@ -487,11 +487,11 @@ namespace Shogi
                     }
 
                     GameState state = DetermineGameState();
-                    if (state is GameState.CheckWhite or GameState.CheckBlack)
+                    if (state is GameState.CheckSente or GameState.CheckGote)
                     {
                         newMove += '+';
                     }
-                    else if (state is GameState.CheckMateWhite or GameState.CheckMateBlack)
+                    else if (state is GameState.CheckMateSente or GameState.CheckMateGote)
                     {
                         newMove += '#';
                     }
@@ -542,7 +542,7 @@ namespace Shogi
                             _ = result.Append(consecutiveNull);
                             consecutiveNull = 0;
                         }
-                        _ = result.Append(piece.IsWhite ? char.ToUpper(piece.SymbolLetter) : char.ToLower(piece.SymbolLetter));
+                        _ = result.Append(piece.IsSente ? char.ToUpper(piece.SymbolLetter) : char.ToLower(piece.SymbolLetter));
                     }
                 }
                 if (consecutiveNull > 0)
@@ -555,25 +555,25 @@ namespace Shogi
                 }
             }
 
-            _ = result.Append(CurrentTurnWhite ? " w " : " b ");
+            _ = result.Append(CurrentTurnSente ? " w " : " b ");
 
             bool atLeastOneCastle = false;
-            if (WhiteMayCastleKingside)
+            if (SenteMayCastleKingside)
             {
                 atLeastOneCastle = true;
                 _ = result.Append('K');
             }
-            if (WhiteMayCastleQueenside)
+            if (SenteMayCastleQueenside)
             {
                 atLeastOneCastle = true;
                 _ = result.Append('Q');
             }
-            if (BlackMayCastleKingside)
+            if (GoteMayCastleKingside)
             {
                 atLeastOneCastle = true;
                 _ = result.Append('k');
             }
-            if (WhiteMayCastleQueenside)
+            if (SenteMayCastleQueenside)
             {
                 atLeastOneCastle = true;
                 _ = result.Append('q');
@@ -595,19 +595,19 @@ namespace Shogi
         /// <summary>
         /// Convert this game to a PGN file for use in other shogi programs
         /// </summary>
-        public string ToPGN(string? eventName, string? siteName, DateOnly? startDate, string whiteName, string blackName,
-            bool whiteIsComputer, bool blackIsComputer)
+        public string ToPGN(string? eventName, string? siteName, DateOnly? startDate, string senteName, string goteName,
+            bool senteIsComputer, bool goteIsComputer)
         {
             GameState state = DetermineGameState();
             string pgn = $"[Event \"{eventName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
                 $"[Site \"{siteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
                 $"[Date \"{startDate?.ToString("yyyy.MM.dd") ?? "????.??.??"}\"]\n" +
                 "[Round \"?\"]\n" +
-                $"[White \"{whiteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Black \"{blackName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Result \"{(!GameOver ? "*" : state == GameState.CheckMateBlack ? "1-0" : state == GameState.CheckMateWhite ? "0-1" : "1/2-1/2")}\"]\n" +
-                $"[WhiteType \"{(whiteIsComputer ? "program" : "human")}\"]\n" +
-                $"[BlackType \"{(blackIsComputer ? "program" : "human")}\"]\n\n";
+                $"[White \"{senteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
+                $"[Black \"{goteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
+                $"[Result \"{(!GameOver ? "*" : state == GameState.CheckMateGote ? "1-0" : state == GameState.CheckMateSente ? "0-1" : "1/2-1/2")}\"]\n" +
+                $"[WhiteType \"{(senteIsComputer ? "program" : "human")}\"]\n" +
+                $"[BlackType \"{(goteIsComputer ? "program" : "human")}\"]\n\n";
 
             // Include initial state if not a standard shogi game
             if (InitialState != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
@@ -626,7 +626,7 @@ namespace Shogi
                 }
             }
             pgn += compiledMoveText.Trim();
-            pgn += !GameOver ? " *\n\n" : state == GameState.CheckMateBlack ? " 1-0\n\n" : state == GameState.CheckMateWhite ? " 0-1\n\n" : " 1/2-1/2\n\n";
+            pgn += !GameOver ? " *\n\n" : state == GameState.CheckMateGote ? " 1-0\n\n" : state == GameState.CheckMateSente ? " 0-1\n\n" : " 1/2-1/2\n\n";
 
             return pgn;
         }
@@ -713,28 +713,28 @@ namespace Shogi
                 }
             }
 
-            bool currentTurnWhite = fields[1] == "w" || (fields[1] == "b" ? false
+            bool currentTurnSente = fields[1] == "w" || (fields[1] == "b" ? false
                 : throw new FormatException("Current turn specifier must be either w or b"));
 
-            bool whiteKingside = false;
-            bool whiteQueenside = false;
-            bool blackKingside = false;
-            bool blackQueenside = false;
+            bool senteKingside = false;
+            bool senteQueenside = false;
+            bool goteKingside = false;
+            bool goteQueenside = false;
             foreach (char castleSpecifier in fields[2])
             {
                 switch (castleSpecifier)
                 {
                     case 'K':
-                        whiteKingside = true;
+                        senteKingside = true;
                         break;
                     case 'Q':
-                        whiteQueenside = true;
+                        senteQueenside = true;
                         break;
                     case 'k':
-                        blackKingside = true;
+                        goteKingside = true;
                         break;
                     case 'q':
-                        blackQueenside = true;
+                        goteQueenside = true;
                         break;
                     case '-': break;
                     default:
@@ -747,9 +747,9 @@ namespace Shogi
             int staleMoves = int.Parse(fields[4]);
 
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
-            // For the PGN standard, if black moves first then a single move "..." is added to the start of the move text list
-            return new ShogiGame(board, currentTurnWhite, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnWhite)),
-                new(), currentTurnWhite ? new() : new() { "..." }, new(), enPassant, whiteKingside, whiteQueenside, blackKingside, blackQueenside,
+            // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
+            return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
+                new(), currentTurnSente ? new() : new() { "..." }, new(), enPassant, senteKingside, senteQueenside, goteKingside, goteQueenside,
                 staleMoves, new(), null);
         }
     }

@@ -22,27 +22,27 @@ namespace Shogi
     public partial class PGNExport : Window
     {
         private readonly ShogiGame game;
-        private readonly bool whiteIsComputer;
-        private readonly bool blackIsComputer;
+        private readonly bool senteIsComputer;
+        private readonly bool goteIsComputer;
 
-        public PGNExport(ShogiGame game, bool whiteIsComputer, bool blackIsComputer)
+        public PGNExport(ShogiGame game, bool senteIsComputer, bool goteIsComputer)
         {
             this.game = game;
-            this.whiteIsComputer = whiteIsComputer;
-            this.blackIsComputer = blackIsComputer;
+            this.senteIsComputer = senteIsComputer;
+            this.goteIsComputer = goteIsComputer;
             InitializeComponent();
 
-            if (whiteIsComputer)
+            if (senteIsComputer)
             {
-                whiteNameBox.Text = "Computer";
-                whiteNameBox.IsReadOnly = true;
-                whiteNameBox.IsEnabled = false;
+                senteNameBox.Text = "Computer";
+                senteNameBox.IsReadOnly = true;
+                senteNameBox.IsEnabled = false;
             }
-            if (blackIsComputer)
+            if (goteIsComputer)
             {
-                blackNameBox.Text = "Computer";
-                blackNameBox.IsReadOnly = true;
-                blackNameBox.IsEnabled = false;
+                goteNameBox.Text = "Computer";
+                goteNameBox.IsReadOnly = true;
+                goteNameBox.IsEnabled = false;
             }
         }
 
@@ -62,11 +62,11 @@ namespace Shogi
             string eventName = eventNameBox.Text.Trim();
             string locationName = locationNameBox.Text.Trim();
             DateOnly? date = dateBox.SelectedDate is null ? null : DateOnly.FromDateTime(dateBox.SelectedDate.Value);
-            string whiteName = whiteNameBox.Text.Trim();
-            string blackName = blackNameBox.Text.Trim();
+            string senteName = senteNameBox.Text.Trim();
+            string goteName = goteNameBox.Text.Trim();
             File.WriteAllText(saveDialog.FileName, game.ToPGN(eventName != "" ? eventName : null,
-                locationName != "" ? locationName : null, date, whiteName != "" ? whiteName : "Player",
-                blackName != "" ? blackName : "Player", whiteIsComputer, blackIsComputer));
+                locationName != "" ? locationName : null, date, senteName != "" ? senteName : "Player",
+                goteName != "" ? goteName : "Player", senteIsComputer, goteIsComputer));
             Close();
         }
     }

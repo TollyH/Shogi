@@ -14,12 +14,12 @@ namespace Shogi
         /// Determine whether a king can be reached by any of the opponents pieces
         /// </summary>
         /// <param name="board">The state of the board to check</param>
-        /// <param name="isWhite">Is the king to check white?</param>
+        /// <param name="isSente">Is the king to check sente?</param>
         /// <param name="target">Override the position of the king to check</param>
         /// <remarks><paramref name="target"/> should always be given if checking a not-yet-peformed king move, as the king's internally stored position will be incorrect.</remarks>
-        public static bool IsKingReachable(Pieces.Piece?[,] board, bool isWhite, Point? target = null)
+        public static bool IsKingReachable(Pieces.Piece?[,] board, bool isSente, Point? target = null)
         {
-            target ??= board.OfType<Pieces.King>().Where(x => x.IsWhite == isWhite).First().Position;
+            target ??= board.OfType<Pieces.King>().Where(x => x.IsSente == isSente).First().Position;
 
             // King check
             for (int dx = -1; dx <= 1; dx++)
@@ -30,7 +30,7 @@ namespace Shogi
                     {
                         Point newPos = new(target.Value.X + dx, target.Value.Y + dy);
                         if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                            && board[newPos.X, newPos.Y] is Pieces.King && board[newPos.X, newPos.Y]!.IsWhite != isWhite)
+                            && board[newPos.X, newPos.Y] is Pieces.King && board[newPos.X, newPos.Y]!.IsSente != isSente)
                         {
                             return true;
                         }
@@ -44,7 +44,7 @@ namespace Shogi
                 Point newPos = new(dx, target.Value.Y);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
                     {
                         return true;
@@ -57,7 +57,7 @@ namespace Shogi
                 Point newPos = new(dx, target.Value.Y);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
                     {
                         return true;
@@ -70,7 +70,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X, dy);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
                     {
                         return true;
@@ -83,7 +83,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X, dy);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
                     {
                         return true;
@@ -98,7 +98,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X + dif, target.Value.Y + dif);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
                     {
                         return true;
@@ -111,7 +111,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X - dif, target.Value.Y + dif);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
                     {
                         return true;
@@ -124,7 +124,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X - dif, target.Value.Y - dif);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
                     {
                         return true;
@@ -137,7 +137,7 @@ namespace Shogi
                 Point newPos = new(target.Value.X + dif, target.Value.Y - dif);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != isWhite &&
+                    if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
                         board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
                     {
                         return true;
@@ -151,41 +151,41 @@ namespace Shogi
             {
                 Point newPos = new(target.Value.X + move.X, target.Value.Y + move.Y);
                 if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                    && board[newPos.X, newPos.Y] is Pieces.Knight && board[newPos.X, newPos.Y]!.IsWhite != isWhite)
+                    && board[newPos.X, newPos.Y] is Pieces.Knight && board[newPos.X, newPos.Y]!.IsSente != isSente)
                 {
                     return true;
                 }
             }
 
             // Pawn checks
-            int pawnYDiff = isWhite ? 1 : -1;
+            int pawnYDiff = isSente ? 1 : -1;
             int newY = target.Value.Y + pawnYDiff;
             if (newY < board.GetLength(1) && newY > 0)
             {
                 if (board[target.Value.X, target.Value.Y] is null && board[target.Value.X, newY] is Pieces.Pawn
-                    && board[target.Value.X, newY]!.IsWhite != isWhite)
+                    && board[target.Value.X, newY]!.IsSente != isSente)
                 {
                     return true;
                 }
                 if (board[target.Value.X, target.Value.Y] is not null)
                 {
                     if (target.Value.X > 0 && board[target.Value.X - 1, newY] is Pieces.Pawn
-                        && board[target.Value.X - 1, newY]!.IsWhite != isWhite)
+                        && board[target.Value.X - 1, newY]!.IsSente != isSente)
                     {
                         return true;
                     }
                     if (target.Value.X < board.GetLength(0) - 1 && board[target.Value.X + 1, newY] is Pieces.Pawn
-                        && board[target.Value.X + 1, newY]!.IsWhite != isWhite)
+                        && board[target.Value.X + 1, newY]!.IsSente != isSente)
                     {
                         return true;
                     }
                 }
             }
             newY = target.Value.Y + (pawnYDiff * 2);
-            if (newY == (isWhite ? board.GetLength(1) - 2 : 1))
+            if (newY == (isSente ? board.GetLength(1) - 2 : 1))
             {
                 if (board[target.Value.X, target.Value.Y] is null && board[target.Value.X, target.Value.Y + pawnYDiff] is null
-                    && board[target.Value.X, newY] is Pieces.Pawn && board[target.Value.X, newY]!.IsWhite != isWhite)
+                    && board[target.Value.X, newY] is Pieces.Pawn && board[target.Value.X, newY]!.IsSente != isSente)
                 {
                     return true;
                 }
@@ -201,10 +201,10 @@ namespace Shogi
         /// <remarks>
         /// This method will not consider whether a king or rook has moved before
         /// </remarks>
-        public static bool IsCastlePossible(Pieces.Piece?[,] board, bool currentTurnWhite, bool kingside)
+        public static bool IsCastlePossible(Pieces.Piece?[,] board, bool currentTurnSente, bool kingside)
         {
-            int yPos = currentTurnWhite ? 0 : 7;
-            if (IsKingReachable(board, currentTurnWhite, new Point(4, yPos)))
+            int yPos = currentTurnSente ? 0 : 7;
+            if (IsKingReachable(board, currentTurnSente, new Point(4, yPos)))
             {
                 return false;
             }
@@ -214,12 +214,12 @@ namespace Shogi
                 Point rookDest = new(5, yPos);
                 Point kingDest = new(6, yPos);
                 if (board[rookDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnWhite, rookDest))
+                    || IsKingReachable(board, currentTurnSente, rookDest))
                 {
                     return false;
                 }
                 if (board[kingDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnWhite, kingDest))
+                    || IsKingReachable(board, currentTurnSente, kingDest))
                 {
                     return false;
                 }
@@ -230,12 +230,12 @@ namespace Shogi
                 Point rookDest = new(3, yPos);
                 Point kingDest = new(2, yPos);
                 if (board[rookDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnWhite, rookDest))
+                    || IsKingReachable(board, currentTurnSente, rookDest))
                 {
                     return false;
                 }
                 if (board[kingDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnWhite, kingDest))
+                    || IsKingReachable(board, currentTurnSente, kingDest))
                 {
                     return false;
                 }
@@ -253,44 +253,44 @@ namespace Shogi
         /// <remarks>
         /// This method will not detect states that depend on game history, such as three-fold repetition or the 50-move rule
         /// </remarks>
-        public static GameState DetermineGameState(Pieces.Piece?[,] board, bool currentTurnWhite,
-            Point? whiteKingPos = null, Point? blackKingPos = null)
+        public static GameState DetermineGameState(Pieces.Piece?[,] board, bool currentTurnSente,
+            Point? senteKingPos = null, Point? goteKingPos = null)
         {
-            IEnumerable<Pieces.Piece> whitePieces = board.OfType<Pieces.Piece>().Where(p => p.IsWhite);
-            IEnumerable<Pieces.Piece> blackPieces = board.OfType<Pieces.Piece>().Where(p => !p.IsWhite);
+            IEnumerable<Pieces.Piece> sentePieces = board.OfType<Pieces.Piece>().Where(p => p.IsSente);
+            IEnumerable<Pieces.Piece> gotePieces = board.OfType<Pieces.Piece>().Where(p => !p.IsSente);
 
-            bool whiteCheck = IsKingReachable(board, true, whiteKingPos ?? null);
-            // White and Black cannot both be in check
-            bool blackCheck = !whiteCheck && IsKingReachable(board, false, blackKingPos ?? null);
+            bool senteCheck = IsKingReachable(board, true, senteKingPos ?? null);
+            // Sente and Gote cannot both be in check
+            bool goteCheck = !senteCheck && IsKingReachable(board, false, goteKingPos ?? null);
 
-            if (currentTurnWhite && !whitePieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
+            if (currentTurnSente && !sentePieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
             {
-                // Black may only win if they have white king in check, otherwise draw
-                return whiteCheck ? GameState.CheckMateWhite : GameState.DrawStalemate;
+                // Gote may only win if they have sente king in check, otherwise draw
+                return senteCheck ? GameState.CheckMateSente : GameState.DrawStalemate;
             }
-            if (!currentTurnWhite && !blackPieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
+            if (!currentTurnSente && !gotePieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
             {
-                // White may only win if they have black king in check, otherwise draw
-                return blackCheck ? GameState.CheckMateBlack : GameState.DrawStalemate;
-            }
-
-            int whitePiecesCount = whitePieces.Count();
-            int blackPiecesCount = blackPieces.Count();
-            if ((whitePiecesCount == 1 || (whitePiecesCount == 2
-                    && whitePieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight))
-                && (blackPiecesCount == 1 || (blackPiecesCount == 2
-                    && blackPieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight)))
-            {
-                return GameState.DrawInsufficientMaterial;
+                // Sente may only win if they have gote king in check, otherwise draw
+                return goteCheck ? GameState.CheckMateGote : GameState.DrawStalemate;
             }
 
-            if ((whitePiecesCount == 1 && blackPiecesCount == 3 && blackPieces.OfType<Pieces.Knight>().Count() == 2)
-                || (blackPiecesCount == 1 && whitePiecesCount == 3 && whitePieces.OfType<Pieces.Knight>().Count() == 2))
+            int sentePiecesCount = sentePieces.Count();
+            int gotePiecesCount = gotePieces.Count();
+            if ((sentePiecesCount == 1 || (sentePiecesCount == 2
+                    && sentePieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight))
+                && (gotePiecesCount == 1 || (gotePiecesCount == 2
+                    && gotePieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight)))
             {
                 return GameState.DrawInsufficientMaterial;
             }
 
-            return whiteCheck ? GameState.CheckWhite : blackCheck ? GameState.CheckBlack : GameState.StandardPlay;
+            if ((sentePiecesCount == 1 && gotePiecesCount == 3 && gotePieces.OfType<Pieces.Knight>().Count() == 2)
+                || (gotePiecesCount == 1 && sentePiecesCount == 3 && sentePieces.OfType<Pieces.Knight>().Count() == 2))
+            {
+                return GameState.DrawInsufficientMaterial;
+            }
+
+            return senteCheck ? GameState.CheckSente : goteCheck ? GameState.CheckGote : GameState.StandardPlay;
         }
 
         /// <summary>
@@ -298,11 +298,11 @@ namespace Shogi
         /// </summary>
         /// <returns>
         /// A <see cref="double"/> representing the total piece value of the entire board.
-        /// Positive means white has stronger material, negative means black does.
+        /// Positive means sente has stronger material, negative means gote does.
         /// </returns>
         public static double CalculateBoardValue(Pieces.Piece?[,] board)
         {
-            return board.OfType<Pieces.Piece>().Sum(p => p.IsWhite ? p.Value : -p.Value);
+            return board.OfType<Pieces.Piece>().Sum(p => p.IsSente ? p.Value : -p.Value);
         }
 
         public readonly struct PossibleMove
@@ -310,24 +310,24 @@ namespace Shogi
             public Point Source { get; }
             public Point Destination { get; }
             public double EvaluatedFutureValue { get; }
-            public bool WhiteMateLocated { get; }
-            public bool BlackMateLocated { get; }
-            public int DepthToWhiteMate { get; }
-            public int DepthToBlackMate { get; }
+            public bool SenteMateLocated { get; }
+            public bool GoteMateLocated { get; }
+            public int DepthToSenteMate { get; }
+            public int DepthToGoteMate { get; }
             public Type? PromotionType { get; }
             public List<(Point, Point, Type)> BestLine { get;  }
 
             public PossibleMove(Point source, Point destination, double evaluatedFutureValue,
-                bool whiteMateLocated, bool blackMateLocated, int depthToWhiteMate, int depthToBlackMate,
+                bool senteMateLocated, bool goteMateLocated, int depthToSenteMate, int depthToGoteMate,
                 Type? promotionType, List<(Point, Point, Type)> bestLine)
             {
                 Source = source;
                 Destination = destination;
                 EvaluatedFutureValue = evaluatedFutureValue;
-                WhiteMateLocated = whiteMateLocated;
-                BlackMateLocated = blackMateLocated;
-                DepthToWhiteMate = depthToWhiteMate;
-                DepthToBlackMate = depthToBlackMate;
+                SenteMateLocated = senteMateLocated;
+                GoteMateLocated = goteMateLocated;
+                DepthToSenteMate = depthToSenteMate;
+                DepthToGoteMate = depthToGoteMate;
                 PromotionType = promotionType;
                 BestLine = bestLine;
             }
@@ -341,16 +341,16 @@ namespace Shogi
         {
             PossibleMove[] moves = await EvaluatePossibleMoves(game, maxDepth, cancellationToken);
             PossibleMove bestMove = new(default, default,
-                game.CurrentTurnWhite ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
+                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
             foreach (PossibleMove potentialMove in moves)
             {
-                if (game.CurrentTurnWhite)
+                if (game.CurrentTurnSente)
                 {
                     if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
-                        || (!bestMove.BlackMateLocated && potentialMove.BlackMateLocated)
-                        || (!bestMove.BlackMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
-                        || (bestMove.BlackMateLocated && potentialMove.BlackMateLocated
-                            && potentialMove.DepthToBlackMate < bestMove.DepthToBlackMate))
+                        || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
+                        || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
+                        || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
+                            && potentialMove.DepthToGoteMate < bestMove.DepthToGoteMate))
                     {
                         bestMove = potentialMove;
                     }
@@ -358,10 +358,10 @@ namespace Shogi
                 else
                 {
                     if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
-                        || (!bestMove.WhiteMateLocated && potentialMove.WhiteMateLocated)
-                        || (!bestMove.WhiteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
-                        || (bestMove.WhiteMateLocated && potentialMove.WhiteMateLocated
-                            && potentialMove.DepthToWhiteMate < bestMove.DepthToWhiteMate))
+                        || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
+                        || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
+                        || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
+                            && potentialMove.DepthToSenteMate < bestMove.DepthToSenteMate))
                     {
                         bestMove = potentialMove;
                     }
@@ -388,7 +388,7 @@ namespace Shogi
             {
                 if (piece is not null)
                 {
-                    if (piece.IsWhite != game.CurrentTurnWhite)
+                    if (piece.IsSente != game.CurrentTurnSente)
                     {
                         continue;
                     }
@@ -411,8 +411,8 @@ namespace Shogi
                             if (bestSubMove.Source != bestSubMove.Destination)
                             {
                                 possibleMoves.Add(new PossibleMove(thisPosition, thisValidMove, bestSubMove.EvaluatedFutureValue,
-                                    bestSubMove.WhiteMateLocated, bestSubMove.BlackMateLocated,
-                                    bestSubMove.DepthToWhiteMate, bestSubMove.DepthToBlackMate, typeof(Pieces.Queen), bestSubMove.BestLine));
+                                    bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                    bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, typeof(Pieces.Queen), bestSubMove.BestLine));
                             }
                             remainingThreads--;
                         });
@@ -442,7 +442,7 @@ namespace Shogi
 
             if (piece is Pieces.King)
             {
-                int homeY = game.CurrentTurnWhite ? 0 : 7;
+                int homeY = game.CurrentTurnSente ? 0 : 7;
                 if (game.IsCastlePossible(true))
                 {
                     _ = allValidMoves.Add(new Point(6, homeY));
@@ -454,9 +454,9 @@ namespace Shogi
             }
             else if (piece is Pieces.Pawn && game.EnPassantSquare is not null
                 && Math.Abs(piece.Position.X - game.EnPassantSquare.Value.X) == 1
-                && piece.Position.Y == (game.CurrentTurnWhite ? 4 : 3)
+                && piece.Position.Y == (game.CurrentTurnSente ? 4 : 3)
                 && !IsKingReachable(game.Board.AfterMove(piece.Position,
-                        game.EnPassantSquare.Value), game.CurrentTurnWhite))
+                        game.EnPassantSquare.Value), game.CurrentTurnSente))
             {
                 _ = allValidMoves.Add(game.EnPassantSquare.Value);
             }
@@ -471,12 +471,12 @@ namespace Shogi
             if (game.GameOver)
             {
                 GameState state = game.DetermineGameState();
-                if (state == GameState.CheckMateWhite)
+                if (state == GameState.CheckMateSente)
                 {
                     return new PossibleMove(lastMove.Item1, lastMove.Item2, double.NegativeInfinity, true, false, depth, 0, typeof(Pieces.Queen),
                         currentLine);
                 }
-                else if (state == GameState.CheckMateBlack)
+                else if (state == GameState.CheckMateGote)
                 {
                     return new PossibleMove(lastMove.Item1, lastMove.Item2, double.PositiveInfinity, false, true, 0, depth, typeof(Pieces.Queen),
                         currentLine);
@@ -493,13 +493,13 @@ namespace Shogi
             }
 
             PossibleMove bestMove = new(default, default,
-                game.CurrentTurnWhite ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
+                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
 
             foreach (Pieces.Piece? piece in game.Board)
             {
                 if (piece is not null)
                 {
-                    if (piece.IsWhite != game.CurrentTurnWhite)
+                    if (piece.IsSente != game.CurrentTurnSente)
                     {
                         continue;
                     }
@@ -515,19 +515,19 @@ namespace Shogi
                         {
                             return bestMove;
                         }
-                        if (game.CurrentTurnWhite)
+                        if (game.CurrentTurnSente)
                         {
                             if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
-                                || (!bestMove.BlackMateLocated && potentialMove.BlackMateLocated)
-                                || (!bestMove.BlackMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
-                                || (bestMove.BlackMateLocated && potentialMove.BlackMateLocated
-                                    && potentialMove.DepthToBlackMate < bestMove.DepthToBlackMate))
+                                || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
+                                || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
+                                || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
+                                    && potentialMove.DepthToGoteMate < bestMove.DepthToGoteMate))
                             {
                                 bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
-                                    potentialMove.WhiteMateLocated, potentialMove.BlackMateLocated,
-                                    potentialMove.DepthToWhiteMate, potentialMove.DepthToBlackMate, typeof(Pieces.Queen), potentialMove.BestLine);
+                                    potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                    potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, typeof(Pieces.Queen), potentialMove.BestLine);
                             }
-                            if (potentialMove.EvaluatedFutureValue >= beta && !bestMove.BlackMateLocated)
+                            if (potentialMove.EvaluatedFutureValue >= beta && !bestMove.GoteMateLocated)
                             {
                                 return bestMove;
                             }
@@ -539,16 +539,16 @@ namespace Shogi
                         else
                         {
                             if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
-                                || (!bestMove.WhiteMateLocated && potentialMove.WhiteMateLocated)
-                                || (!bestMove.WhiteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
-                                || (bestMove.WhiteMateLocated && potentialMove.WhiteMateLocated
-                                    && potentialMove.DepthToWhiteMate < bestMove.DepthToWhiteMate))
+                                || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
+                                || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
+                                || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
+                                    && potentialMove.DepthToSenteMate < bestMove.DepthToSenteMate))
                             {
                                 bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
-                                    potentialMove.WhiteMateLocated, potentialMove.BlackMateLocated,
-                                    potentialMove.DepthToWhiteMate, potentialMove.DepthToBlackMate, typeof(Pieces.Queen), potentialMove.BestLine);
+                                    potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                    potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, typeof(Pieces.Queen), potentialMove.BestLine);
                             }
-                            if (potentialMove.EvaluatedFutureValue <= alpha && !bestMove.WhiteMateLocated)
+                            if (potentialMove.EvaluatedFutureValue <= alpha && !bestMove.SenteMateLocated)
                             {
                                 return bestMove;
                             }

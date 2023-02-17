@@ -10,7 +10,7 @@ namespace Shogi.Pieces
         public abstract char SymbolLetter { get; }
         public abstract char SymbolSpecial { get; }
         public abstract double Value { get; }
-        public abstract bool IsWhite { get; }
+        public abstract bool IsSente { get; }
         public abstract Point Position { get; protected set; }
 
         /// <summary>
@@ -47,14 +47,14 @@ namespace Shogi.Pieces
         public override char SymbolSpecial { get; }
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public King(Point position, bool isWhite)
+        public King(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♔' : '♚';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♔' : '♚';
         }
 
         /// <remarks>
@@ -71,7 +71,7 @@ namespace Shogi.Pieces
                     {
                         Point newPos = new(Position.X + dx, Position.Y + dy);
                         if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsWhite != IsWhite))
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
                         {
                             _ = moves.Add(newPos);
                         }
@@ -80,14 +80,14 @@ namespace Shogi.Pieces
             }
             if (enforceCheckLegality)
             {
-                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite, m));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente, m));
             }
             return moves;
         }
 
         public override King Clone()
         {
-            return new King(Position, IsWhite);
+            return new King(Position, IsSente);
         }
     }
 
@@ -97,14 +97,14 @@ namespace Shogi.Pieces
         public override char SymbolLetter => 'Q';
         public override char SymbolSpecial { get; }
         public override double Value => 9.5;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Queen(Point position, bool isWhite)
+        public Queen(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♕' : '♛';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♕' : '♛';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
@@ -120,7 +120,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -137,7 +137,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -154,7 +154,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -171,7 +171,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -188,7 +188,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -205,7 +205,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -222,7 +222,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -239,7 +239,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -248,14 +248,14 @@ namespace Shogi.Pieces
             }
             if (enforceCheckLegality)
             {
-                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
             return moves;
         }
 
         public override Queen Clone()
         {
-            return new Queen(Position, IsWhite);
+            return new Queen(Position, IsSente);
         }
     }
 
@@ -265,14 +265,14 @@ namespace Shogi.Pieces
         public override char SymbolLetter => 'R';
         public override char SymbolSpecial { get; }
         public override double Value => 5.63;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Rook(Point position, bool isWhite)
+        public Rook(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♖' : '♜';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♖' : '♜';
         }
 
         /// <remarks>
@@ -291,7 +291,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -308,7 +308,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -325,7 +325,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -342,7 +342,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -351,14 +351,14 @@ namespace Shogi.Pieces
             }
             if (enforceCheckLegality)
             {
-                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
             return moves;
         }
 
         public override Rook Clone()
         {
-            return new Rook(Position, IsWhite);
+            return new Rook(Position, IsSente);
         }
     }
 
@@ -368,14 +368,14 @@ namespace Shogi.Pieces
         public override char SymbolLetter => 'B';
         public override char SymbolSpecial { get; }
         public override double Value => 3.33;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Bishop(Point position, bool isWhite)
+        public Bishop(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♗' : '♝';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♗' : '♝';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
@@ -391,7 +391,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -408,7 +408,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -425,7 +425,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -442,7 +442,7 @@ namespace Shogi.Pieces
                 }
                 else
                 {
-                    if (board[newPos.X, newPos.Y]!.IsWhite != IsWhite)
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
                     {
                         _ = moves.Add(newPos);
                     }
@@ -451,14 +451,14 @@ namespace Shogi.Pieces
             }
             if (enforceCheckLegality)
             {
-                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
             return moves;
         }
 
         public override Bishop Clone()
         {
-            return new Bishop(Position, IsWhite);
+            return new Bishop(Position, IsSente);
         }
     }
 
@@ -473,14 +473,14 @@ namespace Shogi.Pieces
         public override char SymbolLetter => 'N';
         public override char SymbolSpecial { get; }
         public override double Value => 3.05;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Knight(Point position, bool isWhite)
+        public Knight(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♘' : '♞';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♘' : '♞';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
@@ -491,21 +491,21 @@ namespace Shogi.Pieces
             {
                 Point newPos = new(Position.X + newMove.X, Position.Y + newMove.Y);
                 if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                    && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsWhite != IsWhite))
+                    && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
                 {
                     _ = validMoves.Add(newPos);
                 }
             }
             if (enforceCheckLegality)
             {
-                _ = validMoves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite));
+                _ = validMoves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
             return validMoves;
         }
 
         public override Knight Clone()
         {
-            return new Knight(Position, IsWhite);
+            return new Knight(Position, IsSente);
         }
     }
 
@@ -515,14 +515,14 @@ namespace Shogi.Pieces
         public override char SymbolLetter => 'P';
         public override char SymbolSpecial { get; }
         public override double Value => 1;
-        public override bool IsWhite { get; }
+        public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Pawn(Point position, bool isWhite)
+        public Pawn(Point position, bool isSente)
         {
             Position = position;
-            IsWhite = isWhite;
-            SymbolSpecial = isWhite ? '♙' : '♟';
+            IsSente = isSente;
+            SymbolSpecial = isSente ? '♙' : '♟';
         }
 
         /// <remarks>
@@ -531,9 +531,9 @@ namespace Shogi.Pieces
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             HashSet<Point> moves = new();
-            int checkY = Position.Y + (IsWhite ? 1 : -1);
-            int doubleCheckY = Position.Y + (IsWhite ? 2 : -2);
-            bool hasMoved = Position.Y != (IsWhite ? 1 : board.GetLength(1) - 2);
+            int checkY = Position.Y + (IsSente ? 1 : -1);
+            int doubleCheckY = Position.Y + (IsSente ? 2 : -2);
+            bool hasMoved = Position.Y != (IsSente ? 1 : board.GetLength(1) - 2);
             if (board[Position.X, checkY] is null)
             {
                 _ = moves.Add(new Point(Position.X, checkY));
@@ -545,26 +545,26 @@ namespace Shogi.Pieces
             }
             // Taking to diagonal left
             if (Position.X > 0 && 
-                board[Position.X - 1, checkY] is not null && board[Position.X - 1, checkY]!.IsWhite != IsWhite)
+                board[Position.X - 1, checkY] is not null && board[Position.X - 1, checkY]!.IsSente != IsSente)
             {
                 _ = moves.Add(new Point(Position.X - 1, checkY));
             }
             // Taking to diagonal right
             if (Position.X < board.GetLength(0) - 1 && 
-                board[Position.X + 1, checkY] is not null && board[Position.X + 1, checkY]!.IsWhite != IsWhite)
+                board[Position.X + 1, checkY] is not null && board[Position.X + 1, checkY]!.IsSente != IsSente)
             {
                 _ = moves.Add(new Point(Position.X + 1, checkY));
             }
             if (enforceCheckLegality)
             {
-                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsWhite));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
             return moves;
         }
 
         public override Pawn Clone()
         {
-            return new Pawn(Position, IsWhite);
+            return new Pawn(Position, IsSente);
         }
     }
 }

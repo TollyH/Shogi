@@ -31,8 +31,8 @@ namespace Shogi
         private HashSet<(System.Drawing.Point, System.Drawing.Point)> lineHighlights = new();
         private System.Drawing.Point? mouseDownStartPoint = null;
 
-        private bool whiteIsComputer = false;
-        private bool blackIsComputer = false;
+        private bool senteIsComputer = false;
+        private bool goteIsComputer = false;
 
         private BoardAnalysis.PossibleMove? currentBestMove = null;
         private bool manuallyEvaluating = false;
@@ -69,52 +69,52 @@ namespace Shogi
             shogiGameCanvas.Children.Clear();
             pieceViews.Clear();
 
-            bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnWhite && !blackIsComputer) || (whiteIsComputer && !blackIsComputer));
+            bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnSente && !goteIsComputer) || (senteIsComputer && !goteIsComputer));
 
             tileWidth = shogiGameCanvas.ActualWidth / game.Board.GetLength(0);
             tileHeight = shogiGameCanvas.ActualHeight / game.Board.GetLength(1);
 
-            whiteCaptures.Content = 0;
-            whiteCaptures.ToolTip = "";
-            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => p.IsWhite))
+            senteCaptures.Content = 0;
+            senteCaptures.ToolTip = "";
+            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => p.IsSente))
             {
-                whiteCaptures.Content = (int)whiteCaptures.Content + 1;
-                whiteCaptures.ToolTip = (string)whiteCaptures.ToolTip + capturedPiece.Name + "\r\n";
+                senteCaptures.Content = (int)senteCaptures.Content + 1;
+                senteCaptures.ToolTip = (string)senteCaptures.ToolTip + capturedPiece.Name + "\r\n";
             }
-            whiteCaptures.ToolTip = ((string)whiteCaptures.ToolTip).TrimEnd();
+            senteCaptures.ToolTip = ((string)senteCaptures.ToolTip).TrimEnd();
 
-            blackCaptures.Content = 0;
-            blackCaptures.ToolTip = "";
-            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => !p.IsWhite))
+            goteCaptures.Content = 0;
+            goteCaptures.ToolTip = "";
+            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => !p.IsSente))
             {
-                blackCaptures.Content = (int)blackCaptures.Content + 1;
-                blackCaptures.ToolTip = (string)blackCaptures.ToolTip + capturedPiece.Name + "\r\n";
+                goteCaptures.Content = (int)goteCaptures.Content + 1;
+                goteCaptures.ToolTip = (string)goteCaptures.ToolTip + capturedPiece.Name + "\r\n";
             }
-            blackCaptures.ToolTip = ((string)blackCaptures.ToolTip).TrimEnd();
+            goteCaptures.ToolTip = ((string)goteCaptures.ToolTip).TrimEnd();
 
             if (currentBestMove is null && !manuallyEvaluating)
             {
-                if (game.CurrentTurnWhite && !whiteIsComputer)
+                if (game.CurrentTurnSente && !senteIsComputer)
                 {
-                    whiteEvaluation.Content = "?";
+                    senteEvaluation.Content = "?";
                 }
-                else if (!blackIsComputer)
+                else if (!goteIsComputer)
                 {
-                    blackEvaluation.Content = "?";
+                    goteEvaluation.Content = "?";
                 }
             }
 
             if (boardFlipped)
             {
-                Grid.SetColumn(whiteEvaluationView, 2);
-                Grid.SetRow(whiteEvaluationView, 0);
-                Grid.SetColumn(blackEvaluationView, 0);
-                Grid.SetRow(blackEvaluationView, 2);
+                Grid.SetColumn(senteEvaluationView, 2);
+                Grid.SetRow(senteEvaluationView, 0);
+                Grid.SetColumn(goteEvaluationView, 0);
+                Grid.SetRow(goteEvaluationView, 2);
 
-                Grid.SetColumn(whiteCapturesView, 0);
-                Grid.SetRow(whiteCapturesView, 0);
-                Grid.SetColumn(blackCapturesView, 2);
-                Grid.SetRow(blackCapturesView, 2);
+                Grid.SetColumn(senteCapturesView, 0);
+                Grid.SetRow(senteCapturesView, 0);
+                Grid.SetColumn(goteCapturesView, 2);
+                Grid.SetRow(goteCapturesView, 2);
 
                 foreach (UIElement child in ranksLeft.Children)
                 {
@@ -135,15 +135,15 @@ namespace Shogi
             }
             else
             {
-                Grid.SetColumn(whiteEvaluationView, 0);
-                Grid.SetRow(whiteEvaluationView, 2);
-                Grid.SetColumn(blackEvaluationView, 2);
-                Grid.SetRow(blackEvaluationView, 0);
+                Grid.SetColumn(senteEvaluationView, 0);
+                Grid.SetRow(senteEvaluationView, 2);
+                Grid.SetColumn(goteEvaluationView, 2);
+                Grid.SetRow(goteEvaluationView, 0);
 
-                Grid.SetColumn(whiteCapturesView, 2);
-                Grid.SetRow(whiteCapturesView, 2);
-                Grid.SetColumn(blackCapturesView, 0);
-                Grid.SetRow(blackCapturesView, 0);
+                Grid.SetColumn(senteCapturesView, 2);
+                Grid.SetRow(senteCapturesView, 2);
+                Grid.SetColumn(goteCapturesView, 0);
+                Grid.SetRow(goteCapturesView, 0);
 
                 foreach (UIElement child in ranksLeft.Children)
                 {
@@ -190,9 +190,9 @@ namespace Shogi
 
             GameState state = game.DetermineGameState();
 
-            if (state is GameState.CheckMateWhite or GameState.CheckMateBlack)
+            if (state is GameState.CheckMateSente or GameState.CheckMateGote)
             {
-                System.Drawing.Point kingPosition = state == GameState.CheckMateWhite ? game.WhiteKing.Position : game.BlackKing.Position;
+                System.Drawing.Point kingPosition = state == GameState.CheckMateSente ? game.SenteKing.Position : game.GoteKing.Position;
                 Rectangle mateHighlight = new()
                 {
                     Width = tileWidth,
@@ -287,9 +287,9 @@ namespace Shogi
 
             if (grabbedPiece is Pieces.Pawn && game.EnPassantSquare is not null && highlightGrabbedMoves
                 && Math.Abs(grabbedPiece.Position.X - game.EnPassantSquare.Value.X) == 1
-                && grabbedPiece.Position.Y == (game.CurrentTurnWhite ? 4 : 3)
+                && grabbedPiece.Position.Y == (game.CurrentTurnSente ? 4 : 3)
                 && !BoardAnalysis.IsKingReachable(game.Board.AfterMove(
-                        grabbedPiece.Position, game.EnPassantSquare.Value), game.CurrentTurnWhite))
+                        grabbedPiece.Position, game.EnPassantSquare.Value), game.CurrentTurnSente))
             {
                 Rectangle enPassantHighlight = new()
                 {
@@ -306,7 +306,7 @@ namespace Shogi
 
             else if (grabbedPiece is Pieces.King && highlightGrabbedMoves)
             {
-                int yPos = game.CurrentTurnWhite ? 0 : 7;
+                int yPos = game.CurrentTurnSente ? 0 : 7;
                 if (game.IsCastlePossible(true))
                 {
                     Rectangle castleHighlight = new()
@@ -375,7 +375,7 @@ namespace Shogi
                     if (piece is not null)
                     {
                         Brush foregroundBrush;
-                        if (piece is Pieces.King && ((piece.IsWhite && state == GameState.CheckWhite) || (!piece.IsWhite && state == GameState.CheckBlack)))
+                        if (piece is Pieces.King && ((piece.IsSente && state == GameState.CheckSente) || (!piece.IsSente && state == GameState.CheckGote)))
                         {
                             foregroundBrush = new SolidColorBrush(config.CheckedKingColor);
                         }
@@ -421,8 +421,8 @@ namespace Shogi
                 return;
             }
             Pieces.Piece? checkPiece = GetPieceAtCanvasPoint(Mouse.GetPosition(shogiGameCanvas));
-            if (checkPiece is not null && ((checkPiece.IsWhite && game.CurrentTurnWhite && !whiteIsComputer)
-                || (!checkPiece.IsWhite && !game.CurrentTurnWhite && !blackIsComputer)))
+            if (checkPiece is not null && ((checkPiece.IsSente && game.CurrentTurnSente && !senteIsComputer)
+                || (!checkPiece.IsSente && !game.CurrentTurnSente && !goteIsComputer)))
             {
                 Mouse.OverrideCursor = Cursors.Hand;
                 return;
@@ -439,8 +439,8 @@ namespace Shogi
             {
                 _ = MessageBox.Show(game.DetermineGameState() switch
                 {
-                    GameState.CheckMateWhite => "Black wins by checkmate!",
-                    GameState.CheckMateBlack => "White wins by checkmate!",
+                    GameState.CheckMateSente => "Gote wins by checkmate!",
+                    GameState.CheckMateGote => "Sente wins by checkmate!",
                     GameState.DrawStalemate => "Game drawn due to stalemate",
                     GameState.DrawInsufficientMaterial => "Game drawn as neither side has sufficient material to mate",
                     GameState.DrawThreeFold => "Game drawn as the same position has occured three times",
@@ -450,9 +450,9 @@ namespace Shogi
             }
         }
 
-        private void UpdateEvaluationMeter(BoardAnalysis.PossibleMove? bestMove, bool white)
+        private void UpdateEvaluationMeter(BoardAnalysis.PossibleMove? bestMove, bool sente)
         {
-            Label toUpdate = white ? whiteEvaluation : blackEvaluation;
+            Label toUpdate = sente ? senteEvaluation : goteEvaluation;
             if (bestMove is null)
             {
                 toUpdate.Content = "...";
@@ -460,15 +460,15 @@ namespace Shogi
                 return;
             }
 
-            if ((bestMove.Value.WhiteMateLocated && !bestMove.Value.BlackMateLocated)
+            if ((bestMove.Value.SenteMateLocated && !bestMove.Value.GoteMateLocated)
                 || bestMove.Value.EvaluatedFutureValue == double.NegativeInfinity)
             {
-                toUpdate.Content = $"-M{(int)Math.Ceiling(bestMove.Value.DepthToWhiteMate / 2d)}";
+                toUpdate.Content = $"-M{(int)Math.Ceiling(bestMove.Value.DepthToSenteMate / 2d)}";
             }
-            else if ((bestMove.Value.BlackMateLocated && !bestMove.Value.WhiteMateLocated)
+            else if ((bestMove.Value.GoteMateLocated && !bestMove.Value.SenteMateLocated)
                 || bestMove.Value.EvaluatedFutureValue == double.PositiveInfinity)
             {
-                toUpdate.Content = $"+M{(int)Math.Ceiling(bestMove.Value.DepthToBlackMate / 2d)}";
+                toUpdate.Content = $"+M{(int)Math.Ceiling(bestMove.Value.DepthToGoteMate / 2d)}";
             }
             else
             {
@@ -500,12 +500,12 @@ namespace Shogi
         /// </summary>
         private async Task CheckComputerMove()
         {
-            while (!game.GameOver && ((game.CurrentTurnWhite && whiteIsComputer) || (!game.CurrentTurnWhite && blackIsComputer)))
+            while (!game.GameOver && ((game.CurrentTurnSente && senteIsComputer) || (!game.CurrentTurnSente && goteIsComputer)))
             {
                 CancellationToken cancellationToken = cancelMoveComputation.Token;
                 if (config.UpdateEvalAfterBot)
                 {
-                    UpdateEvaluationMeter(null, game.CurrentTurnWhite);
+                    UpdateEvaluationMeter(null, game.CurrentTurnSente);
                 }
                 BoardAnalysis.PossibleMove bestMove = await GetEngineMove(cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
@@ -519,7 +519,7 @@ namespace Shogi
                 if (config.UpdateEvalAfterBot)
                 {
                     // Turn has been inverted already but we have value for the now old turn
-                    UpdateEvaluationMeter(bestMove, !game.CurrentTurnWhite);
+                    UpdateEvaluationMeter(bestMove, !game.CurrentTurnSente);
                 }
                 PushEndgameMessage();
             }
@@ -527,7 +527,7 @@ namespace Shogi
 
         private System.Drawing.Point GetCoordFromCanvasPoint(Point position)
         {
-            bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnWhite && !blackIsComputer) || (whiteIsComputer && !blackIsComputer));
+            bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnSente && !goteIsComputer) || (senteIsComputer && !goteIsComputer));
             // Canvas coordinates are relative to top-left, whereas shogi's are from bottom-left, so y is inverted
             return new System.Drawing.Point((int)((boardFlipped ? shogiGameCanvas.ActualWidth - position.X : position.X) / tileWidth),
                 (int)((!boardFlipped ? shogiGameCanvas.ActualHeight - position.Y : position.Y) / tileHeight));
@@ -555,8 +555,8 @@ namespace Shogi
             manuallyEvaluating = false;
             grabbedPiece = null;
             highlightGrabbedMoves = false;
-            whiteEvaluation.Content = "?";
-            blackEvaluation.Content = "?";
+            senteEvaluation.Content = "?";
+            goteEvaluation.Content = "?";
             UpdateGameDisplay();
             UpdateCursor();
             await CheckComputerMove();
@@ -618,8 +618,8 @@ namespace Shogi
                 Pieces.Piece? toCheck = GetPieceAtCanvasPoint(mousePos);
                 if (toCheck is not null)
                 {
-                    if ((toCheck.IsWhite && game.CurrentTurnWhite && !whiteIsComputer)
-                        || (!toCheck.IsWhite && !game.CurrentTurnWhite && !blackIsComputer))
+                    if ((toCheck.IsSente && game.CurrentTurnSente && !senteIsComputer)
+                        || (!toCheck.IsSente && !game.CurrentTurnSente && !goteIsComputer))
                     {
                         grabbedPiece = toCheck;
                         manuallyEvaluating = false;
@@ -725,15 +725,15 @@ namespace Shogi
 
         private async void evaluation_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (currentBestMove is not null || (game.CurrentTurnWhite && whiteIsComputer)
-                || (!game.CurrentTurnWhite && blackIsComputer))
+            if (currentBestMove is not null || (game.CurrentTurnSente && senteIsComputer)
+                || (!game.CurrentTurnSente && goteIsComputer))
             {
                 return;
             }
             manuallyEvaluating = true;
             grabbedPiece = null;
             highlightGrabbedMoves = false;
-            UpdateEvaluationMeter(null, game.CurrentTurnWhite);
+            UpdateEvaluationMeter(null, game.CurrentTurnSente);
             UpdateGameDisplay();
             UpdateCursor();
 
@@ -745,7 +745,7 @@ namespace Shogi
                 return;
             }
 
-            UpdateEvaluationMeter(bestMove, game.CurrentTurnWhite);
+            UpdateEvaluationMeter(bestMove, game.CurrentTurnSente);
             currentBestMove = bestMove;
             UpdateGameDisplay();
             manuallyEvaluating = false;
@@ -753,29 +753,29 @@ namespace Shogi
 
         private async void NewGame_Click(object sender, RoutedEventArgs e)
         {
-            whiteIsComputer = false;
-            blackIsComputer = false;
+            senteIsComputer = false;
+            goteIsComputer = false;
             await NewGame();
         }
 
-        private async void NewGameCpuWhite_Click(object sender, RoutedEventArgs e)
+        private async void NewGameCpuSente_Click(object sender, RoutedEventArgs e)
         {
-            whiteIsComputer = false;
-            blackIsComputer = true;
+            senteIsComputer = false;
+            goteIsComputer = true;
             await NewGame();
         }
 
-        private async void NewGameCpuBlack_Click(object sender, RoutedEventArgs e)
+        private async void NewGameCpuGote_Click(object sender, RoutedEventArgs e)
         {
-            whiteIsComputer = true;
-            blackIsComputer = false;
+            senteIsComputer = true;
+            goteIsComputer = false;
             await NewGame();
         }
 
         private async void NewGameCpuOnly_Click(object sender, RoutedEventArgs e)
         {
-            whiteIsComputer = true;
-            blackIsComputer = true;
+            senteIsComputer = true;
+            goteIsComputer = true;
             await NewGame();
         }
 
@@ -791,7 +791,7 @@ namespace Shogi
             manuallyEvaluating = false;
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            _ = new PGNExport(game, whiteIsComputer, blackIsComputer).ShowDialog();
+            _ = new PGNExport(game, senteIsComputer, goteIsComputer).ShowDialog();
             await CheckComputerMove();
         }
 
@@ -805,13 +805,13 @@ namespace Shogi
             if (customDialog.GeneratedGame is not null)
             {
                 game = customDialog.GeneratedGame;
-                whiteIsComputer = customDialog.WhiteIsComputer;
-                blackIsComputer = customDialog.BlackIsComputer;
+                senteIsComputer = customDialog.SenteIsComputer;
+                goteIsComputer = customDialog.GoteIsComputer;
                 grabbedPiece = null;
                 highlightGrabbedMoves = false;
                 currentBestMove = null;
-                whiteEvaluation.Content = "?";
-                blackEvaluation.Content = "?";
+                senteEvaluation.Content = "?";
+                goteEvaluation.Content = "?";
                 UpdateGameDisplay();
                 PushEndgameMessage();
             }
