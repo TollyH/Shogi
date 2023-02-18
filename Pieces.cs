@@ -762,11 +762,6 @@ namespace Shogi.Pieces
 
     public class Lance : Piece
     {
-        public static readonly ImmutableArray<Point> Moves = new Point[8]
-        {
-            new(1, 2), new(1, -2), new(-1, 2), new(-1, -2), new(2, 1), new(2, -1), new(-2, 1), new(-2, -1)
-        }.ToImmutableArray();
-
         public override string Name => "Lance";
         public override char SymbolLetter => '香';
         public override double Value => 6;
@@ -814,11 +809,6 @@ namespace Shogi.Pieces
 
     public class PromotedLance : Piece
     {
-        public static readonly ImmutableArray<Point> Moves = new Point[8]
-        {
-            new(1, 2), new(1, -2), new(-1, 2), new(-1, -2), new(2, 1), new(2, -1), new(-2, 1), new(-2, -1)
-        }.ToImmutableArray();
-
         public override string Name => "Promoted Lance";
         public override char SymbolLetter => '杏';
         public override double Value => 11;
