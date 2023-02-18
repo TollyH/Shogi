@@ -21,7 +21,8 @@ namespace Shogi
         {
             target ??= board.OfType<Pieces.King>().Where(x => x.IsSente == isSente).First().Position;
 
-            // King check
+            int backwardsY = isSente ? -1 : 1;
+            // King, promoted bishop straights, promoted rook diagonals, gold general (and equivalents), silver general check
             for (int dx = -1; dx <= 1; dx++)
             {
                 for (int dy = -1; dy <= 1; dy++)
@@ -30,22 +31,34 @@ namespace Shogi
                     {
                         Point newPos = new(target.Value.X + dx, target.Value.Y + dy);
                         if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                            && board[newPos.X, newPos.Y] is Pieces.King && board[newPos.X, newPos.Y]!.IsSente != isSente)
+                            && board[newPos.X, newPos.Y] is Pieces.Piece piece && board[newPos.X, newPos.Y]!.IsSente != isSente)
                         {
-                            return true;
+                            if (piece is Pieces.King or Pieces.PromotedBishop or Pieces.PromotedRook)
+                            {
+                                return true;
+                            }
+                            if (piece is Pieces.GoldGeneral or Pieces.PromotedKnight or Pieces.PromotedLance
+                                or Pieces.PromotedPawn or Pieces.PromotedSilverGeneral && (dy != backwardsY || dx == 0))
+                            {
+                                return true;
+                            }
+                            if (piece is Pieces.SilverGeneral && (dy != backwardsY || dx != 0) && dy != 0)
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
             }
 
-            // Straight checks (rook & queen)
+            // Straight checks (rook & lance)
             for (int dx = target.Value.X + 1; dx < board.GetLength(0); dx++)
             {
                 Point newPos = new(dx, target.Value.Y);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
+                        board[newPos.X, newPos.Y] is Pieces.Rook or Pieces.PromotedRook)
                     {
                         return true;
                     }
@@ -58,7 +71,7 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
+                        board[newPos.X, newPos.Y] is Pieces.Rook or Pieces.PromotedRook)
                     {
                         return true;
                     }
@@ -71,7 +84,8 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
+                        (board[newPos.X, newPos.Y] is Pieces.Rook or Pieces.PromotedRook
+                            || (board[newPos.X, newPos.Y] is Pieces.Lance lance && !lance.IsSente)))
                     {
                         return true;
                     }
@@ -84,7 +98,8 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Rook)
+                        (board[newPos.X, newPos.Y] is Pieces.Rook or Pieces.PromotedRook
+                            || (board[newPos.X, newPos.Y] is Pieces.Lance lance && lance.IsSente)))
                     {
                         return true;
                     }
@@ -92,14 +107,14 @@ namespace Shogi
                 }
             }
 
-            // Diagonal checks (bishop & queen)
+            // Diagonal checks (bishop)
             for (int dif = 1; target.Value.X + dif < board.GetLength(0) && target.Value.Y + dif < board.GetLength(1); dif++)
             {
                 Point newPos = new(target.Value.X + dif, target.Value.Y + dif);
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
+                        board[newPos.X, newPos.Y] is Pieces.Bishop or Pieces.PromotedBishop)
                     {
                         return true;
                     }
@@ -112,7 +127,7 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
+                        board[newPos.X, newPos.Y] is Pieces.Bishop or Pieces.PromotedBishop)
                     {
                         return true;
                     }
@@ -125,7 +140,7 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
+                        board[newPos.X, newPos.Y] is Pieces.Bishop or Pieces.PromotedBishop)
                     {
                         return true;
                     }
@@ -138,7 +153,7 @@ namespace Shogi
                 if (board[newPos.X, newPos.Y] is not null)
                 {
                     if (board[newPos.X, newPos.Y]!.IsSente != isSente &&
-                        board[newPos.X, newPos.Y] is Pieces.Queen or Pieces.Bishop)
+                        board[newPos.X, newPos.Y] is Pieces.Bishop or Pieces.PromotedBishop)
                     {
                         return true;
                     }
@@ -147,14 +162,18 @@ namespace Shogi
             }
 
             // Knight checks
-            foreach (Point move in Pieces.Knight.Moves)
+            int knightDY = isSente ? 2 : -2;
+            Point knightPos = new(target.Value.X + 1, target.Value.Y + knightDY);
+            if (knightPos.X >= 0 && knightPos.Y >= 0 && knightPos.X < board.GetLength(0) && knightPos.Y < board.GetLength(1)
+                && board[knightPos.X, knightPos.Y] is Pieces.Knight && board[knightPos.X, knightPos.Y]!.IsSente != isSente)
             {
-                Point newPos = new(target.Value.X + move.X, target.Value.Y + move.Y);
-                if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                    && board[newPos.X, newPos.Y] is Pieces.Knight && board[newPos.X, newPos.Y]!.IsSente != isSente)
-                {
-                    return true;
-                }
+                return true;
+            }
+            knightPos = new(target.Value.X - 1, target.Value.Y + knightDY);
+            if (knightPos.X >= 0 && knightPos.Y >= 0 && knightPos.X < board.GetLength(0) && knightPos.Y < board.GetLength(1)
+                && board[knightPos.X, knightPos.Y] is Pieces.Knight && board[knightPos.X, knightPos.Y]!.IsSente != isSente)
+            {
+                return true;
             }
 
             // Pawn checks
@@ -162,30 +181,7 @@ namespace Shogi
             int newY = target.Value.Y + pawnYDiff;
             if (newY < board.GetLength(1) && newY > 0)
             {
-                if (board[target.Value.X, target.Value.Y] is null && board[target.Value.X, newY] is Pieces.Pawn
-                    && board[target.Value.X, newY]!.IsSente != isSente)
-                {
-                    return true;
-                }
-                if (board[target.Value.X, target.Value.Y] is not null)
-                {
-                    if (target.Value.X > 0 && board[target.Value.X - 1, newY] is Pieces.Pawn
-                        && board[target.Value.X - 1, newY]!.IsSente != isSente)
-                    {
-                        return true;
-                    }
-                    if (target.Value.X < board.GetLength(0) - 1 && board[target.Value.X + 1, newY] is Pieces.Pawn
-                        && board[target.Value.X + 1, newY]!.IsSente != isSente)
-                    {
-                        return true;
-                    }
-                }
-            }
-            newY = target.Value.Y + (pawnYDiff * 2);
-            if (newY == (isSente ? board.GetLength(1) - 2 : 1))
-            {
-                if (board[target.Value.X, target.Value.Y] is null && board[target.Value.X, target.Value.Y + pawnYDiff] is null
-                    && board[target.Value.X, newY] is Pieces.Pawn && board[target.Value.X, newY]!.IsSente != isSente)
+                if (board[target.Value.X, newY] is Pieces.Pawn && board[target.Value.X, newY]!.IsSente != isSente)
                 {
                     return true;
                 }
