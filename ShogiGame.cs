@@ -54,10 +54,6 @@ namespace Shogi
         public List<Pieces.Piece> CapturedPieces { get; }
 
         public Point? EnPassantSquare { get; private set; }
-        public bool SenteMayCastleKingside { get; private set; }
-        public bool SenteMayCastleQueenside { get; private set; }
-        public bool GoteMayCastleKingside { get; private set; }
-        public bool GoteMayCastleQueenside { get; private set; }
 
         // Used for the 50-move rule
         public int StaleMoveCounter { get; private set; }
@@ -81,10 +77,6 @@ namespace Shogi
             CapturedPieces = new List<Pieces.Piece>();
 
             EnPassantSquare = null;
-            SenteMayCastleKingside = true;
-            SenteMayCastleQueenside = true;
-            GoteMayCastleKingside = true;
-            GoteMayCastleQueenside = true;
 
             StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
@@ -108,8 +100,7 @@ namespace Shogi
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
         public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
-            List<Pieces.Piece> capturedPieces, Point? enPassantSquare, bool senteMayCastleKingside, bool senteMayCastleQueenside,
-            bool goteMayCastleKingside, bool goteMayCastleQueenside, int staleMoveCounter, Dictionary<string, int> boardCounts,
+            List<Pieces.Piece> capturedPieces, Point? enPassantSquare, int staleMoveCounter, Dictionary<string, int> boardCounts,
             string? initialState)
         {
             if (board.GetLength(0) != 8 || board.GetLength(1) != 8)
@@ -121,29 +112,12 @@ namespace Shogi
             SenteKing = Board.OfType<Pieces.King>().Where(k => k.IsSente).First();
             GoteKing = Board.OfType<Pieces.King>().Where(k => !k.IsSente).First();
 
-            if ((senteMayCastleKingside && (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsSente
-                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsSente))
-                || (senteMayCastleQueenside && (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsSente
-                    || Board[4, 0] is not Pieces.King || !Board[4, 0]!.IsSente))
-                || (goteMayCastleKingside && (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsSente
-                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsSente))
-                || (goteMayCastleQueenside && (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsSente
-                    || Board[4, 7] is not Pieces.King || Board[4, 7]!.IsSente)))
-            {
-                throw new ArgumentException(
-                    "At least one castling allowed flag was set to true without a valid position for performing it");
-            }
-
             CurrentTurnSente = currentTurnSente;
             GameOver = gameOver;
             Moves = moves;
             MoveText = moveText;
             CapturedPieces = capturedPieces;
             EnPassantSquare = enPassantSquare;
-            SenteMayCastleKingside = senteMayCastleKingside;
-            SenteMayCastleQueenside = senteMayCastleQueenside;
-            GoteMayCastleKingside = goteMayCastleKingside;
-            GoteMayCastleQueenside = goteMayCastleQueenside;
             StaleMoveCounter = staleMoveCounter;
             BoardCounts = boardCounts;
 
@@ -165,8 +139,7 @@ namespace Shogi
             }
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
-                CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, SenteMayCastleKingside,
-                SenteMayCastleQueenside, GoteMayCastleKingside, GoteMayCastleQueenside, StaleMoveCounter,
+                CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, StaleMoveCounter,
                 new(BoardCounts), InitialState);
         }
 
@@ -195,47 +168,6 @@ namespace Shogi
                 return GameState.DrawFiftyMove;
             }
             return staticState;
-        }
-
-        /// <summary>
-        /// Determine if the player who's turn it is may castle in a given direction on this turn
-        /// </summary>
-        /// <param name="kingside"><see langword="true"/> if checking kingside, <see langword="false"/> if checking queenside</param>
-        /// <remarks>
-        /// This method is similar to <see cref="BoardAnalysis.IsCastlePossible"/>,
-        /// however it also accounts for whether a king or rook have moved before
-        /// </remarks>
-        public bool IsCastlePossible(bool kingside)
-        {
-            if (GameOver)
-            {
-                return false;
-            }
-
-            if (kingside)
-            {
-                if (CurrentTurnSente && !SenteMayCastleKingside)
-                {
-                    return false;
-                }
-                if (!CurrentTurnSente && !GoteMayCastleKingside)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (CurrentTurnSente && !SenteMayCastleQueenside)
-                {
-                    return false;
-                }
-                if (!CurrentTurnSente && !GoteMayCastleQueenside)
-                {
-                    return false;
-                }
-            }
-
-            return BoardAnalysis.IsCastlePossible(Board, CurrentTurnSente, kingside);
         }
 
         /// <summary>
@@ -275,22 +207,7 @@ namespace Shogi
             }
 
             bool pieceMoved;
-            int homeY = CurrentTurnSente ? 0 : 7;
-            if (piece is Pieces.King && source.X == 4 && destination.Y == homeY
-                && ((destination.X == 6 && (forceMove || IsCastlePossible(true)))
-                    || (destination.X == 2 && (forceMove || IsCastlePossible(false)))))
-            {
-                // King performed castle, move correct rook
-                pieceMoved = true;
-                _ = piece.Move(Board, destination, true);
-
-                int rookXPos = destination.X == 2 ? 0 : 7;
-                int newRookXPos = destination.X == 2 ? 3 : 5;
-                _ = Board[rookXPos, homeY]!.Move(Board, new Point(newRookXPos, homeY), true);
-                Board[newRookXPos, homeY] = Board[rookXPos, homeY];
-                Board[rookXPos, homeY] = null;
-            }
-            else if (piece is Pieces.Pawn && destination == EnPassantSquare && (forceMove ||
+            if (piece is Pieces.Pawn && destination == EnPassantSquare && (forceMove ||
                 (Math.Abs(source.X - destination.X) == 1 && source.Y == (CurrentTurnSente ? 4 : 3)
                 && !BoardAnalysis.IsKingReachable(Board.AfterMove(source, destination), CurrentTurnSente))))
             {
@@ -314,25 +231,6 @@ namespace Shogi
                 Moves.Add((source, destination));
                 if (Board[destination.X, destination.Y] is not null)
                 {
-                    if (Board[destination.X, destination.Y] is Pieces.Rook)
-                    {
-                        if (destination == new Point(0, 0))
-                        {
-                            SenteMayCastleQueenside = false;
-                        }
-                        else if (destination == new Point(7, 0))
-                        {
-                            SenteMayCastleKingside = false;
-                        }
-                        else if (destination == new Point(0, 7))
-                        {
-                            GoteMayCastleQueenside = false;
-                        }
-                        else if (destination == new Point(7, 7))
-                        {
-                            GoteMayCastleKingside = false;
-                        }
-                    }
                     CapturedPieces.Add(Board[destination.X, destination.Y]!);
                     StaleMoveCounter = 0;
                 }
@@ -360,44 +258,6 @@ namespace Shogi
                             AwaitingPromotionResponse = false;
                         }
                         Board[source.X, source.Y] = piece;
-                    }
-                }
-                else if (piece is Pieces.King)
-                {
-                    if (piece.IsSente)
-                    {
-                        SenteMayCastleKingside = false;
-                        SenteMayCastleQueenside = false;
-                    }
-                    else
-                    {
-                        GoteMayCastleKingside = false;
-                        GoteMayCastleQueenside = false;
-                    }
-                }
-                else if (piece is Pieces.Rook)
-                {
-                    if (piece.IsSente)
-                    {
-                        if (source.X == 0)
-                        {
-                            SenteMayCastleQueenside = false;
-                        }
-                        else if (source.X == 7)
-                        {
-                            SenteMayCastleKingside = false;
-                        }
-                    }
-                    else
-                    {
-                        if (source.X == 0)
-                        {
-                            GoteMayCastleQueenside = false;
-                        }
-                        else if (source.X == 7)
-                        {
-                            GoteMayCastleKingside = false;
-                        }
                     }
                 }
 
@@ -434,20 +294,6 @@ namespace Shogi
                     }
                     else
                     {
-                        bool castle = false;
-                        if (piece is Pieces.King && source.X == 4)
-                        {
-                            if (destination.X == 6)
-                            {
-                                castle = true;
-                                newMove = "O-O";
-                            }
-                            else if (destination.X == 2)
-                            {
-                                castle = true;
-                                newMove = "O-O-O";
-                            }
-                        }
                         if (oldGame!.Board[destination.X, destination.Y] is not null)
                         {
                             newMove = 'x' + newMove;
@@ -480,10 +326,7 @@ namespace Shogi
                                 newMove = coordinate[0] + newMove;
                             }
                         }
-                        if (!castle)
-                        {
-                            newMove = piece.SymbolLetter + newMove;
-                        }
+                        newMove = piece.SymbolLetter + newMove;
                     }
 
                     GameState state = DetermineGameState();
@@ -556,32 +399,7 @@ namespace Shogi
             }
 
             _ = result.Append(CurrentTurnSente ? " w " : " b ");
-
-            bool atLeastOneCastle = false;
-            if (SenteMayCastleKingside)
-            {
-                atLeastOneCastle = true;
-                _ = result.Append('K');
-            }
-            if (SenteMayCastleQueenside)
-            {
-                atLeastOneCastle = true;
-                _ = result.Append('Q');
-            }
-            if (GoteMayCastleKingside)
-            {
-                atLeastOneCastle = true;
-                _ = result.Append('k');
-            }
-            if (SenteMayCastleQueenside)
-            {
-                atLeastOneCastle = true;
-                _ = result.Append('q');
-            }
-            if (!atLeastOneCastle)
-            {
-                _ = result.Append('-');
-            }
+            _ = result.Append('-');
 
             _ = EnPassantSquare is null
                 ? result.Append(" -")
@@ -716,32 +534,6 @@ namespace Shogi
             bool currentTurnSente = fields[1] == "w" || (fields[1] == "b" ? false
                 : throw new FormatException("Current turn specifier must be either w or b"));
 
-            bool senteKingside = false;
-            bool senteQueenside = false;
-            bool goteKingside = false;
-            bool goteQueenside = false;
-            foreach (char castleSpecifier in fields[2])
-            {
-                switch (castleSpecifier)
-                {
-                    case 'K':
-                        senteKingside = true;
-                        break;
-                    case 'Q':
-                        senteQueenside = true;
-                        break;
-                    case 'k':
-                        goteKingside = true;
-                        break;
-                    case 'q':
-                        goteQueenside = true;
-                        break;
-                    case '-': break;
-                    default:
-                        throw new FormatException($"{castleSpecifier} is not a valid castling specifier");
-                }
-            }
-
             Point? enPassant = fields[3] == "-" ? null : fields[3].FromShogiCoordinate();
 
             int staleMoves = int.Parse(fields[4]);
@@ -749,8 +541,7 @@ namespace Shogi
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, new(), enPassant, senteKingside, senteQueenside, goteKingside, goteQueenside,
-                staleMoves, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, new(), enPassant, staleMoves, new(), null);
         }
     }
 }

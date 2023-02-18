@@ -203,12 +203,6 @@
                     <CheckBox x:Name="computerSelectGote" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
                 </Grid>
                 <Separator/>
-                <Label Content="Castling Status" Margin="5" Padding="0,0,0,0" FontSize="14"/>
-                <CheckBox x:Name="castleSenteKingside" Margin="5,2,5,2" Content="Sente May Castle Kingside" IsEnabled="False"/>
-                <CheckBox x:Name="castleSenteQueenside" Margin="5,2,5,2" Content="Sente May Castle Queenside" IsEnabled="False"/>
-                <CheckBox x:Name="castleGoteKingside" Margin="5,2,5,2" Content="Gote May Castle Kingside" IsEnabled="False"/>
-                <CheckBox x:Name="castleGoteQueenside" Margin="5,2,5,5" Content="Gote May Castle Queenside" IsEnabled="False"/>
-                <Separator/>
                 <Label Content="En Passant Square" Margin="5" Padding="0,0,0,0" FontSize="14"/>
                 <CheckBox x:Name="enPassantSelect" Margin="5,2,5,5" Content="Select Square With Left Click"/>
                 <Button x:Name="clearEnPassantButton" Content="Clear Square" Margin="5,2,5,5" HorizontalAlignment="Left" Padding="5,1,5,1" Click="clearEnPassantButton_Click"/>

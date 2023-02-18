@@ -77,9 +77,6 @@ namespace Shogi.Pieces
             SymbolLetter = isSente ? '玉' : '王';
         }
 
-        /// <remarks>
-        /// This method will not return either of the castling moves
-        /// </remarks>
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             HashSet<Point> moves = new();
@@ -263,9 +260,6 @@ namespace Shogi.Pieces
             IsSente = isSente;
         }
 
-        /// <remarks>
-        /// This method will not return an available castling move
-        /// </remarks>
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             HashSet<Point> moves = new();
@@ -364,9 +358,6 @@ namespace Shogi.Pieces
             IsSente = isSente;
         }
 
-        /// <remarks>
-        /// This method will not return an available castling move
-        /// </remarks>
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             HashSet<Point> moves = new();

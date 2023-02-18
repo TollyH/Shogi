@@ -29,7 +29,6 @@ namespace Shogi
             availableMovePicker.SelectedColor = Config.AvailableMoveColor;
             availableCapturePicker.SelectedColor = Config.AvailableCaptureColor;
             availableEnPassantPicker.SelectedColor = Config.AvailableEnPassantColor;
-            availableCastlePicker.SelectedColor = Config.AvailableCastleColor;
 
             performRefresh = true;
         }
@@ -52,7 +51,6 @@ namespace Shogi
             Config.AvailableMoveColor = availableMovePicker.SelectedColor ?? default;
             Config.AvailableCaptureColor = availableCapturePicker.SelectedColor ?? default;
             Config.AvailableEnPassantColor = availableEnPassantPicker.SelectedColor ?? default;
-            Config.AvailableCastleColor = availableCastlePicker.SelectedColor ?? default;
         }
     }
 }

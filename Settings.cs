@@ -23,7 +23,6 @@ namespace Shogi
         public Color AvailableMoveColor { get; set; }
         public Color AvailableCaptureColor { get; set; }
         public Color AvailableEnPassantColor { get; set; }
-        public Color AvailableCastleColor { get; set; }
 
         public Settings()
         {
@@ -43,15 +42,13 @@ namespace Shogi
             AvailableMoveColor = Brushes.Yellow.Color;
             AvailableCaptureColor = Brushes.Red.Color;
             AvailableEnPassantColor = Brushes.OrangeRed.Color;
-            AvailableCastleColor = Brushes.MediumPurple.Color;
         }
 
         [JsonConstructor]
         public Settings(bool useSymbolsOnMoveList, bool flipBoard, bool updateEvalAfterBot,
             Color boardColor, Color defaultPieceColor,
             Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor, Color lastMoveSourceColor, Color lastMoveDestinationColor,
-            Color bestMoveSourceColor, Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor, Color availableEnPassantColor,
-            Color availableCastleColor)
+            Color bestMoveSourceColor, Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor, Color availableEnPassantColor)
         {
             UseSymbolsOnMoveList = useSymbolsOnMoveList;
             FlipBoard = flipBoard;
@@ -68,7 +65,6 @@ namespace Shogi
             AvailableMoveColor = availableMoveColor;
             AvailableCaptureColor = availableCaptureColor;
             AvailableEnPassantColor = availableEnPassantColor;
-            AvailableCastleColor = availableCastleColor;
         }
     }
 }

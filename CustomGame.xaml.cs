@@ -79,54 +79,6 @@ namespace Shogi
             }
 
             startButton.IsEnabled = senteKing is not null && goteKing is not null;
-
-            if (senteKing is null || senteKing.Position != new System.Drawing.Point(4, 0))
-            {
-                castleSenteKingside.IsChecked = false;
-                castleSenteKingside.IsEnabled = false;
-                castleSenteQueenside.IsChecked = false;
-                castleSenteQueenside.IsEnabled = false;
-            }
-            else
-            {
-                castleSenteKingside.IsEnabled = true;
-                castleSenteQueenside.IsEnabled = true;
-            }
-
-            if (Board[0, 0] is not Pieces.Rook || !Board[0, 0]!.IsSente)
-            {
-                castleSenteQueenside.IsChecked = false;
-                castleSenteQueenside.IsEnabled = false;
-            }
-            if (Board[7, 0] is not Pieces.Rook || !Board[7, 0]!.IsSente)
-            {
-                castleSenteKingside.IsChecked = false;
-                castleSenteKingside.IsEnabled = false;
-            }
-
-            if (goteKing is null || goteKing.Position != new System.Drawing.Point(4, 7))
-            {
-                castleGoteKingside.IsChecked = false;
-                castleGoteKingside.IsEnabled = false;
-                castleGoteQueenside.IsChecked = false;
-                castleGoteQueenside.IsEnabled = false;
-            }
-            else
-            {
-                castleGoteKingside.IsEnabled = true;
-                castleGoteQueenside.IsEnabled = true;
-            }
-
-            if (Board[0, 7] is not Pieces.Rook || Board[0, 7]!.IsSente)
-            {
-                castleGoteQueenside.IsChecked = false;
-                castleGoteQueenside.IsEnabled = false;
-            }
-            if (Board[7, 7] is not Pieces.Rook || Board[7, 7]!.IsSente)
-            {
-                castleGoteKingside.IsChecked = false;
-                castleGoteKingside.IsEnabled = false;
-            }
         }
 
         private void clearEnPassantButton_Click(object sender, RoutedEventArgs e)
@@ -143,9 +95,7 @@ namespace Shogi
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             GeneratedGame = new ShogiGame(Board, currentTurnSente,
                 ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, new(), EnPassantSquare, castleSenteKingside.IsChecked ?? false,
-                castleSenteQueenside.IsChecked ?? false, castleGoteKingside.IsChecked ?? false,
-                castleGoteQueenside.IsChecked ?? false, 0, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, new(), EnPassantSquare, 0, new(), null);
             Close();
         }
 

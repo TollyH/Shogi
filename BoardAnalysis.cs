@@ -195,59 +195,6 @@ namespace Shogi
         }
 
         /// <summary>
-        /// Determine if the player who's turn it is may castle in a given direction on this turn
-        /// </summary>
-        /// <param name="kingside"><see langword="true"/> if checking kingside, <see langword="false"/> if checking queenside</param>
-        /// <remarks>
-        /// This method will not consider whether a king or rook has moved before
-        /// </remarks>
-        public static bool IsCastlePossible(Pieces.Piece?[,] board, bool currentTurnSente, bool kingside)
-        {
-            int yPos = currentTurnSente ? 0 : 7;
-            if (IsKingReachable(board, currentTurnSente, new Point(4, yPos)))
-            {
-                return false;
-            }
-
-            if (kingside)
-            {
-                Point rookDest = new(5, yPos);
-                Point kingDest = new(6, yPos);
-                if (board[rookDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnSente, rookDest))
-                {
-                    return false;
-                }
-                if (board[kingDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnSente, kingDest))
-                {
-                    return false;
-                }
-                return true;
-            }
-            else
-            {
-                Point rookDest = new(3, yPos);
-                Point kingDest = new(2, yPos);
-                if (board[rookDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnSente, rookDest))
-                {
-                    return false;
-                }
-                if (board[kingDest.X, yPos] is not null
-                    || IsKingReachable(board, currentTurnSente, kingDest))
-                {
-                    return false;
-                }
-                if (board[1, yPos] is not null)
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
-
-        /// <summary>
         /// Determine the current state of the game with the given board.
         /// </summary>
         /// <remarks>
@@ -440,19 +387,7 @@ namespace Shogi
         {
             HashSet<Point> allValidMoves = piece.GetValidMoves(game.Board, true);
 
-            if (piece is Pieces.King)
-            {
-                int homeY = game.CurrentTurnSente ? 0 : 7;
-                if (game.IsCastlePossible(true))
-                {
-                    _ = allValidMoves.Add(new Point(6, homeY));
-                }
-                if (game.IsCastlePossible(false))
-                {
-                    _ = allValidMoves.Add(new Point(2, homeY));
-                }
-            }
-            else if (piece is Pieces.Pawn && game.EnPassantSquare is not null
+            if (piece is Pieces.Pawn && game.EnPassantSquare is not null
                 && Math.Abs(piece.Position.X - game.EnPassantSquare.Value.X) == 1
                 && piece.Position.Y == (game.CurrentTurnSente ? 4 : 3)
                 && !IsKingReachable(game.Board.AfterMove(piece.Position,

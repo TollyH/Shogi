@@ -303,35 +303,6 @@ namespace Shogi
                     (boardFlipped ? 7 - game.EnPassantSquare.Value.X : game.EnPassantSquare.Value.X) * tileWidth);
             }
 
-            else if (grabbedPiece is Pieces.King && highlightGrabbedMoves)
-            {
-                int yPos = game.CurrentTurnSente ? 0 : 7;
-                if (game.IsCastlePossible(true))
-                {
-                    Rectangle castleHighlight = new()
-                    {
-                        Width = tileWidth,
-                        Height = tileHeight,
-                        Fill = new SolidColorBrush(config.AvailableCastleColor)
-                    };
-                    _ = shogiGameCanvas.Children.Add(castleHighlight);
-                    Canvas.SetBottom(castleHighlight, (boardFlipped ? 7 - yPos : yPos) * tileHeight);
-                    Canvas.SetLeft(castleHighlight, (boardFlipped ? 1 : 6) * tileWidth);
-                }
-                if (game.IsCastlePossible(false))
-                {
-                    Rectangle castleHighlight = new()
-                    {
-                        Width = tileWidth,
-                        Height = tileHeight,
-                        Fill = new SolidColorBrush(config.AvailableCastleColor)
-                    };
-                    _ = shogiGameCanvas.Children.Add(castleHighlight);
-                    Canvas.SetBottom(castleHighlight, (boardFlipped ? 7 - yPos : yPos) * tileHeight);
-                    Canvas.SetLeft(castleHighlight, (boardFlipped ? 5 : 2) * tileWidth);
-                }
-            }
-
             foreach (System.Drawing.Point square in squareHighlights)
             {
                 Ellipse ellipse = new()
