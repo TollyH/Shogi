@@ -26,7 +26,7 @@ namespace Shogi
 
         public CustomGame()
         {
-            Board = new Pieces.Piece?[8, 8];
+            Board = new Pieces.Piece?[9, 9];
             GeneratedGame = null;
 
             InitializeComponent();

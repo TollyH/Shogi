@@ -68,7 +68,7 @@ namespace Shogi
             AwaitingPromotionResponse = false;
 
             SenteKing = new Pieces.King(new Point(4, 0), true);
-            GoteKing = new Pieces.King(new Point(4, 7), false);
+            GoteKing = new Pieces.King(new Point(4, 8), false);
 
             Moves = new List<(Point, Point)>();
             MoveText = new List<string>();
@@ -77,16 +77,17 @@ namespace Shogi
             StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
 
-            Board = new Pieces.Piece?[8, 8]
+            Board = new Pieces.Piece?[9, 9]
             {
-                { new Pieces.Rook(new Point(0, 0), true), new Pieces.Pawn(new Point(0, 1), true), null, null, null, null, new Pieces.Pawn(new Point(0, 6), false), new Pieces.Rook(new Point(0, 7), false) },
-                { new Pieces.Knight(new Point(1, 0), true), new Pieces.Pawn(new Point(1, 1), true), null, null, null, null, new Pieces.Pawn(new Point(1, 6), false), new Pieces.Knight(new Point(1, 7), false) },
-                { new Pieces.Bishop(new Point(2, 0), true), new Pieces.Pawn(new Point(2, 1), true), null, null, null, null, new Pieces.Pawn(new Point(2, 6), false), new Pieces.Bishop(new Point(2, 7), false) },
-                { new Pieces.Queen(new Point(3, 0), true), new Pieces.Pawn(new Point(3, 1), true), null, null, null, null, new Pieces.Pawn(new Point(3, 6), false), new Pieces.Queen(new Point(3, 7), false) },
-                { SenteKing, new Pieces.Pawn(new Point(4, 1), true), null, null, null, null, new Pieces.Pawn(new Point(4, 6), false), GoteKing },
-                { new Pieces.Bishop(new Point(5, 0), true), new Pieces.Pawn(new Point(5, 1), true), null, null, null, null, new Pieces.Pawn(new Point(5, 6), false), new Pieces.Bishop(new Point(5, 7), false) },
-                { new Pieces.Knight(new Point(6, 0), true), new Pieces.Pawn(new Point(6, 1), true), null, null, null, null, new Pieces.Pawn(new Point(6, 6), false), new Pieces.Knight(new Point(6, 7), false) },
-                { new Pieces.Rook(new Point(7, 0), true), new Pieces.Pawn(new Point(7, 1), true), null, null, null, null, new Pieces.Pawn(new Point(7, 6), false), new Pieces.Rook(new Point(7, 7), false) }
+                { new Pieces.Lance(new Point(0, 0), true), null, new Pieces.Pawn(new Point(0, 2), true), null, null, null, new Pieces.Pawn(new Point(0, 6), true), null, new Pieces.Lance(new Point(0, 8), false) },
+                { new Pieces.Knight(new Point(1, 0), true), new Pieces.Bishop(new Point(1, 1), true), new Pieces.Pawn(new Point(1, 2), true), null, null, new Pieces.Pawn(new Point(1, 6), true), null, new Pieces.Rook(new Point(1, 7), false), new Pieces.Knight(new Point(1, 8), false) },
+                { new Pieces.SilverGeneral(new Point(2, 0), true), null, new Pieces.Pawn(new Point(2, 2), true), null, null, null, new Pieces.Pawn(new Point(2, 6), true), null, new Pieces.SilverGeneral(new Point(2, 8), false) },
+                { new Pieces.GoldGeneral(new Point(3, 0), true), null, new Pieces.Pawn(new Point(3, 2), true), null, null, null, new Pieces.Pawn(new Point(3, 6), true), null, new Pieces.GoldGeneral(new Point(3, 8), false) },
+                { SenteKing, null, new Pieces.Pawn(new Point(4, 2), true), null, null, null, new Pieces.Pawn(new Point(4, 6), true), null, GoteKing },
+                { new Pieces.GoldGeneral(new Point(5, 0), true), null, new Pieces.Pawn(new Point(5, 2), true), null, null, null, new Pieces.Pawn(new Point(5, 6), true), null, new Pieces.GoldGeneral(new Point(5, 8), false) },
+                { new Pieces.SilverGeneral(new Point(6, 0), true), null, new Pieces.Pawn(new Point(6, 2), true), null, null, null, new Pieces.Pawn(new Point(6, 6), true), null, new Pieces.SilverGeneral(new Point(6, 8), false) },
+                { new Pieces.Knight(new Point(7, 0), true), new Pieces.Rook(new Point(7, 1), true), new Pieces.Pawn(new Point(7, 2), true), null, null, null, new Pieces.Pawn(new Point(7, 6), true), new Pieces.Bishop(new Point(7, 7), false), new Pieces.Knight(new Point(7, 8), false) },
+                { new Pieces.Lance(new Point(8, 0), true), null, new Pieces.Pawn(new Point(8, 2), true), null, null, null, new Pieces.Pawn(new Point(8, 6), true), null, new Pieces.Lance(new Point(8, 8), false) }
             };
 
             InitialState = ToString();
@@ -99,9 +100,9 @@ namespace Shogi
             List<Pieces.Piece> capturedPieces, int staleMoveCounter, Dictionary<string, int> boardCounts,
             string? initialState)
         {
-            if (board.GetLength(0) != 8 || board.GetLength(1) != 8)
+            if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
             {
-                throw new ArgumentException("Boards must be 8x8 in size");
+                throw new ArgumentException("Boards must be 9x9 in size");
             }
 
             Board = board;
