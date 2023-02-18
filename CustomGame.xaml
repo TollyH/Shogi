@@ -202,10 +202,6 @@
                     <RadioButton x:Name="turnSelectGote" Margin="5,2,5,5" Content="Gote" GroupName="CurrentTurn"/>
                     <CheckBox x:Name="computerSelectGote" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
                 </Grid>
-                <Separator/>
-                <Label Content="En Passant Square" Margin="5" Padding="0,0,0,0" FontSize="14"/>
-                <CheckBox x:Name="enPassantSelect" Margin="5,2,5,5" Content="Select Square With Left Click"/>
-                <Button x:Name="clearEnPassantButton" Content="Clear Square" Margin="5,2,5,5" HorizontalAlignment="Left" Padding="5,1,5,1" Click="clearEnPassantButton_Click"/>
             </StackPanel>
         </Border>
         <Button x:Name="startButton" Content="Start" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" Width="50" IsEnabled="False" Click="startButton_Click"/>

@@ -53,8 +53,6 @@ namespace Shogi
         public List<string> MoveText { get; }
         public List<Pieces.Piece> CapturedPieces { get; }
 
-        public Point? EnPassantSquare { get; private set; }
-
         // Used for the 50-move rule
         public int StaleMoveCounter { get; private set; }
         // Used to detect three-fold repetition
@@ -75,8 +73,6 @@ namespace Shogi
             Moves = new List<(Point, Point)>();
             MoveText = new List<string>();
             CapturedPieces = new List<Pieces.Piece>();
-
-            EnPassantSquare = null;
 
             StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
@@ -100,7 +96,7 @@ namespace Shogi
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
         public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
-            List<Pieces.Piece> capturedPieces, Point? enPassantSquare, int staleMoveCounter, Dictionary<string, int> boardCounts,
+            List<Pieces.Piece> capturedPieces, int staleMoveCounter, Dictionary<string, int> boardCounts,
             string? initialState)
         {
             if (board.GetLength(0) != 8 || board.GetLength(1) != 8)
@@ -117,7 +113,6 @@ namespace Shogi
             Moves = moves;
             MoveText = moveText;
             CapturedPieces = capturedPieces;
-            EnPassantSquare = enPassantSquare;
             StaleMoveCounter = staleMoveCounter;
             BoardCounts = boardCounts;
 
@@ -139,7 +134,7 @@ namespace Shogi
             }
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
-                CapturedPieces.Select(c => c.Clone()).ToList(), EnPassantSquare, StaleMoveCounter,
+                CapturedPieces.Select(c => c.Clone()).ToList(), StaleMoveCounter,
                 new(BoardCounts), InitialState);
         }
 
@@ -206,24 +201,7 @@ namespace Shogi
                 oldGame = Clone();
             }
 
-            bool pieceMoved;
-            if (piece is Pieces.Pawn && destination == EnPassantSquare && (forceMove ||
-                (Math.Abs(source.X - destination.X) == 1 && source.Y == (CurrentTurnSente ? 4 : 3)
-                && !BoardAnalysis.IsKingReachable(Board.AfterMove(source, destination), CurrentTurnSente))))
-            {
-                pieceMoved = true;
-                _ = piece.Move(Board, destination, true);
-                // Take pawn after en passant
-                if (Board[destination.X, source.Y] is not null)
-                {
-                    CapturedPieces.Add(Board[destination.X, source.Y]!);
-                    Board[destination.X, source.Y] = null;
-                }
-            }
-            else
-            {
-                pieceMoved = piece.Move(Board, destination, forceMove);
-            }
+            bool pieceMoved = piece.Move(Board, destination, forceMove);
 
             if (pieceMoved)
             {
@@ -235,14 +213,9 @@ namespace Shogi
                     StaleMoveCounter = 0;
                 }
 
-                EnPassantSquare = null;
                 if (piece is Pieces.Pawn)
                 {
                     StaleMoveCounter = 0;
-                    if (Math.Abs(destination.Y - source.Y) > 1)
-                    {
-                        EnPassantSquare = new Point(source.X, source.Y + (piece.IsSente ? 1 : -1));
-                    }
                     if (destination.Y == (piece.IsSente ? 7 : 0))
                     {
                         if (promotionType is not null)
@@ -282,8 +255,7 @@ namespace Shogi
                     string newMove = destination.ToShogiCoordinate();
                     if (oldGame!.Board[source.X, source.Y] is Pieces.Pawn)
                     {
-                        if (oldGame!.Board[destination.X, destination.Y] is not null
-                            || destination == oldGame.EnPassantSquare)
+                        if (oldGame!.Board[destination.X, destination.Y] is not null)
                         {
                             newMove = source.ToShogiCoordinate()[0] + "x" + newMove;
                         }
@@ -399,11 +371,7 @@ namespace Shogi
             }
 
             _ = result.Append(CurrentTurnSente ? " w " : " b ");
-            _ = result.Append('-');
-
-            _ = EnPassantSquare is null
-                ? result.Append(" -")
-                : result.Append(' ').Append(EnPassantSquare.Value.ToShogiCoordinate());
+            _ = result.Append("- -");
 
             _ = omitMoveCounts ? null : result.Append(' ').Append(StaleMoveCounter).Append(' ').Append((Moves.Count / 2) + 1);
 
@@ -534,14 +502,12 @@ namespace Shogi
             bool currentTurnSente = fields[1] == "w" || (fields[1] == "b" ? false
                 : throw new FormatException("Current turn specifier must be either w or b"));
 
-            Point? enPassant = fields[3] == "-" ? null : fields[3].FromShogiCoordinate();
-
             int staleMoves = int.Parse(fields[4]);
 
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, new(), enPassant, staleMoves, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, new(), staleMoves, new(), null);
         }
     }
 }

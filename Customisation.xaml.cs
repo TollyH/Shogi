@@ -28,7 +28,6 @@ namespace Shogi
             bestMoveDestinationPicker.SelectedColor = Config.BestMoveDestinationColor;
             availableMovePicker.SelectedColor = Config.AvailableMoveColor;
             availableCapturePicker.SelectedColor = Config.AvailableCaptureColor;
-            availableEnPassantPicker.SelectedColor = Config.AvailableEnPassantColor;
 
             performRefresh = true;
         }
@@ -50,7 +49,6 @@ namespace Shogi
             Config.BestMoveDestinationColor = bestMoveDestinationPicker.SelectedColor ?? default;
             Config.AvailableMoveColor = availableMovePicker.SelectedColor ?? default;
             Config.AvailableCaptureColor = availableCapturePicker.SelectedColor ?? default;
-            Config.AvailableEnPassantColor = availableEnPassantPicker.SelectedColor ?? default;
         }
     }
 }

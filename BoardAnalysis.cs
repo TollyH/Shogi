@@ -385,18 +385,7 @@ namespace Shogi
 
         private static HashSet<Point> GetValidMovesForEval(ShogiGame game, Pieces.Piece piece)
         {
-            HashSet<Point> allValidMoves = piece.GetValidMoves(game.Board, true);
-
-            if (piece is Pieces.Pawn && game.EnPassantSquare is not null
-                && Math.Abs(piece.Position.X - game.EnPassantSquare.Value.X) == 1
-                && piece.Position.Y == (game.CurrentTurnSente ? 4 : 3)
-                && !IsKingReachable(game.Board.AfterMove(piece.Position,
-                        game.EnPassantSquare.Value), game.CurrentTurnSente))
-            {
-                _ = allValidMoves.Add(game.EnPassantSquare.Value);
-            }
-
-            return allValidMoves;
+            return piece.GetValidMoves(game.Board, true);
         }
 
         private static PossibleMove MinimaxMove(ShogiGame game, double alpha, double beta, int depth, int maxDepth,

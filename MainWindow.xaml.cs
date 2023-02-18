@@ -284,25 +284,6 @@ namespace Shogi
                 }
             }
 
-            if (grabbedPiece is Pieces.Pawn && game.EnPassantSquare is not null && highlightGrabbedMoves
-                && Math.Abs(grabbedPiece.Position.X - game.EnPassantSquare.Value.X) == 1
-                && grabbedPiece.Position.Y == (game.CurrentTurnSente ? 4 : 3)
-                && !BoardAnalysis.IsKingReachable(game.Board.AfterMove(
-                        grabbedPiece.Position, game.EnPassantSquare.Value), game.CurrentTurnSente))
-            {
-                Rectangle enPassantHighlight = new()
-                {
-                    Width = tileWidth,
-                    Height = tileHeight,
-                    Fill = new SolidColorBrush(config.AvailableEnPassantColor)
-                };
-                _ = shogiGameCanvas.Children.Add(enPassantHighlight);
-                Canvas.SetBottom(enPassantHighlight,
-                    (boardFlipped ? 7 - game.EnPassantSquare.Value.Y : game.EnPassantSquare.Value.Y) * tileHeight);
-                Canvas.SetLeft(enPassantHighlight,
-                    (boardFlipped ? 7 - game.EnPassantSquare.Value.X : game.EnPassantSquare.Value.X) * tileWidth);
-            }
-
             foreach (System.Drawing.Point square in squareHighlights)
             {
                 Ellipse ellipse = new()

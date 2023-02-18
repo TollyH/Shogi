@@ -13,7 +13,6 @@ namespace Shogi
     public partial class CustomGame : Window
     {
         public Pieces.Piece?[,] Board { get; private set; }
-        public System.Drawing.Point? EnPassantSquare { get; private set; }
 
         public ShogiGame? GeneratedGame { get; private set; }
         public bool SenteIsComputer { get; private set; }
@@ -28,7 +27,6 @@ namespace Shogi
         public CustomGame()
         {
             Board = new Pieces.Piece?[8, 8];
-            EnPassantSquare = null;
             GeneratedGame = null;
 
             InitializeComponent();
@@ -40,19 +38,6 @@ namespace Shogi
             tileHeight = shogiGameCanvas.ActualHeight / Board.GetLength(1);
 
             shogiGameCanvas.Children.Clear();
-
-            if (EnPassantSquare is not null)
-            {
-                Rectangle enPassantHighlight = new()
-                {
-                    Width = tileWidth,
-                    Height = tileHeight,
-                    Fill = Brushes.OrangeRed
-                };
-                _ = shogiGameCanvas.Children.Add(enPassantHighlight);
-                Canvas.SetBottom(enPassantHighlight, EnPassantSquare.Value.Y * tileHeight);
-                Canvas.SetLeft(enPassantHighlight, EnPassantSquare.Value.X * tileWidth);
-            }
 
             for (int x = 0; x < Board.GetLength(0); x++)
             {
@@ -81,12 +66,6 @@ namespace Shogi
             startButton.IsEnabled = senteKing is not null && goteKing is not null;
         }
 
-        private void clearEnPassantButton_Click(object sender, RoutedEventArgs e)
-        {
-            EnPassantSquare = null;
-            UpdateBoard();
-        }
-
         private void startButton_Click(object sender, RoutedEventArgs e)
         {
             SenteIsComputer = computerSelectSente.IsChecked ?? false;
@@ -95,7 +74,7 @@ namespace Shogi
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             GeneratedGame = new ShogiGame(Board, currentTurnSente,
                 ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, new(), EnPassantSquare, 0, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, new(), 0, new(), null);
             Close();
         }
 
@@ -121,65 +100,58 @@ namespace Shogi
                 return;
             }
 
-            if (e.ChangedButton == MouseButton.Left && (enPassantSelect.IsChecked ?? false))
+            if (Board[coord.X, coord.Y] is null)
             {
-                EnPassantSquare = coord;
+                bool sente = e.ChangedButton == MouseButton.Left;
+                if (pieceSelectKing.IsChecked ?? false)
+                {
+                    // Only allow one king of each colour
+                    if (sente && senteKing is null)
+                    {
+                        senteKing = new Pieces.King(coord, true);
+                        Board[coord.X, coord.Y] = senteKing;
+                    }
+                    else if (!sente && goteKing is null)
+                    {
+                        goteKing = new Pieces.King(coord, false);
+                        Board[coord.X, coord.Y] = goteKing;
+                    }
+                }
+                else if (pieceSelectQueen.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Queen(coord, sente);
+                }
+                else if (pieceSelectRook.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Rook(coord, sente);
+                }
+                else if (pieceSelectBishop.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Bishop(coord, sente);
+                }
+                else if (pieceSelectKnight.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Knight(coord, sente);
+                }
+                else if (pieceSelectPawn.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Pawn(coord, sente);
+                }
             }
             else
             {
-                if (Board[coord.X, coord.Y] is null)
+                if (Board[coord.X, coord.Y] is Pieces.King king)
                 {
-                    bool sente = e.ChangedButton == MouseButton.Left;
-                    if (pieceSelectKing.IsChecked ?? false)
+                    if (king.IsSente)
                     {
-                        // Only allow one king of each colour
-                        if (sente && senteKing is null)
-                        {
-                            senteKing = new Pieces.King(coord, true);
-                            Board[coord.X, coord.Y] = senteKing;
-                        }
-                        else if (!sente && goteKing is null)
-                        {
-                            goteKing = new Pieces.King(coord, false);
-                            Board[coord.X, coord.Y] = goteKing;
-                        }
+                        senteKing = null;
                     }
-                    else if (pieceSelectQueen.IsChecked ?? false)
+                    else
                     {
-                        Board[coord.X, coord.Y] = new Pieces.Queen(coord, sente);
-                    }
-                    else if (pieceSelectRook.IsChecked ?? false)
-                    {
-                        Board[coord.X, coord.Y] = new Pieces.Rook(coord, sente);
-                    }
-                    else if (pieceSelectBishop.IsChecked ?? false)
-                    {
-                        Board[coord.X, coord.Y] = new Pieces.Bishop(coord, sente);
-                    }
-                    else if (pieceSelectKnight.IsChecked ?? false)
-                    {
-                        Board[coord.X, coord.Y] = new Pieces.Knight(coord, sente);
-                    }
-                    else if (pieceSelectPawn.IsChecked ?? false)
-                    {
-                        Board[coord.X, coord.Y] = new Pieces.Pawn(coord, sente);
+                        goteKing = null;
                     }
                 }
-                else
-                {
-                    if (Board[coord.X, coord.Y] is Pieces.King king)
-                    {
-                        if (king.IsSente)
-                        {
-                            senteKing = null;
-                        }
-                        else
-                        {
-                            goteKing = null;
-                        }
-                    }
-                    Board[coord.X, coord.Y] = null;
-                }
+                Board[coord.X, coord.Y] = null;
             }
 
             UpdateBoard();

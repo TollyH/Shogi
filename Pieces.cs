@@ -877,9 +877,6 @@ namespace Shogi.Pieces
             IsSente = isSente;
         }
 
-        /// <remarks>
-        /// This method will not return an available en passant move
-        /// </remarks>
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             HashSet<Point> moves = new();
@@ -915,9 +912,6 @@ namespace Shogi.Pieces
             IsSente = isSente;
         }
 
-        /// <remarks>
-        /// This method will not return an available en passant move
-        /// </remarks>
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
             int backwardsY = IsSente ? -1 : 1;
