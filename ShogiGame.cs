@@ -79,15 +79,15 @@ namespace Shogi
 
             Board = new Pieces.Piece?[9, 9]
             {
-                { new Pieces.Lance(new Point(0, 0), true), null, new Pieces.Pawn(new Point(0, 2), true), null, null, null, new Pieces.Pawn(new Point(0, 6), true), null, new Pieces.Lance(new Point(0, 8), false) },
-                { new Pieces.Knight(new Point(1, 0), true), new Pieces.Bishop(new Point(1, 1), true), new Pieces.Pawn(new Point(1, 2), true), null, null, new Pieces.Pawn(new Point(1, 6), true), null, new Pieces.Rook(new Point(1, 7), false), new Pieces.Knight(new Point(1, 8), false) },
-                { new Pieces.SilverGeneral(new Point(2, 0), true), null, new Pieces.Pawn(new Point(2, 2), true), null, null, null, new Pieces.Pawn(new Point(2, 6), true), null, new Pieces.SilverGeneral(new Point(2, 8), false) },
-                { new Pieces.GoldGeneral(new Point(3, 0), true), null, new Pieces.Pawn(new Point(3, 2), true), null, null, null, new Pieces.Pawn(new Point(3, 6), true), null, new Pieces.GoldGeneral(new Point(3, 8), false) },
-                { SenteKing, null, new Pieces.Pawn(new Point(4, 2), true), null, null, null, new Pieces.Pawn(new Point(4, 6), true), null, GoteKing },
-                { new Pieces.GoldGeneral(new Point(5, 0), true), null, new Pieces.Pawn(new Point(5, 2), true), null, null, null, new Pieces.Pawn(new Point(5, 6), true), null, new Pieces.GoldGeneral(new Point(5, 8), false) },
-                { new Pieces.SilverGeneral(new Point(6, 0), true), null, new Pieces.Pawn(new Point(6, 2), true), null, null, null, new Pieces.Pawn(new Point(6, 6), true), null, new Pieces.SilverGeneral(new Point(6, 8), false) },
-                { new Pieces.Knight(new Point(7, 0), true), new Pieces.Rook(new Point(7, 1), true), new Pieces.Pawn(new Point(7, 2), true), null, null, null, new Pieces.Pawn(new Point(7, 6), true), new Pieces.Bishop(new Point(7, 7), false), new Pieces.Knight(new Point(7, 8), false) },
-                { new Pieces.Lance(new Point(8, 0), true), null, new Pieces.Pawn(new Point(8, 2), true), null, null, null, new Pieces.Pawn(new Point(8, 6), true), null, new Pieces.Lance(new Point(8, 8), false) }
+                { new Pieces.Lance(new Point(0, 0), true), null, new Pieces.Pawn(new Point(0, 2), true), null, null, null, new Pieces.Pawn(new Point(0, 6), false), null, new Pieces.Lance(new Point(0, 8), false) },
+                { new Pieces.Knight(new Point(1, 0), true), new Pieces.Bishop(new Point(1, 1), true), new Pieces.Pawn(new Point(1, 2), true), null, null, null, new Pieces.Pawn(new Point(1, 6), false), new Pieces.Rook(new Point(1, 7), false), new Pieces.Knight(new Point(1, 8), false) },
+                { new Pieces.SilverGeneral(new Point(2, 0), true), null, new Pieces.Pawn(new Point(2, 2), true), null, null, null, new Pieces.Pawn(new Point(2, 6), false), null, new Pieces.SilverGeneral(new Point(2, 8), false) },
+                { new Pieces.GoldGeneral(new Point(3, 0), true), null, new Pieces.Pawn(new Point(3, 2), true), null, null, null, new Pieces.Pawn(new Point(3, 6), false), null, new Pieces.GoldGeneral(new Point(3, 8), false) },
+                { SenteKing, null, new Pieces.Pawn(new Point(4, 2), true), null, null, null, new Pieces.Pawn(new Point(4, 6), false), null, GoteKing },
+                { new Pieces.GoldGeneral(new Point(5, 0), true), null, new Pieces.Pawn(new Point(5, 2), true), null, null, null, new Pieces.Pawn(new Point(5, 6), false), null, new Pieces.GoldGeneral(new Point(5, 8), false) },
+                { new Pieces.SilverGeneral(new Point(6, 0), true), null, new Pieces.Pawn(new Point(6, 2), true), null, null, null, new Pieces.Pawn(new Point(6, 6), false), null, new Pieces.SilverGeneral(new Point(6, 8), false) },
+                { new Pieces.Knight(new Point(7, 0), true), new Pieces.Rook(new Point(7, 1), true), new Pieces.Pawn(new Point(7, 2), true), null, null, null, new Pieces.Pawn(new Point(7, 6), false), new Pieces.Bishop(new Point(7, 7), false), new Pieces.Knight(new Point(7, 8), false) },
+                { new Pieces.Lance(new Point(8, 0), true), null, new Pieces.Pawn(new Point(8, 2), true), null, null, null, new Pieces.Pawn(new Point(8, 6), false), null, new Pieces.Lance(new Point(8, 8), false) }
             };
 
             InitialState = ToString();
