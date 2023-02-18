@@ -15,8 +15,8 @@ namespace Shogi
             return newBoard;
         }
 
-        private const string files = "abcdefgh";
-        private const string ranks = "12345678";
+        private const string files = "987654321";
+        private const string ranks = "九八七六五四三二一";
         public static string ToShogiCoordinate(this Point point)
         {
             return $"{files[point.X]}{ranks[point.Y]}";
