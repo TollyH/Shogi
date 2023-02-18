@@ -428,9 +428,9 @@ namespace Shogi
 
             string convertedBestLine = "";
             ShogiGame moveStringGenerator = game.Clone();
-            foreach ((System.Drawing.Point source, System.Drawing.Point destination, Type promotionType) in bestMove.Value.BestLine)
+            foreach ((System.Drawing.Point source, System.Drawing.Point destination, bool doPromotion) in bestMove.Value.BestLine)
             {
-                _ = moveStringGenerator.MovePiece(source, destination, true, promotionType);
+                _ = moveStringGenerator.MovePiece(source, destination, true, doPromotion);
                 convertedBestLine += " " + moveStringGenerator.MoveText[^1];
             }
             toUpdate.ToolTip = convertedBestLine.Trim();
@@ -464,7 +464,7 @@ namespace Shogi
                     return;
                 }
 
-                _ = game.MovePiece(bestMove.Source, bestMove.Destination, true, promotionType: bestMove.PromotionType);
+                _ = game.MovePiece(bestMove.Source, bestMove.Destination, true, doPromotion: bestMove.DoPromotion);
                 UpdateGameDisplay();
                 movesScroll.ScrollToBottom();
                 if (config.UpdateEvalAfterBot)
@@ -550,7 +550,7 @@ namespace Shogi
                 if (grabbedPiece is not null && highlightGrabbedMoves)
                 {
                     System.Drawing.Point destination = GetCoordFromCanvasPoint(mousePos);
-                    bool success = game.MovePiece(grabbedPiece.Position, destination, promotionType: null);
+                    bool success = game.MovePiece(grabbedPiece.Position, destination, doPromotion: null);
                     if (success)
                     {
                         highlightGrabbedMoves = false;
@@ -618,7 +618,7 @@ namespace Shogi
                         UpdateGameDisplay();
                         return;
                     }
-                    bool success = game.MovePiece(grabbedPiece.Position, destination, promotionType: null);
+                    bool success = game.MovePiece(grabbedPiece.Position, destination, doPromotion: null);
                     if (success)
                     {
                         grabbedPiece = null;

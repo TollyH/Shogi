@@ -261,12 +261,12 @@ namespace Shogi
             public bool GoteMateLocated { get; }
             public int DepthToSenteMate { get; }
             public int DepthToGoteMate { get; }
-            public Type? PromotionType { get; }
-            public List<(Point, Point, Type)> BestLine { get;  }
+            public bool DoPromotion { get; }
+            public List<(Point, Point, bool)> BestLine { get;  }
 
             public PossibleMove(Point source, Point destination, double evaluatedFutureValue,
                 bool senteMateLocated, bool goteMateLocated, int depthToSenteMate, int depthToGoteMate,
-                Type? promotionType, List<(Point, Point, Type)> bestLine)
+                bool doPromotion, List<(Point, Point, bool)> bestLine)
             {
                 Source = source;
                 Destination = destination;
@@ -275,7 +275,7 @@ namespace Shogi
                 GoteMateLocated = goteMateLocated;
                 DepthToSenteMate = depthToSenteMate;
                 DepthToGoteMate = depthToGoteMate;
-                PromotionType = promotionType;
+                DoPromotion = doPromotion;
                 BestLine = bestLine;
             }
         }
@@ -288,7 +288,7 @@ namespace Shogi
         {
             PossibleMove[] moves = await EvaluatePossibleMoves(game, maxDepth, cancellationToken);
             PossibleMove bestMove = new(default, default,
-                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
+                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, false, new());
             foreach (PossibleMove potentialMove in moves)
             {
                 if (game.CurrentTurnSente)
@@ -342,28 +342,58 @@ namespace Shogi
 
                     foreach (Point validMove in GetValidMovesForEval(game, piece))
                     {
-                        remainingThreads++;
-                        Point thisPosition = piece.Position;
-                        Point thisValidMove = validMove;
-                        ShogiGame gameClone = game.Clone();
-                        List<(Point, Point, Type)> thisLine = new() { (piece.Position, validMove, typeof(Pieces.Queen)) };
-                        _ = gameClone.MovePiece(piece.Position, validMove, true,
-                            promotionType: typeof(Pieces.Queen), updateMoveText: false);
-
-                        Thread processThread = new(() =>
+                        if (Pieces.Piece.PromotionMap.ContainsKey(piece.GetType())
+                            && piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
                         {
-                            PossibleMove bestSubMove = MinimaxMove(gameClone,
-                                double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
-                            // Don't include default value in results
-                            if (bestSubMove.Source != bestSubMove.Destination)
+                            remainingThreads++;
+                            Point promotionPosition = piece.Position;
+                            Point promotionMove = validMove;
+                            ShogiGame promotionGameClone = game.Clone();
+                            List<(Point, Point, bool)> promotionLine = new() { (piece.Position, validMove, true) };
+                            _ = promotionGameClone.MovePiece(piece.Position, validMove, true,
+                                doPromotion: true, updateMoveText: false);
+
+                            Thread promotionThread = new(() =>
                             {
-                                possibleMoves.Add(new PossibleMove(thisPosition, thisValidMove, bestSubMove.EvaluatedFutureValue,
-                                    bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
-                                    bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, typeof(Pieces.Queen), bestSubMove.BestLine));
-                            }
-                            remainingThreads--;
-                        });
-                        processThread.Start();
+                                PossibleMove bestSubMove = MinimaxMove(promotionGameClone,
+                                    double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, promotionLine, cancellationToken);
+                                // Don't include default value in results
+                                if (bestSubMove.Source != bestSubMove.Destination)
+                                {
+                                    possibleMoves.Add(new PossibleMove(promotionPosition, promotionMove, bestSubMove.EvaluatedFutureValue,
+                                        bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                        bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, true, bestSubMove.BestLine));
+                                }
+                                remainingThreads--;
+                            });
+                            promotionThread.Start();
+                        }
+                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y is not 0 and not 8)
+                            && (piece is not Pieces.Knight || validMove.Y is not >= 7 and not <= 1))
+                        {
+                            remainingThreads++;
+                            Point thisPosition = piece.Position;
+                            Point thisValidMove = validMove;
+                            ShogiGame gameClone = game.Clone();
+                            List<(Point, Point, bool)> thisLine = new() { (piece.Position, validMove, false) };
+                            _ = gameClone.MovePiece(piece.Position, validMove, true,
+                                doPromotion: false, updateMoveText: false);
+
+                            Thread processThread = new(() =>
+                            {
+                                PossibleMove bestSubMove = MinimaxMove(gameClone,
+                                    double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
+                                // Don't include default value in results
+                                if (bestSubMove.Source != bestSubMove.Destination)
+                                {
+                                    possibleMoves.Add(new PossibleMove(thisPosition, thisValidMove, bestSubMove.EvaluatedFutureValue,
+                                        bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                        bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine));
+                                }
+                                remainingThreads--;
+                            });
+                            processThread.Start();
+                        }
                     }
                 }
             }
@@ -389,7 +419,7 @@ namespace Shogi
         }
 
         private static PossibleMove MinimaxMove(ShogiGame game, double alpha, double beta, int depth, int maxDepth,
-            List<(Point, Point, Type)> currentLine, CancellationToken cancellationToken)
+            List<(Point, Point, bool)> currentLine, CancellationToken cancellationToken)
         {
             (Point, Point) lastMove = game.Moves.Last();
             if (game.GameOver)
@@ -397,27 +427,27 @@ namespace Shogi
                 GameState state = game.DetermineGameState();
                 if (state == GameState.CheckMateSente)
                 {
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.NegativeInfinity, true, false, depth, 0, typeof(Pieces.Queen),
+                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.NegativeInfinity, true, false, depth, 0, false,
                         currentLine);
                 }
                 else if (state == GameState.CheckMateGote)
                 {
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.PositiveInfinity, false, true, 0, depth, typeof(Pieces.Queen),
+                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.PositiveInfinity, false, true, 0, depth, false,
                         currentLine);
                 }
                 else
                 {
                     // Draw
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, 0, false, false, 0, 0, typeof(Pieces.Queen), currentLine);
+                    return new PossibleMove(lastMove.Item1, lastMove.Item2, 0, false, false, 0, 0, false, currentLine);
                 }
             }
             if (depth > maxDepth)
             {
-                return new PossibleMove(lastMove.Item1, lastMove.Item2, CalculateBoardValue(game.Board), false, false, 0, 0, typeof(Pieces.Queen), currentLine);
+                return new PossibleMove(lastMove.Item1, lastMove.Item2, CalculateBoardValue(game.Board), false, false, 0, 0, false, currentLine);
             }
 
             PossibleMove bestMove = new(default, default,
-                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, typeof(Pieces.Queen), new());
+                game.CurrentTurnSente ? double.NegativeInfinity : double.PositiveInfinity, false, false, 0, 0, false, new());
 
             foreach (Pieces.Piece? piece in game.Board)
             {
@@ -430,55 +460,69 @@ namespace Shogi
 
                     foreach (Point validMove in GetValidMovesForEval(game, piece))
                     {
-                        ShogiGame gameClone = game.Clone();
-                        List<(Point, Point, Type)> newLine = new(currentLine) { (piece.Position, validMove, typeof(Pieces.Queen)) };
-                        _ = gameClone.MovePiece(piece.Position, validMove, true,
-                            promotionType: typeof(Pieces.Queen), updateMoveText: false);
-                        PossibleMove potentialMove = MinimaxMove(gameClone, alpha, beta, depth + 1, maxDepth, newLine, cancellationToken);
-                        if (cancellationToken.IsCancellationRequested)
+                        List<bool> availablePromotions = new(2);
+                        if (Pieces.Piece.PromotionMap.ContainsKey(piece.GetType())
+                            && piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
                         {
-                            return bestMove;
+                            availablePromotions.Add(true);
                         }
-                        if (game.CurrentTurnSente)
+                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y is not 0 and not 8)
+                            && (piece is not Pieces.Knight || validMove.Y is not >= 7 and not <= 1))
                         {
-                            if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
-                                || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
-                                || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
-                                || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
-                                    && potentialMove.DepthToGoteMate < bestMove.DepthToGoteMate))
-                            {
-                                bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
-                                    potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
-                                    potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, typeof(Pieces.Queen), potentialMove.BestLine);
-                            }
-                            if (potentialMove.EvaluatedFutureValue >= beta && !bestMove.GoteMateLocated)
+                            availablePromotions.Add(false);
+                        }
+                        foreach (bool doPromotion in availablePromotions)
+                        {
+                            ShogiGame gameClone = game.Clone();
+                            List<(Point, Point, bool)> newLine = new(currentLine) { (piece.Position, validMove, doPromotion) };
+                            _ = gameClone.MovePiece(piece.Position, validMove, true,
+                                doPromotion: doPromotion, updateMoveText: false);
+                            PossibleMove potentialMove = MinimaxMove(gameClone, alpha, beta, depth + 1, maxDepth, newLine, cancellationToken);
+                            if (cancellationToken.IsCancellationRequested)
                             {
                                 return bestMove;
                             }
-                            if (potentialMove.EvaluatedFutureValue > alpha)
+                            if (game.CurrentTurnSente)
                             {
-                                alpha = potentialMove.EvaluatedFutureValue;
+                                if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
+                                    || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
+                                    || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
+                                    || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
+                                        && potentialMove.DepthToGoteMate < bestMove.DepthToGoteMate))
+                                {
+                                    bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
+                                        potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                        potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, potentialMove.DoPromotion, potentialMove.BestLine);
+                                }
+                                if (potentialMove.EvaluatedFutureValue >= beta && !bestMove.GoteMateLocated)
+                                {
+                                    return bestMove;
+                                }
+                                if (potentialMove.EvaluatedFutureValue > alpha)
+                                {
+                                    alpha = potentialMove.EvaluatedFutureValue;
+                                }
                             }
-                        }
-                        else
-                        {
-                            if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
-                                || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
-                                || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
-                                || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
-                                    && potentialMove.DepthToSenteMate < bestMove.DepthToSenteMate))
+                            else
                             {
-                                bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
-                                    potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
-                                    potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, typeof(Pieces.Queen), potentialMove.BestLine);
-                            }
-                            if (potentialMove.EvaluatedFutureValue <= alpha && !bestMove.SenteMateLocated)
-                            {
-                                return bestMove;
-                            }
-                            if (potentialMove.EvaluatedFutureValue < beta)
-                            {
-                                beta = potentialMove.EvaluatedFutureValue;
+                                if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
+                                    || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
+                                    || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
+                                    || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
+                                        && potentialMove.DepthToSenteMate < bestMove.DepthToSenteMate))
+                                {
+                                    bestMove = new PossibleMove(piece.Position, validMove, potentialMove.EvaluatedFutureValue,
+                                        potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                        potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, potentialMove.DoPromotion, potentialMove.BestLine);
+                                }
+                                if (potentialMove.EvaluatedFutureValue <= alpha && !bestMove.SenteMateLocated)
+                                {
+                                    return bestMove;
+                                }
+                                if (potentialMove.EvaluatedFutureValue < beta)
+                                {
+                                    beta = potentialMove.EvaluatedFutureValue;
+                                }
                             }
                         }
                     }

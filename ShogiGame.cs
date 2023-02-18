@@ -168,8 +168,8 @@ namespace Shogi
         /// <summary>
         /// Move a piece on the board from a <paramref name="source"/> coordinate to a <paramref name="destination"/> coordinate.
         /// </summary>
-        /// <param name="promotionType">
-        /// If a pawn is promoted, what <see cref="Pieces.Piece"/> should it be promoted to. <see langword="null"/> means the user should be prompted for the type.
+        /// <param name="doPromotion">
+        /// If a piece can be promoted, should it be? <see langword="null"/> means the user should be prompted.
         /// </param>
         /// <param name="updateMoveText">
         /// Whether the move should update the game move text. This should usually be <see langword="true"/>,
@@ -177,7 +177,7 @@ namespace Shogi
         /// </param>
         /// <returns><see langword="true"/> if the move was valid and executed, <see langword="false"/> otherwise</returns>
         /// <remarks>This method will check if the move is completely valid, unless <paramref name="forceMove"/> is <see langword="true"/>. No other validity checks are required.</remarks>
-        public bool MovePiece(Point source, Point destination, bool forceMove = false, Type? promotionType = null, bool updateMoveText = true)
+        public bool MovePiece(Point source, Point destination, bool forceMove = false, bool? doPromotion = null, bool updateMoveText = true)
         {
             if (!forceMove && GameOver)
             {
@@ -213,22 +213,25 @@ namespace Shogi
                     StaleMoveCounter = 0;
                 }
 
-                if (piece is Pieces.Pawn)
+                Type pieceType = piece.GetType();
+                if (Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
-                    StaleMoveCounter = 0;
-                    if (destination.Y == (piece.IsSente ? 7 : 0))
+                    if (piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
                     {
-                        if (promotionType is not null)
+                        if ((piece is Pieces.Pawn or Pieces.Lance && destination.Y is 0 or 8)
+                            || (piece is Pieces.Knight && destination.Y is >= 7 or <= 1))
                         {
-                            piece = (Pieces.Piece)Activator.CreateInstance(promotionType, piece.Position, piece.IsSente)!;
+                            // Always promote pawns and lances upon reaching the last rank
+                            // Always promote knights upon reaching the last two ranks
+                            doPromotion = true;
                         }
-                        else
+                        doPromotion ??= System.Windows.MessageBox.Show(
+                            $"Do you want to promote the {piece.Name} you just moved?", "Promotion",
+                            System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question
+                        ) == System.Windows.MessageBoxResult.Yes;
+                        if (doPromotion.Value)
                         {
-                            AwaitingPromotionResponse = true;
-                            PromotionPrompt prompt = new(CurrentTurnSente);
-                            _ = prompt.ShowDialog();
-                            piece = (Pieces.Piece)Activator.CreateInstance(prompt.ChosenPieceType, piece.Position, piece.IsSente)!;
-                            AwaitingPromotionResponse = false;
+                            piece = (Pieces.Piece)Activator.CreateInstance(Pieces.Piece.PromotionMap[pieceType], piece.Position, piece.IsSente)!;
                         }
                         Board[source.X, source.Y] = piece;
                     }
