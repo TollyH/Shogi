@@ -449,7 +449,7 @@ namespace Shogi
                             board[fileIndex, 7 - r] = new Pieces.King(new Point(fileIndex, 7 - r), true);
                             break;
                         case 'Q':
-                            board[fileIndex, 7 - r] = new Pieces.Queen(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 7 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 7 - r), true);
                             break;
                         case 'R':
                             board[fileIndex, 7 - r] = new Pieces.Rook(new Point(fileIndex, 7 - r), true);
@@ -467,7 +467,7 @@ namespace Shogi
                             board[fileIndex, 7 - r] = new Pieces.King(new Point(fileIndex, 7 - r), false);
                             break;
                         case 'q':
-                            board[fileIndex, 7 - r] = new Pieces.Queen(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 7 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 7 - r), false);
                             break;
                         case 'r':
                             board[fileIndex, 7 - r] = new Pieces.Rook(new Point(fileIndex, 7 - r), false);
