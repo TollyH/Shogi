@@ -117,25 +117,57 @@ namespace Shogi
                         Board[coord.X, coord.Y] = goteKing;
                     }
                 }
-                else if (pieceSelectQueen.IsChecked ?? false)
+                else if (pieceSelectGoldGeneral.IsChecked ?? false)
                 {
-                    Board[coord.X, coord.Y] = new Pieces.Queen(coord, sente);
+                    Board[coord.X, coord.Y] = new Pieces.GoldGeneral(coord, sente);
+                }
+                else if (pieceSelectSilverGeneral.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.SilverGeneral(coord, sente);
+                }
+                else if (pieceSelectPromotedSilverGeneral.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedSilverGeneral(coord, sente);
                 }
                 else if (pieceSelectRook.IsChecked ?? false)
                 {
                     Board[coord.X, coord.Y] = new Pieces.Rook(coord, sente);
                 }
+                else if (pieceSelectPromotedRook.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedRook(coord, sente);
+                }
                 else if (pieceSelectBishop.IsChecked ?? false)
                 {
                     Board[coord.X, coord.Y] = new Pieces.Bishop(coord, sente);
+                }
+                else if (pieceSelectPromotedBishop.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedBishop(coord, sente);
                 }
                 else if (pieceSelectKnight.IsChecked ?? false)
                 {
                     Board[coord.X, coord.Y] = new Pieces.Knight(coord, sente);
                 }
+                else if (pieceSelectPromotedKnight.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedKnight(coord, sente);
+                }
+                else if (pieceSelectLance.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.Lance(coord, sente);
+                }
+                else if (pieceSelectPromotedLance.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedLance(coord, sente);
+                }
                 else if (pieceSelectPawn.IsChecked ?? false)
                 {
                     Board[coord.X, coord.Y] = new Pieces.Pawn(coord, sente);
+                }
+                else if (pieceSelectPromotedPawn.IsChecked ?? false)
+                {
+                    Board[coord.X, coord.Y] = new Pieces.PromotedPawn(coord, sente);
                 }
             }
             else

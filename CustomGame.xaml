@@ -191,11 +191,19 @@
                 <Label Content="Piece Selection (Click on Board)" Margin="5,5,5,1" Padding="0,0,0,0" FontSize="14"/>
                 <Label Content="Left Click = Sente, Right Click = Gote" Margin="5,1,5,5" Padding="0,0,0,0" FontSize="11"/>
                 <RadioButton x:Name="pieceSelectKing" Margin="5,2,5,2" Content="King" GroupName="Piece" IsChecked="True"/>
-                <RadioButton x:Name="pieceSelectQueen" Margin="5,2,5,2" Content="Queen" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectGoldGeneral" Margin="5,2,5,2" Content="Gold General" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectSilverGeneral" Margin="5,2,5,2" Content="Silver General" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedSilverGeneral" Margin="5,2,5,2" Content="Promoted Silver General" GroupName="Piece" Foreground="Red"/>
                 <RadioButton x:Name="pieceSelectRook" Margin="5,2,5,2" Content="Rook" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedRook" Margin="5,2,5,2" Content="Promoted Rook" GroupName="Piece" Foreground="Red"/>
                 <RadioButton x:Name="pieceSelectBishop" Margin="5,2,5,2" Content="Bishop" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedBishop" Margin="5,2,5,2" Content="Promoted Bishop" GroupName="Piece" Foreground="Red"/>
                 <RadioButton x:Name="pieceSelectKnight" Margin="5,2,5,2" Content="Knight" GroupName="Piece"/>
-                <RadioButton x:Name="pieceSelectPawn" Margin="5,2,5,5" Content="Pawn" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedKnight" Margin="5,2,5,2" Content="Promoted Knight" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectLance" Margin="5,2,5,2" Content="Lance" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedLance" Margin="5,2,5,2" Content="Promoted Lance" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectPawn" Margin="5,2,5,2" Content="Pawn" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedPawn" Margin="5,2,5,5" Content="Promoted Pawn" GroupName="Piece" Foreground="Red"/>
                 <Separator/>
                 <Label Content="Current Turn" Margin="5" Padding="0,0,0,0" FontSize="14"/>
                 <Grid>
