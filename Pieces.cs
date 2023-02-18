@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Drawing;
 
@@ -6,9 +7,29 @@ namespace Shogi.Pieces
 {
     public abstract class Piece
     {
+        public static readonly Dictionary<Type, Type> PromotionMap = new()
+        {
+            { typeof(SilverGeneral), typeof(PromotedSilverGeneral) },
+            { typeof(Rook), typeof(PromotedRook) },
+            { typeof(Bishop), typeof(PromotedBishop) },
+            { typeof(Knight), typeof(PromotedKnight) },
+            { typeof(Lance), typeof(PromotedLance) },
+            { typeof(Pawn), typeof(PromotedPawn) }
+        };
+        public static readonly Dictionary<Type, Type> DemotionMap = new()
+        {
+            { typeof(PromotedSilverGeneral), typeof(SilverGeneral) },
+            { typeof(PromotedRook), typeof(Rook) },
+            { typeof(PromotedBishop), typeof(Bishop) },
+            { typeof(PromotedKnight), typeof(Knight) },
+            { typeof(PromotedLance), typeof(Lance) },
+            { typeof(PromotedPawn), typeof(Pawn) }
+        };
+
         public abstract string Name { get; }
         public abstract char SymbolLetter { get; }
-        public abstract char SymbolSpecial { get; }
+        // TODO: Remove once image rendering is implemented
+        public char SymbolSpecial => '?';
         public abstract double Value { get; }
         public abstract bool IsSente { get; }
         public abstract Point Position { get; protected set; }
@@ -43,8 +64,7 @@ namespace Shogi.Pieces
     public class King : Piece
     {
         public override string Name => "King";
-        public override char SymbolLetter => 'K';
-        public override char SymbolSpecial { get; }
+        public override char SymbolLetter { get; }
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
         public override bool IsSente { get; }
@@ -54,7 +74,7 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♔' : '♚';
+            SymbolLetter = isSente ? '玉' : '王';
         }
 
         /// <remarks>
@@ -91,159 +111,37 @@ namespace Shogi.Pieces
         }
     }
 
-    public class Queen : Piece
+    public class GoldGeneral : Piece
     {
-        public override string Name => "Queen";
-        public override char SymbolLetter => 'Q';
-        public override char SymbolSpecial { get; }
-        public override double Value => 9.5;
+        public override string Name => "Gold General";
+        public override char SymbolLetter => '金';
+        public override double Value => 11;
         public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
-        public Queen(Point position, bool isSente)
+        public GoldGeneral(Point position, bool isSente)
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♕' : '♛';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
+            int backwardsY = IsSente ? -1 : 1;
             HashSet<Point> moves = new();
-            // Right
-            for (int dx = Position.X + 1; dx < board.GetLength(0); dx++)
+            for (int dx = -1; dx <= 1; dx++)
             {
-                Point newPos = new(dx, Position.Y);
-                if (board[newPos.X, newPos.Y] is null)
+                for (int dy = -1; dy <= 1; dy++)
                 {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0))
                     {
-                        _ = moves.Add(newPos);
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
                     }
-                    break;
-                }
-            }
-            // Left
-            for (int dx = Position.X - 1; dx >= 0; dx--)
-            {
-                Point newPos = new(dx, Position.Y);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Up
-            for (int dy = Position.Y + 1; dy < board.GetLength(1); dy++)
-            {
-                Point newPos = new(Position.X, dy);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Down
-            for (int dy = Position.Y - 1; dy >= 0; dy--)
-            {
-                Point newPos = new(Position.X, dy);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Diagonal Up Right
-            for (int dif = 1; Position.X + dif < board.GetLength(0) && Position.Y + dif < board.GetLength(1); dif++)
-            {
-                Point newPos = new(Position.X + dif, Position.Y + dif);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Diagonal Up Left
-            for (int dif = 1; Position.X - dif >= 0 && Position.Y + dif < board.GetLength(1); dif++)
-            {
-                Point newPos = new(Position.X - dif, Position.Y + dif);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Diagonal Down Left
-            for (int dif = 1; Position.X - dif >= 0 && Position.Y - dif >= 0; dif++)
-            {
-                Point newPos = new(Position.X - dif, Position.Y - dif);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
-                }
-            }
-            // Diagonal Down Right
-            for (int dif = 1; Position.X + dif < board.GetLength(0) && Position.Y - dif >= 0; dif++)
-            {
-                Point newPos = new(Position.X + dif, Position.Y - dif);
-                if (board[newPos.X, newPos.Y] is null)
-                {
-                    _ = moves.Add(newPos);
-                }
-                else
-                {
-                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
-                    {
-                        _ = moves.Add(newPos);
-                    }
-                    break;
                 }
             }
             if (enforceCheckLegality)
@@ -253,18 +151,109 @@ namespace Shogi.Pieces
             return moves;
         }
 
-        public override Queen Clone()
+        public override GoldGeneral Clone()
         {
-            return new Queen(Position, IsSente);
+            return new GoldGeneral(Position, IsSente);
+        }
+    }
+
+    public class SilverGeneral : Piece
+    {
+        public override string Name => "Silver General";
+        public override char SymbolLetter => '銀';
+        public override double Value => 10;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public SilverGeneral(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int backwardsY = IsSente ? -1 : 1;
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0) && dy != 0)
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override SilverGeneral Clone()
+        {
+            return new SilverGeneral(Position, IsSente);
+        }
+    }
+
+    public class PromotedSilverGeneral : Piece
+    {
+        public override string Name => "Promoted Silver General";
+        public override char SymbolLetter => '全';
+        public override double Value => 11;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedSilverGeneral(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int backwardsY = IsSente ? -1 : 1;
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0))
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override PromotedSilverGeneral Clone()
+        {
+            return new PromotedSilverGeneral(Position, IsSente);
         }
     }
 
     public class Rook : Piece
     {
         public override string Name => "Rook";
-        public override char SymbolLetter => 'R';
-        public override char SymbolSpecial { get; }
-        public override double Value => 5.63;
+        public override char SymbolLetter => '飛';
+        public override double Value => 19;
         public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
@@ -272,7 +261,6 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♖' : '♜';
         }
 
         /// <remarks>
@@ -362,12 +350,127 @@ namespace Shogi.Pieces
         }
     }
 
+    public class PromotedRook : Piece
+    {
+        public override string Name => "Promoted Rook";
+        public override char SymbolLetter => '龍';
+        public override double Value => 22;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedRook(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        /// <remarks>
+        /// This method will not return an available castling move
+        /// </remarks>
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dy != 0 || dx != 0)
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            // Right
+            for (int dx = Position.X + 1; dx < board.GetLength(0); dx++)
+            {
+                Point newPos = new(dx, Position.Y);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Left
+            for (int dx = Position.X - 1; dx >= 0; dx--)
+            {
+                Point newPos = new(dx, Position.Y);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Up
+            for (int dy = Position.Y + 1; dy < board.GetLength(1); dy++)
+            {
+                Point newPos = new(Position.X, dy);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Down
+            for (int dy = Position.Y - 1; dy >= 0; dy--)
+            {
+                Point newPos = new(Position.X, dy);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override PromotedRook Clone()
+        {
+            return new PromotedRook(Position, IsSente);
+        }
+    }
+
     public class Bishop : Piece
     {
         public override string Name => "Bishop";
-        public override char SymbolLetter => 'B';
-        public override char SymbolSpecial { get; }
-        public override double Value => 3.33;
+        public override char SymbolLetter => '角';
+        public override double Value => 17;
         public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
@@ -375,7 +478,6 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♗' : '♝';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
@@ -462,17 +564,124 @@ namespace Shogi.Pieces
         }
     }
 
+    public class PromotedBishop : Piece
+    {
+        public override string Name => "Promoted Bishop";
+        public override char SymbolLetter => '馬';
+        public override double Value => 20;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedBishop(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if (dy != 0 || dx != 0)
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            // Diagonal Up Right
+            for (int dif = 1; Position.X + dif < board.GetLength(0) && Position.Y + dif < board.GetLength(1); dif++)
+            {
+                Point newPos = new(Position.X + dif, Position.Y + dif);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Diagonal Up Left
+            for (int dif = 1; Position.X - dif >= 0 && Position.Y + dif < board.GetLength(1); dif++)
+            {
+                Point newPos = new(Position.X - dif, Position.Y + dif);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Diagonal Down Left
+            for (int dif = 1; Position.X - dif >= 0 && Position.Y - dif >= 0; dif++)
+            {
+                Point newPos = new(Position.X - dif, Position.Y - dif);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            // Diagonal Down Right
+            for (int dif = 1; Position.X + dif < board.GetLength(0) && Position.Y - dif >= 0; dif++)
+            {
+                Point newPos = new(Position.X + dif, Position.Y - dif);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override PromotedBishop Clone()
+        {
+            return new PromotedBishop(Position, IsSente);
+        }
+    }
+
     public class Knight : Piece
     {
-        public static readonly ImmutableArray<Point> Moves = new Point[8]
-        {
-            new(1, 2), new(1, -2), new(-1, 2), new(-1, -2), new(2, 1), new(2, -1), new(-2, 1), new(-2, -1)
-        }.ToImmutableArray();
-
         public override string Name => "Knight";
-        public override char SymbolLetter => 'N';
-        public override char SymbolSpecial { get; }
-        public override double Value => 3.05;
+        public override char SymbolLetter => '桂';
+        public override double Value => 6;
         public override bool IsSente { get; }
         public override Point Position { get; protected set; }
 
@@ -480,27 +689,32 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♘' : '♞';
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
         {
-            HashSet<Point> vectors = new(Moves);
-            HashSet<Point> validMoves = new();
-            foreach (Point newMove in vectors)
+            int dy = IsSente ? 2 : -2;
+            HashSet<Point> moves = new();
+
+            Point newPos = new(Position.X + 1, Position.Y + dy);
+            if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
             {
-                Point newPos = new(Position.X + newMove.X, Position.Y + newMove.Y);
-                if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
-                    && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
-                {
-                    _ = validMoves.Add(newPos);
-                }
+                _ = moves.Add(newPos);
             }
+
+            newPos = new(Position.X - 1, Position.Y + dy);
+            if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+            {
+                _ = moves.Add(newPos);
+            }
+
             if (enforceCheckLegality)
             {
-                _ = validMoves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
             }
-            return validMoves;
+            return moves;
         }
 
         public override Knight Clone()
@@ -509,11 +723,159 @@ namespace Shogi.Pieces
         }
     }
 
+    public class PromotedKnight : Piece
+    {
+        public override string Name => "Promoted Knight";
+        public override char SymbolLetter => '圭';
+        public override double Value => 11;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedKnight(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int backwardsY = IsSente ? -1 : 1;
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0))
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override PromotedKnight Clone()
+        {
+            return new PromotedKnight(Position, IsSente);
+        }
+    }
+
+    public class Lance : Piece
+    {
+        public static readonly ImmutableArray<Point> Moves = new Point[8]
+        {
+            new(1, 2), new(1, -2), new(-1, 2), new(-1, -2), new(2, 1), new(2, -1), new(-2, 1), new(-2, -1)
+        }.ToImmutableArray();
+
+        public override string Name => "Lance";
+        public override char SymbolLetter => '香';
+        public override double Value => 6;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public Lance(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int yChange = IsSente ? 1 : -1;
+            HashSet<Point> moves = new();
+            for (int dy = Position.Y + yChange; dy < board.GetLength(1) && dy >= 0; dy += yChange)
+            {
+                Point newPos = new(Position.X, dy);
+                if (board[newPos.X, newPos.Y] is null)
+                {
+                    _ = moves.Add(newPos);
+                }
+                else
+                {
+                    if (board[newPos.X, newPos.Y]!.IsSente != IsSente)
+                    {
+                        _ = moves.Add(newPos);
+                    }
+                    break;
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override Lance Clone()
+        {
+            return new Lance(Position, IsSente);
+        }
+    }
+
+    public class PromotedLance : Piece
+    {
+        public static readonly ImmutableArray<Point> Moves = new Point[8]
+        {
+            new(1, 2), new(1, -2), new(-1, 2), new(-1, -2), new(2, 1), new(2, -1), new(-2, 1), new(-2, -1)
+        }.ToImmutableArray();
+
+        public override string Name => "Promoted Lance";
+        public override char SymbolLetter => '杏';
+        public override double Value => 11;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedLance(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int backwardsY = IsSente ? -1 : 1;
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0))
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override Lance Clone()
+        {
+            return new Lance(Position, IsSente);
+        }
+    }
+
     public class Pawn : Piece
     {
         public override string Name => "Pawn";
-        public override char SymbolLetter => 'P';
-        public override char SymbolSpecial { get; }
+        public override char SymbolLetter => '歩';
         public override double Value => 1;
         public override bool IsSente { get; }
         public override Point Position { get; protected set; }
@@ -522,7 +884,6 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolSpecial = isSente ? '♙' : '♟';
         }
 
         /// <remarks>
@@ -532,28 +893,9 @@ namespace Shogi.Pieces
         {
             HashSet<Point> moves = new();
             int checkY = Position.Y + (IsSente ? 1 : -1);
-            int doubleCheckY = Position.Y + (IsSente ? 2 : -2);
-            bool hasMoved = Position.Y != (IsSente ? 1 : board.GetLength(1) - 2);
-            if (board[Position.X, checkY] is null)
+            if (board[Position.X, checkY] is null || board[Position.X, checkY]!.IsSente != IsSente)
             {
                 _ = moves.Add(new Point(Position.X, checkY));
-            }
-            // First move can optionally be two instead of one
-            if (!hasMoved && board[Position.X, checkY] is null && board[Position.X, doubleCheckY] is null)
-            {
-                _ = moves.Add(new Point(Position.X, doubleCheckY));
-            }
-            // Taking to diagonal left
-            if (Position.X > 0 && 
-                board[Position.X - 1, checkY] is not null && board[Position.X - 1, checkY]!.IsSente != IsSente)
-            {
-                _ = moves.Add(new Point(Position.X - 1, checkY));
-            }
-            // Taking to diagonal right
-            if (Position.X < board.GetLength(0) - 1 && 
-                board[Position.X + 1, checkY] is not null && board[Position.X + 1, checkY]!.IsSente != IsSente)
-            {
-                _ = moves.Add(new Point(Position.X + 1, checkY));
             }
             if (enforceCheckLegality)
             {
@@ -565,6 +907,55 @@ namespace Shogi.Pieces
         public override Pawn Clone()
         {
             return new Pawn(Position, IsSente);
+        }
+    }
+
+    public class PromotedPawn : Piece
+    {
+        public override string Name => "Promoted Pawn";
+        public override char SymbolLetter => 'と';
+        public override double Value => 11;
+        public override bool IsSente { get; }
+        public override Point Position { get; protected set; }
+
+        public PromotedPawn(Point position, bool isSente)
+        {
+            Position = position;
+            IsSente = isSente;
+        }
+
+        /// <remarks>
+        /// This method will not return an available en passant move
+        /// </remarks>
+        public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
+        {
+            int backwardsY = IsSente ? -1 : 1;
+            HashSet<Point> moves = new();
+            for (int dx = -1; dx <= 1; dx++)
+            {
+                for (int dy = -1; dy <= 1; dy++)
+                {
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0))
+                    {
+                        Point newPos = new(Position.X + dx, Position.Y + dy);
+                        if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
+                            && (board[newPos.X, newPos.Y] is null || board[newPos.X, newPos.Y]!.IsSente != IsSente))
+                        {
+                            _ = moves.Add(newPos);
+                        }
+                    }
+                }
+            }
+            if (enforceCheckLegality)
+            {
+                _ = moves.RemoveWhere(m => BoardAnalysis.IsKingReachable(board.AfterMove(Position, m), IsSente));
+            }
+            return moves;
+        }
+
+        public override PromotedPawn Clone()
+        {
+            return new PromotedPawn(Position, IsSente);
         }
     }
 }
