@@ -423,11 +423,11 @@ namespace Shogi
                         }
                         else if (destination.Y > source.Y && !canReachDest.Where(p => destination.Y > p.Position.Y).Any())
                         {
-                            newMove += '上';
+                            newMove += CurrentTurnSente ? '引' : '上';
                         }
                         else if (destination.Y < source.Y && !canReachDest.Where(p => destination.Y < p.Position.Y).Any())
                         {
-                            newMove += '引';
+                            newMove += CurrentTurnSente ? '上' : '引';
                         }
                         else if (destination.Y == source.Y && !canReachDest.Where(p => destination.Y == p.Position.Y).Any())
                         {
