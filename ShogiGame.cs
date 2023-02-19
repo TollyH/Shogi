@@ -356,6 +356,7 @@ namespace Shogi
 
                 bool promotionPossible = false;
                 bool promotionHappened = false;
+                Pieces.Piece beforePromotion = piece;
                 Type pieceType = piece.GetType();
                 if (source.X != -1 && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
@@ -408,7 +409,7 @@ namespace Shogi
                 {
                     string newMove = (CurrentTurnSente ? "☖" : "☗")
                         + (Moves.Count > 1 && destination == Moves[^2].Item2 ? "同" : destination.ToShogiCoordinate())
-                        + piece.SymbolLetter;
+                        + beforePromotion.SymbolLetter;
 
                     // Disambiguate moving piece if two pieces of the same type can reach destination
                     IEnumerable<Pieces.Piece> canReachDest = oldGame!.Board.OfType<Pieces.Piece>().Where(
