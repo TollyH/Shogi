@@ -62,7 +62,7 @@ namespace Shogi.Pieces
     public class King : Piece
     {
         public override string Name => "King";
-        public override string SymbolLetter { get; }
+        public override string SymbolLetter => "玉";
         public override string SFENLetter => "K";
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
@@ -73,7 +73,6 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolLetter = isSente ? "玉" : "王";
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
