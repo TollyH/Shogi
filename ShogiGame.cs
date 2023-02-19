@@ -420,17 +420,29 @@ namespace Shogi
                         {
                             newMove += '打';
                         }
-                        else if (destination.Y > source.Y)
+                        else if (destination.Y > source.Y && !canReachDest.Where(p => destination.Y > p.Position.Y).Any())
                         {
                             newMove += '上';
                         }
-                        else if (destination.Y < source.Y)
+                        else if (destination.Y < source.Y && !canReachDest.Where(p => destination.Y < p.Position.Y).Any())
                         {
                             newMove += '引';
                         }
-                        else
+                        else if (destination.Y == source.Y && !canReachDest.Where(p => destination.Y == p.Position.Y).Any())
                         {
                             newMove += '寄';
+                        }
+                        else if (destination.X > source.X && !canReachDest.Where(p => destination.X > p.Position.X).Any())
+                        {
+                            newMove += CurrentTurnSente ? "右" : "左";
+                        }
+                        else if (destination.X < source.X && !canReachDest.Where(p => destination.X < p.Position.X).Any())
+                        {
+                            newMove += CurrentTurnSente ? "左" : "右";
+                        }
+                        else
+                        {
+                            newMove += "直";
                         }
                     }
 
