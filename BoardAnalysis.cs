@@ -194,7 +194,7 @@ namespace Shogi
         /// Determine the current state of the game with the given board.
         /// </summary>
         /// <remarks>
-        /// This method will not detect states that depend on game history, such as three-fold repetition or the 50-move rule
+        /// This method will not detect states that depend on game history, such as repetition
         /// </remarks>
         public static GameState DetermineGameState(Pieces.Piece?[,] board, bool currentTurnSente,
             Point? senteKingPos = null, Point? goteKingPos = null)
@@ -208,29 +208,11 @@ namespace Shogi
 
             if (currentTurnSente && !sentePieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
             {
-                // Gote may only win if they have sente king in check, otherwise draw
-                return senteCheck ? GameState.CheckMateSente : GameState.DrawStalemate;
+                return senteCheck ? GameState.CheckMateSente : GameState.StalemateSente;
             }
             if (!currentTurnSente && !gotePieces.SelectMany(p => p.GetValidMoves(board, true)).Any())
             {
-                // Sente may only win if they have gote king in check, otherwise draw
-                return goteCheck ? GameState.CheckMateGote : GameState.DrawStalemate;
-            }
-
-            int sentePiecesCount = sentePieces.Count();
-            int gotePiecesCount = gotePieces.Count();
-            if ((sentePiecesCount == 1 || (sentePiecesCount == 2
-                    && sentePieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight))
-                && (gotePiecesCount == 1 || (gotePiecesCount == 2
-                    && gotePieces.Where(p => p is not Pieces.King).First() is Pieces.Bishop or Pieces.Knight)))
-            {
-                return GameState.DrawInsufficientMaterial;
-            }
-
-            if ((sentePiecesCount == 1 && gotePiecesCount == 3 && gotePieces.OfType<Pieces.Knight>().Count() == 2)
-                || (gotePiecesCount == 1 && sentePiecesCount == 3 && sentePieces.OfType<Pieces.Knight>().Count() == 2))
-            {
-                return GameState.DrawInsufficientMaterial;
+                return goteCheck ? GameState.CheckMateGote : GameState.StalemateGote;
             }
 
             return senteCheck ? GameState.CheckSente : goteCheck ? GameState.CheckGote : GameState.StandardPlay;

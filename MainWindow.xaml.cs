@@ -401,10 +401,11 @@ namespace Shogi
                 {
                     GameState.CheckMateSente => "Gote wins by checkmate!",
                     GameState.CheckMateGote => "Sente wins by checkmate!",
-                    GameState.DrawStalemate => "Game drawn due to stalemate",
-                    GameState.DrawInsufficientMaterial => "Game drawn as neither side has sufficient material to mate",
-                    GameState.DrawThreeFold => "Game drawn as the same position has occured three times",
-                    GameState.DrawFiftyMove => "Game drawn as fifty moves have occured without a capture or a pawn movement",
+                    GameState.StalemateSente => "Gote wins by stalemate!",
+                    GameState.StalemateGote => "Sente wins by stalemate!",
+                    GameState.PerpetualCheckSente => "Sente wins as gote attempted to draw through perpetual check",
+                    GameState.PerpetualCheckGote => "Gote wins as sente attempted to draw through perpetual check",
+                    GameState.DrawRepetition => "Game drawn as the same position has occured four times",
                     _ => "Game over"
                 }, "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
             }

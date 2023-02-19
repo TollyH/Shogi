@@ -14,12 +14,13 @@ namespace Shogi
     public enum GameState
     {
         StandardPlay,
-        DrawStalemate,
-        DrawFiftyMove,
-        DrawThreeFold,
-        DrawInsufficientMaterial,
+        DrawRepetition,
         CheckSente,
         CheckGote,
+        PerpetualCheckSente,
+        PerpetualCheckGote,
+        StalemateSente,
+        StalemateGote,
         CheckMateSente,
         CheckMateGote
     }
@@ -28,10 +29,11 @@ namespace Shogi
     {
         public static readonly ImmutableHashSet<GameState> EndingStates = new HashSet<GameState>()
         {
-            GameState.DrawFiftyMove,
-            GameState.DrawStalemate,
-            GameState.DrawThreeFold,
-            GameState.DrawInsufficientMaterial,
+            GameState.DrawRepetition,
+            GameState.PerpetualCheckSente,
+            GameState.PerpetualCheckGote,
+            GameState.StalemateSente,
+            GameState.StalemateGote,
             GameState.CheckMateSente,
             GameState.CheckMateGote
         }.ToImmutableHashSet();
@@ -73,9 +75,7 @@ namespace Shogi
         public Dictionary<Type, int> SentePieceDrops { get; }
         public Dictionary<Type, int> GotePieceDrops { get; }
 
-        // Used for the 50-move rule
-        public int StaleMoveCounter { get; private set; }
-        // Used to detect three-fold repetition
+        // Used to detect repetition
         public Dictionary<string, int> BoardCounts { get; }
 
         /// <summary>
@@ -113,7 +113,6 @@ namespace Shogi
                 { typeof(Pieces.Pawn), 0 },
             };
 
-            StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
 
             Board = new Pieces.Piece?[9, 9]
@@ -136,7 +135,7 @@ namespace Shogi
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
         public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
-            Dictionary<Type, int>? sentePieceDrops, Dictionary<Type, int>? gotePieceDrops, int staleMoveCounter,
+            Dictionary<Type, int>? sentePieceDrops, Dictionary<Type, int>? gotePieceDrops,
             Dictionary<string, int> boardCounts, string? initialState)
         {
             if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
@@ -172,7 +171,6 @@ namespace Shogi
                 { typeof(Pieces.Lance), 0 },
                 { typeof(Pieces.Pawn), 0 },
             };
-            StaleMoveCounter = staleMoveCounter;
             BoardCounts = boardCounts;
 
             InitialState = initialState ?? ToString();
@@ -193,7 +191,7 @@ namespace Shogi
             }
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
-                new Dictionary<Type, int>(SentePieceDrops), new Dictionary<Type, int>(GotePieceDrops), StaleMoveCounter,
+                new Dictionary<Type, int>(SentePieceDrops), new Dictionary<Type, int>(GotePieceDrops),
                 new(BoardCounts), InitialState);
         }
 
@@ -201,10 +199,9 @@ namespace Shogi
         /// Determine the current state of the game.
         /// </summary>
         /// <remarks>
-        /// This method is similar to <see cref="BoardAnalysis.DetermineGameState"/>,
-        /// however it can also detect the 50-move rule and three-fold repetition.
+        /// This method is similar to <see cref="BoardAnalysis.DetermineGameState"/>, however it can also detect repetition.
         /// </remarks>
-        public GameState DetermineGameState()
+        public GameState DetermineGameState(bool includeRepetition = true)
         {
             GameState staticState = BoardAnalysis.DetermineGameState(Board, CurrentTurnSente,
                 SenteKing.Position, GoteKing.Position);
@@ -212,14 +209,13 @@ namespace Shogi
             {
                 return staticState;
             }
-            if (BoardCounts.GetValueOrDefault(ToString(true)) >= 3)
+            if (includeRepetition && BoardCounts.GetValueOrDefault(ToString(true)) >= 4)
             {
-                return GameState.DrawThreeFold;
-            }
-            // 100 because the 50-move rule needs 50 stale moves from *each* player
-            if (StaleMoveCounter >= 100)
-            {
-                return GameState.DrawFiftyMove;
+                if (ToString(true)[^1] == '!')
+                {
+                    return CurrentTurnSente ? GameState.PerpetualCheckGote : GameState.PerpetualCheckSente;
+                }
+                return GameState.DrawRepetition;
             }
             return staticState;
         }
@@ -337,7 +333,6 @@ namespace Shogi
 
             if (pieceMoved)
             {
-                StaleMoveCounter++;
                 Moves.Add((source, destination));
                 if (Board[destination.X, destination.Y] is not null)
                 {
@@ -528,7 +523,9 @@ namespace Shogi
             _ = result.Append(CurrentTurnSente ? " w " : " b ");
             _ = result.Append("- -");
 
-            _ = omitMoveCounts ? null : result.Append(' ').Append(StaleMoveCounter).Append(' ').Append((Moves.Count / 2) + 1);
+            // Append whether in check or not for checking whether perpetual check occurred
+            _ = omitMoveCounts ? result.Append(' ').Append(DetermineGameState(false) is GameState.CheckSente or GameState.CheckGote ? '!' : '-')
+                : result.Append(' ').Append(0).Append(' ').Append((Moves.Count / 2) + 1);
 
             return result.ToString();
         }
@@ -662,7 +659,7 @@ namespace Shogi
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, null, null, staleMoves, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, null, null, new(), null);
         }
     }
 }
