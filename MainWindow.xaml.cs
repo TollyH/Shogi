@@ -56,7 +56,6 @@ namespace Shogi
             InitializeComponent();
 
             shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
-            moveListSymbolsItem.IsChecked = config.UseSymbolsOnMoveList;
             flipBoardItem.IsChecked = config.FlipBoard;
             updateEvalAfterBotItem.IsChecked = config.UpdateEvalAfterBot;
             foreach (MenuItem item in pieceSetItem.Items)
@@ -175,19 +174,9 @@ namespace Shogi
             for (int i = 0; i < game.MoveText.Count; i += 2)
             {
                 string text = $"{(i / 2) + 1}. {game.MoveText[i]}";
-                if (config.UseSymbolsOnMoveList)
-                {
-                    text = text.Replace('K', '♔').Replace('Q', '♕').Replace('R', '♖')
-                        .Replace('B', '♗').Replace('N', '♘');
-                }
                 if (i + 1 < game.MoveText.Count)
                 {
                     text += $" {game.MoveText[i + 1]}";
-                    if (config.UseSymbolsOnMoveList)
-                    {
-                        text = text.Replace('K', '♚').Replace('Q', '♛').Replace('R', '♜')
-                            .Replace('B', '♝').Replace('N', '♞');
-                    }
                 }
                 _ = movesPanel.Children.Add(new Label()
                 {
@@ -823,7 +812,6 @@ namespace Shogi
 
         private void SettingsCheckItem_Click(object sender, RoutedEventArgs e)
         {
-            config.UseSymbolsOnMoveList = moveListSymbolsItem.IsChecked;
             config.FlipBoard = flipBoardItem.IsChecked;
             config.UpdateEvalAfterBot = updateEvalAfterBotItem.IsChecked;
 

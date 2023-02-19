@@ -7,7 +7,6 @@ namespace Shogi
     [Serializable]
     public class Settings
     {
-        public bool UseSymbolsOnMoveList { get; set; }
         public bool FlipBoard { get; set; }
         public bool UpdateEvalAfterBot { get; set; }
         public string PieceSet { get; set; }
@@ -25,7 +24,6 @@ namespace Shogi
 
         public Settings()
         {
-            UseSymbolsOnMoveList = false;
             FlipBoard = false;
             UpdateEvalAfterBot = true;
             PieceSet = "1kanji";
@@ -43,12 +41,11 @@ namespace Shogi
         }
 
         [JsonConstructor]
-        public Settings(bool useSymbolsOnMoveList, bool flipBoard, bool updateEvalAfterBot, string pieceSet,
+        public Settings(bool flipBoard, bool updateEvalAfterBot, string pieceSet,
             Color boardColor, Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor,
             Color lastMoveSourceColor, Color lastMoveDestinationColor, Color bestMoveSourceColor,
             Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor)
         {
-            UseSymbolsOnMoveList = useSymbolsOnMoveList;
             FlipBoard = flipBoard;
             UpdateEvalAfterBot = updateEvalAfterBot;
             PieceSet = pieceSet;

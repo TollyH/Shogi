@@ -31,7 +31,6 @@
                 <MenuItem Header="Copy SFEN _to Clipboard" Click="FENCopy_Click"/>
             </MenuItem>
             <MenuItem Header="_Settings" Margin="2">
-                <MenuItem x:Name="moveListSymbolsItem" Header="Use Piece _Symbols on the Move List" Click="SettingsCheckItem_Click" IsCheckable="True"/>
                 <MenuItem x:Name="flipBoardItem" Header="_Flip the Board on Gote's Turn" Click="SettingsCheckItem_Click" IsCheckable="True"/>
                 <MenuItem x:Name="updateEvalAfterBotItem" Header="Update _Evaluation Meter Automatically After Computer Move" Click="SettingsCheckItem_Click" IsCheckable="True"/>
                 <Separator/>
