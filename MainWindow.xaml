@@ -233,31 +233,31 @@
         </Border>
         <Border x:Name="goteDropsContainer" Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <StackPanel x:Name="goteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}">
+                <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Gold General.png" Tag="Gold General"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="goteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}">
+                <Grid x:Name="goteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Silver General.png" Tag="Silver General"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="goteRookDrop" Tag="{x:Type pieces:Rook}">
+                <Grid x:Name="goteRookDrop" Tag="{x:Type pieces:Rook}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Rook.png" Tag="Rook"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="goteBishopDrop" Tag="{x:Type pieces:Bishop}">
+                <Grid x:Name="goteBishopDrop" Tag="{x:Type pieces:Bishop}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Bishop.png" Tag="Bishop"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="goteKnightDrop" Tag="{x:Type pieces:Knight}">
+                <Grid x:Name="goteKnightDrop" Tag="{x:Type pieces:Knight}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Knight.png" Tag="Knight"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="goteLanceDrop" Tag="{x:Type pieces:Lance}">
+                <Grid x:Name="goteLanceDrop" Tag="{x:Type pieces:Lance}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Lance.png" Tag="Lance"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="gotePawnDrop" Tag="{x:Type pieces:Pawn}">
+                <Grid x:Name="gotePawnDrop" Tag="{x:Type pieces:Pawn}" MouseUp="GoteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Gote/Pawn.png" Tag="Pawn"/>
                     <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
@@ -265,31 +265,31 @@
         </Border>
         <Border x:Name="senteDropsContainer" Grid.Row="3" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <StackPanel x:Name="senteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Grid x:Name="senteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}">
+                <Grid x:Name="senteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Gold General.png" Tag="Gold General"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="senteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}">
+                <Grid x:Name="senteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Silver General.png" Tag="Silver General"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="senteRookDrop" Tag="{x:Type pieces:Rook}">
+                <Grid x:Name="senteRookDrop" Tag="{x:Type pieces:Rook}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Rook.png" Tag="Rook"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="senteBishopDrop" Tag="{x:Type pieces:Bishop}">
+                <Grid x:Name="senteBishopDrop" Tag="{x:Type pieces:Bishop}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Bishop.png" Tag="Bishop"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="senteKnightDrop" Tag="{x:Type pieces:Knight}">
+                <Grid x:Name="senteKnightDrop" Tag="{x:Type pieces:Knight}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Knight.png" Tag="Knight"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="senteLanceDrop" Tag="{x:Type pieces:Lance}">
+                <Grid x:Name="senteLanceDrop" Tag="{x:Type pieces:Lance}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Lance.png" Tag="Lance"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>
-                <Grid x:Name="sentePawnDrop" Tag="{x:Type pieces:Pawn}">
+                <Grid x:Name="sentePawnDrop" Tag="{x:Type pieces:Pawn}" MouseUp="SenteDrop_MouseUp">
                     <Image Source="/Pieces/1kanji/Sente/Pawn.png" Tag="Pawn"/>
                     <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
                 </Grid>

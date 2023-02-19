@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Shogi.Pieces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +26,8 @@ namespace Shogi
         /// <see langword="true"/> if the player has selected a piece but isn't dragging it, <see langword="false"/> otherwise
         /// </summary>
         private bool highlightGrabbedMoves = false;
+
+        private Type? selectedDropType = null;
 
         private HashSet<System.Drawing.Point> squareHighlights = new();
         private HashSet<(System.Drawing.Point, System.Drawing.Point)> lineHighlights = new();
@@ -84,6 +84,8 @@ namespace Shogi
                 Type pieceType = (Type)dropItem.Tag;
                 int heldCount = game.SentePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                dropItem.Background = selectedDropType == pieceType && game.CurrentTurnSente
+                    ? new SolidColorBrush(config.SelectedPieceColor) : Brushes.Transparent;
                 ((Label)dropItem.Children[1]).Content = heldCount;
                 ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Bottom : VerticalAlignment.Top;
                 ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
@@ -94,6 +96,8 @@ namespace Shogi
                 Type pieceType = (Type)dropItem.Tag;
                 int heldCount = game.GotePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                dropItem.Background = selectedDropType == pieceType && !game.CurrentTurnSente
+                    ? new SolidColorBrush(config.SelectedPieceColor) : Brushes.Transparent;
                 ((Label)dropItem.Children[1]).Content = heldCount;
                 ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Top : VerticalAlignment.Bottom;
                 ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
@@ -212,15 +216,18 @@ namespace Shogi
             {
                 (System.Drawing.Point lastMoveSource, System.Drawing.Point lastMoveDestination) = game.Moves[^1];
 
-                Rectangle sourceMoveHighlight = new()
+                if (lastMoveSource.X != -1)
                 {
-                    Width = tileWidth,
-                    Height = tileHeight,
-                    Fill = new SolidColorBrush(config.LastMoveSourceColor)
-                };
-                _ = shogiGameCanvas.Children.Add(sourceMoveHighlight);
-                Canvas.SetBottom(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.Y : lastMoveSource.Y) * tileHeight);
-                Canvas.SetLeft(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.X : lastMoveSource.X) * tileWidth);
+                    Rectangle sourceMoveHighlight = new()
+                    {
+                        Width = tileWidth,
+                        Height = tileHeight,
+                        Fill = new SolidColorBrush(config.LastMoveSourceColor)
+                    };
+                    _ = shogiGameCanvas.Children.Add(sourceMoveHighlight);
+                    Canvas.SetBottom(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.Y : lastMoveSource.Y) * tileHeight);
+                    Canvas.SetLeft(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.X : lastMoveSource.X) * tileWidth);
+                }
 
                 Rectangle destinationMoveHighlight = new()
                 {
@@ -548,6 +555,26 @@ namespace Shogi
                     return;
                 }
 
+                if (selectedDropType is not null)
+                {
+                    System.Drawing.Point destination = GetCoordFromCanvasPoint(mousePos);
+                    bool success = game.MovePiece(ShogiGame.PieceDropSources[selectedDropType], destination, doPromotion: null);
+                    if (success)
+                    {
+                        highlightGrabbedMoves = false;
+                        grabbedPiece = null;
+                        currentBestMove = null;
+                        selectedDropType = null;
+                        UpdateCursor();
+                        UpdateGameDisplay();
+                        movesScroll.ScrollToBottom();
+                        PushEndgameMessage();
+                        await CheckComputerMove();
+                        return;
+                    }
+                }
+                selectedDropType = null;
+
                 // If a piece is selected, try to move it
                 if (grabbedPiece is not null && highlightGrabbedMoves)
                 {
@@ -801,6 +828,30 @@ namespace Shogi
                 item.IsChecked = chosenSet == (string)item.Tag;
             }
             UpdateGameDisplay();
+        }
+
+        private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Type clickedType = (Type)((Grid)sender).Tag;
+            if (game.CurrentTurnSente || game.GotePieceDrops[clickedType] == 0)
+            {
+                return;
+            }
+            selectedDropType = clickedType;
+            grabbedPiece = null;
+            highlightGrabbedMoves = false;
+        }
+
+        private void SenteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Type clickedType = (Type)((Grid)sender).Tag;
+            if (!game.CurrentTurnSente || game.SentePieceDrops[clickedType] == 0)
+            {
+                return;
+            }
+            selectedDropType = clickedType;
+            grabbedPiece = null;
+            highlightGrabbedMoves = false;
         }
     }
 }

@@ -36,6 +36,25 @@ namespace Shogi
             GameState.CheckMateGote
         }.ToImmutableHashSet();
 
+        /// <summary>
+        /// Used to give to <see cref="MovePiece"/> as the source position to declare that a piece drop should occur
+        /// </summary>
+        public static readonly Dictionary<Type, Point> PieceDropSources = new()
+        {
+            { typeof(Pieces.GoldGeneral), new Point(-1, 0) },
+            { typeof(Pieces.SilverGeneral), new Point(-1, 1) },
+            { typeof(Pieces.Rook), new Point(-1, 2) },
+            { typeof(Pieces.Bishop), new Point(-1, 3) },
+            { typeof(Pieces.Knight), new Point(-1, 4) },
+            { typeof(Pieces.Lance), new Point(-1, 5) },
+            { typeof(Pieces.Pawn), new Point(-1, 6) },
+        };
+        public static readonly Type[] DropTypeOrder = new Type[7]
+        {
+            typeof(Pieces.GoldGeneral), typeof(Pieces.SilverGeneral), typeof(Pieces.Rook),
+            typeof(Pieces.Bishop), typeof(Pieces.Knight), typeof(Pieces.Lance), typeof(Pieces.Pawn)
+        };
+
         public Pieces.Piece?[,] Board { get; }
         public string InitialState { get; }
 
@@ -206,8 +225,56 @@ namespace Shogi
         }
 
         /// <summary>
-        /// Move a piece on the board from a <paramref name="source"/> coordinate to a <paramref name="destination"/> coordinate.
+        /// Determine whether a drop of the given piece type to the given destination is valid or not.
         /// </summary>
+        public bool IsDropPossible(Type dropType, Point destination)
+        {
+            if (destination.X < 0 || destination.Y < 0
+                || destination.X >= Board.GetLength(0) || destination.Y >= Board.GetLength(1))
+            {
+                return false;
+            }
+            Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(dropType, destination, CurrentTurnSente)!;
+            if (Board[destination.X, destination.Y] is not null)
+            {
+                return false;
+            }
+            if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? 8 : 0)))
+                || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= 7 : destination.Y <= 1)))
+            {
+                return false;
+            }
+
+            bool pawnPresentOnFile = false;
+            for (int y = 0; y < Board.GetLength(1); y++)
+            {
+                if (Board[destination.X, y] is Pieces.Pawn
+                    && Board[destination.X, y]!.IsSente == CurrentTurnSente)
+                {
+                    pawnPresentOnFile = true;
+                    break;
+                }
+            }
+
+            ShogiGame checkmateTest = Clone();
+            _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
+                destination, forceMove: true, updateMoveText: false);
+            if (piece is Pieces.Pawn && (pawnPresentOnFile
+                || checkmateTest.DetermineGameState() is GameState.CheckMateSente or GameState.CheckMateGote))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Move a piece on the board from a <paramref name="source"/> coordinate to a <paramref name="destination"/> coordinate.
+        /// To perform a piece drop, set <paramref name="source"/> to a value within <see cref="PieceDropSources"/>.
+        /// </summary>
+        /// <param name="forceMove">
+        /// Whether or not a move should always be allowed to occur. If <see langword="true"/> when performing a piece drop, the held piece counters will not be decremented.
+        /// </param>
         /// <param name="doPromotion">
         /// If a piece can be promoted, should it be? <see langword="null"/> means the user should be prompted.
         /// </param>
@@ -224,14 +291,39 @@ namespace Shogi
                 return false;
             }
 
-            Pieces.Piece? piece = Board[source.X, source.Y];
-            if (piece is null)
+            Pieces.Piece? piece;
+            if (source.X == -1)
             {
-                return false;
+                // Piece drop
+                Type dropType = DropTypeOrder[source.Y];
+                piece = (Pieces.Piece)Activator.CreateInstance(dropType, destination, CurrentTurnSente)!;
+                if (!forceMove && !IsDropPossible(dropType, destination))
+                {
+                    return false;
+                }
+                if (!forceMove)
+                {
+                    if (CurrentTurnSente)
+                    {
+                        SentePieceDrops[dropType]--;
+                    }
+                    else
+                    {
+                        GotePieceDrops[dropType]--;
+                    }
+                }
             }
-            if (!forceMove && piece.IsSente != CurrentTurnSente)
+            else
             {
-                return false;
+                piece = Board[source.X, source.Y];
+                if (piece is null)
+                {
+                    return false;
+                }
+                if (!forceMove && piece.IsSente != CurrentTurnSente)
+                {
+                    return false;
+                }
             }
 
             // Used for generating new move text
@@ -241,7 +333,7 @@ namespace Shogi
                 oldGame = Clone();
             }
 
-            bool pieceMoved = piece.Move(Board, destination, forceMove);
+            bool pieceMoved = piece.Move(Board, destination, forceMove || source.X == -1);
 
             if (pieceMoved)
             {
@@ -268,7 +360,7 @@ namespace Shogi
                 }
 
                 Type pieceType = piece.GetType();
-                if (Pieces.Piece.PromotionMap.ContainsKey(pieceType))
+                if (source.X != -1 && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
                     if ((piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
                         || (piece.IsSente ? source.Y >= 6 : source.Y <= 2))
@@ -293,7 +385,10 @@ namespace Shogi
                 }
 
                 Board[destination.X, destination.Y] = piece;
-                Board[source.X, source.Y] = null;
+                if (source.X != -1)
+                {
+                    Board[source.X, source.Y] = null;
+                }
 
                 CurrentTurnSente = !CurrentTurnSente;
 
@@ -311,7 +406,7 @@ namespace Shogi
                 if (updateMoveText)
                 {
                     string newMove = destination.ToShogiCoordinate();
-                    if (oldGame!.Board[source.X, source.Y] is Pieces.Pawn)
+                    if (source.X != -1 && oldGame!.Board[source.X, source.Y] is Pieces.Pawn)
                     {
                         if (oldGame!.Board[destination.X, destination.Y] is not null)
                         {
