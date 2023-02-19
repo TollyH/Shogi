@@ -217,10 +217,11 @@ namespace Shogi
                 Type pieceType = piece.GetType();
                 if (Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
-                    if (piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
+                    if ((piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
+                        || (piece.IsSente ? source.Y >= 6 : source.Y <= 2))
                     {
-                        if ((piece is Pieces.Pawn or Pieces.Lance && destination.Y is 0 or 8)
-                            || (piece is Pieces.Knight && destination.Y is >= 7 or <= 1))
+                        if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? 8 : 0)))
+                            || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= 7 : destination.Y <= 1)))
                         {
                             // Always promote pawns and lances upon reaching the last rank
                             // Always promote knights upon reaching the last two ranks

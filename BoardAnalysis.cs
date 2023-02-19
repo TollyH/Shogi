@@ -339,7 +339,8 @@ namespace Shogi
                     foreach (Point validMove in GetValidMovesForEval(game, piece))
                     {
                         if (Pieces.Piece.PromotionMap.ContainsKey(piece.GetType())
-                            && piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
+                            && ((piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
+                                || (piece.IsSente ? piece.Position.Y >= 6 : piece.Position.Y <= 2)))
                         {
                             remainingThreads++;
                             Point promotionPosition = piece.Position;
@@ -364,8 +365,8 @@ namespace Shogi
                             });
                             promotionThread.Start();
                         }
-                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y is not 0 and not 8)
-                            && (piece is not Pieces.Knight || validMove.Y is not >= 7 and not <= 1))
+                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y != (piece.IsSente ? 8 : 0))
+                            && (piece is not Pieces.Knight || !(piece.IsSente ? validMove.Y >= 7 : validMove.Y <= 1)))
                         {
                             remainingThreads++;
                             Point thisPosition = piece.Position;
