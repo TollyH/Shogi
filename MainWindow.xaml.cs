@@ -204,8 +204,8 @@ namespace Shogi
                     Fill = new SolidColorBrush(config.CheckMateHighlightColor)
                 };
                 _ = shogiGameCanvas.Children.Add(mateHighlight);
-                Canvas.SetBottom(mateHighlight, (boardFlipped ? 7 - kingPosition.Y : kingPosition.Y) * tileHeight);
-                Canvas.SetLeft(mateHighlight, (boardFlipped ? 7 - kingPosition.X : kingPosition.X) * tileWidth);
+                Canvas.SetBottom(mateHighlight, (boardFlipped ? 8 - kingPosition.Y : kingPosition.Y) * tileHeight);
+                Canvas.SetLeft(mateHighlight, (boardFlipped ? 8 - kingPosition.X : kingPosition.X) * tileWidth);
             }
 
             if (game.Moves.Count > 0)
@@ -219,8 +219,8 @@ namespace Shogi
                     Fill = new SolidColorBrush(config.LastMoveSourceColor)
                 };
                 _ = shogiGameCanvas.Children.Add(sourceMoveHighlight);
-                Canvas.SetBottom(sourceMoveHighlight, (boardFlipped ? 7 - lastMoveSource.Y : lastMoveSource.Y) * tileHeight);
-                Canvas.SetLeft(sourceMoveHighlight, (boardFlipped ? 7 - lastMoveSource.X : lastMoveSource.X) * tileWidth);
+                Canvas.SetBottom(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.Y : lastMoveSource.Y) * tileHeight);
+                Canvas.SetLeft(sourceMoveHighlight, (boardFlipped ? 8 - lastMoveSource.X : lastMoveSource.X) * tileWidth);
 
                 Rectangle destinationMoveHighlight = new()
                 {
@@ -229,8 +229,8 @@ namespace Shogi
                     Fill = new SolidColorBrush(config.LastMoveDestinationColor)
                 };
                 _ = shogiGameCanvas.Children.Add(destinationMoveHighlight);
-                Canvas.SetBottom(destinationMoveHighlight, (boardFlipped ? 7 - lastMoveDestination.Y : lastMoveDestination.Y) * tileHeight);
-                Canvas.SetLeft(destinationMoveHighlight, (boardFlipped ? 7 - lastMoveDestination.X : lastMoveDestination.X) * tileWidth);
+                Canvas.SetBottom(destinationMoveHighlight, (boardFlipped ? 8 - lastMoveDestination.Y : lastMoveDestination.Y) * tileHeight);
+                Canvas.SetLeft(destinationMoveHighlight, (boardFlipped ? 8 - lastMoveDestination.X : lastMoveDestination.X) * tileWidth);
 
             }
 
@@ -246,9 +246,9 @@ namespace Shogi
                 };
                 _ = shogiGameCanvas.Children.Add(bestMoveSrcHighlight);
                 Canvas.SetBottom(bestMoveSrcHighlight,
-                    (boardFlipped ? 7 - currentBestMove.Value.Source.Y : currentBestMove.Value.Source.Y) * tileHeight);
+                    (boardFlipped ? 8 - currentBestMove.Value.Source.Y : currentBestMove.Value.Source.Y) * tileHeight);
                 Canvas.SetLeft(bestMoveSrcHighlight,
-                    (boardFlipped ? 7 - currentBestMove.Value.Source.X : currentBestMove.Value.Source.X) * tileWidth);
+                    (boardFlipped ? 8 - currentBestMove.Value.Source.X : currentBestMove.Value.Source.X) * tileWidth);
 
                 Rectangle bestMoveDstHighlight = new()
                 {
@@ -258,9 +258,9 @@ namespace Shogi
                 };
                 _ = shogiGameCanvas.Children.Add(bestMoveDstHighlight);
                 Canvas.SetBottom(bestMoveDstHighlight,
-                    (boardFlipped ? 7 - currentBestMove.Value.Destination.Y : currentBestMove.Value.Destination.Y) * tileHeight);
+                    (boardFlipped ? 8 - currentBestMove.Value.Destination.Y : currentBestMove.Value.Destination.Y) * tileHeight);
                 Canvas.SetLeft(bestMoveDstHighlight,
-                    (boardFlipped ? 7 - currentBestMove.Value.Destination.X : currentBestMove.Value.Destination.X) * tileWidth);
+                    (boardFlipped ? 8 - currentBestMove.Value.Destination.X : currentBestMove.Value.Destination.X) * tileWidth);
             }
 
             if (grabbedPiece is not null && highlightGrabbedMoves)
@@ -284,8 +284,8 @@ namespace Shogi
                         Fill = fillBrush
                     };
                     _ = shogiGameCanvas.Children.Add(newRect);
-                    Canvas.SetBottom(newRect, (boardFlipped ? 7 - validMove.Y : validMove.Y) * tileHeight);
-                    Canvas.SetLeft(newRect, (boardFlipped ? 7 - validMove.X : validMove.X) * tileWidth);
+                    Canvas.SetBottom(newRect, (boardFlipped ? 8 - validMove.Y : validMove.Y) * tileHeight);
+                    Canvas.SetLeft(newRect, (boardFlipped ? 8 - validMove.X : validMove.X) * tileWidth);
                 }
             }
 
@@ -299,8 +299,8 @@ namespace Shogi
                     Height = tileHeight * 0.8
                 };
                 _ = shogiGameCanvas.Children.Add(ellipse);
-                Canvas.SetBottom(ellipse, ((boardFlipped ? 7 - square.Y : square.Y) * tileHeight) + (tileHeight * 0.1));
-                Canvas.SetLeft(ellipse, (boardFlipped ? 7 - square.X : square.X) * tileWidth + (tileWidth * 0.1));
+                Canvas.SetBottom(ellipse, ((boardFlipped ? 8 - square.Y : square.Y) * tileHeight) + (tileHeight * 0.1));
+                Canvas.SetLeft(ellipse, (boardFlipped ? 8 - square.X : square.X) * tileWidth + (tileWidth * 0.1));
             }
 
             foreach ((System.Drawing.Point lineStart, System.Drawing.Point lineEnd) in lineHighlights)
@@ -315,10 +315,10 @@ namespace Shogi
                     ArrowLength = arrowLength,
                     ArrowAngle = 45,
                     IsArrowClosed = true,
-                    X1 = (boardFlipped ? 7 - lineStart.X : lineStart.X) * tileWidth + (tileWidth / 2),
-                    X2 = (boardFlipped ? 7 - lineEnd.X : lineEnd.X) * tileWidth + (tileWidth / 2),
-                    Y1 = (boardFlipped ? lineStart.Y : 7 - lineStart.Y) * tileHeight + (tileHeight / 2),
-                    Y2 = (boardFlipped ? lineEnd.Y : 7 - lineEnd.Y) * tileHeight + (tileHeight / 2)
+                    X1 = (boardFlipped ? 8 - lineStart.X : lineStart.X) * tileWidth + (tileWidth / 2),
+                    X2 = (boardFlipped ? 8 - lineEnd.X : lineEnd.X) * tileWidth + (tileWidth / 2),
+                    Y1 = (boardFlipped ? lineStart.Y : 8 - lineStart.Y) * tileHeight + (tileHeight / 2),
+                    Y2 = (boardFlipped ? lineEnd.Y : 8 - lineEnd.Y) * tileHeight + (tileHeight / 2)
                 };
                 _ = shogiGameCanvas.Children.Add(line);
             }
@@ -349,13 +349,18 @@ namespace Shogi
                             Source = new BitmapImage(
                                 new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
                             Width = tileWidth,
-                            Height = tileHeight
+                            Height = tileHeight,
+                            RenderTransformOrigin = new Point(0.5, 0.5),
+                            RenderTransform = new RotateTransform()
+                            {
+                                Angle = boardFlipped ? 180 : 0
+                            }
                         };
                         RenderOptions.SetBitmapScalingMode(newPiece, BitmapScalingMode.HighQuality);
                         pieceViews[piece] = newPiece;
                         _ = shogiGameCanvas.Children.Add(newPiece);
-                        Canvas.SetBottom(newPiece, (boardFlipped ? 7 - y : y) * tileHeight);
-                        Canvas.SetLeft(newPiece, (boardFlipped ? 7 - x : x) * tileWidth);
+                        Canvas.SetBottom(newPiece, (boardFlipped ? 8 - y : y) * tileHeight);
+                        Canvas.SetLeft(newPiece, (boardFlipped ? 8 - x : x) * tileWidth);
                     }
                 }
             }
