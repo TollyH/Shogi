@@ -484,9 +484,9 @@ namespace Shogi
         /// </summary>
         /// <remarks>
         /// The resulting string complies with the Forsyth–Edwards Notation standard,
-        /// unless <paramref name="omitMoveCounts"/> is <see langword="true"/>
+        /// unless <paramref name="appendCheckStatus"/> is <see langword="true"/>
         /// </remarks>
-        public string ToString(bool omitMoveCounts)
+        public string ToString(bool appendCheckStatus)
         {
             StringBuilder result = new(90);
 
@@ -507,7 +507,7 @@ namespace Shogi
                             _ = result.Append(consecutiveNull);
                             consecutiveNull = 0;
                         }
-                        _ = result.Append(piece.IsSente ? char.ToUpper(piece.SymbolLetter) : char.ToLower(piece.SymbolLetter));
+                        _ = result.Append(piece.IsSente ? piece.SFENLetter.ToUpper() : piece.SFENLetter.ToLower());
                     }
                 }
                 if (consecutiveNull > 0)
@@ -520,12 +520,44 @@ namespace Shogi
                 }
             }
 
-            _ = result.Append(CurrentTurnSente ? " w " : " b ");
-            _ = result.Append("- -");
+            _ = result.Append(CurrentTurnSente ? " b " : " w ");
+
+            bool anyHeldPieces = false;
+            foreach ((Type pieceType, int count) in SentePieceDrops)
+            {
+                Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(pieceType, new Point(), CurrentTurnSente)!;
+                if (count == 0)
+                {
+                    continue;
+                }
+                if (count != 1)
+                {
+                    _ = result.Append(count);
+                }
+                _ = result.Append(piece.SFENLetter.ToUpper());
+            }
+            foreach ((Type pieceType, int count) in GotePieceDrops)
+            {
+                Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(pieceType, new Point(), CurrentTurnSente)!;
+                if (count == 0)
+                {
+                    continue;
+                }
+                anyHeldPieces = true;
+                if (count != 1)
+                {
+                    _ = result.Append(count);
+                }
+                _ = result.Append(piece.SFENLetter.ToLower());
+            }
+            if (!anyHeldPieces)
+            {
+                _ = result.Append('-');
+            }
 
             // Append whether in check or not for checking whether perpetual check occurred
-            _ = omitMoveCounts ? result.Append(' ').Append(DetermineGameState(false) is GameState.CheckSente or GameState.CheckGote ? '!' : '-')
-                : result.Append(' ').Append(0).Append(' ').Append((Moves.Count / 2) + 1);
+            _ = !appendCheckStatus ? null
+                : result.Append(DetermineGameState(false) is GameState.CheckSente or GameState.CheckGote ? " !" : " -");
 
             return result.ToString();
         }
@@ -570,64 +602,104 @@ namespace Shogi
         }
 
         /// <summary>
-        /// Convert Forsyth–Edwards Notation to a shogi game instance.
+        /// Convert Shogi Forsyth–Edwards Notation (SFEN) to a shogi game instance.
         /// </summary>
-        public static ShogiGame FromForsythEdwards(string forsythEdwards)
+        public static ShogiGame FromShogiForsythEdwards(string forsythEdwards)
         {
             string[] fields = forsythEdwards.Split(' ');
-            if (fields.Length != 6)
+            if (fields.Length != 3)
             {
-                throw new FormatException("Forsyth–Edwards Notation requires 6 fields separated by spaces");
+                throw new FormatException("Shogi Forsyth–Edwards Notation requires 3 fields separated by spaces");
             }
 
             string[] ranks = fields[0].Split('/');
-            if (ranks.Length != 8)
+            if (ranks.Length != 9)
             {
-                throw new FormatException("Board definitions must have 8 ranks separated by a forward slash");
+                throw new FormatException("Board definitions must have 9 ranks separated by a forward slash");
             }
-            Pieces.Piece?[,] board = new Pieces.Piece?[8, 8];
+            Pieces.Piece?[,] board = new Pieces.Piece?[9, 9];
             for (int r = 0; r < ranks.Length; r++)
             {
                 int fileIndex = 0;
+                bool promoteNextPiece = false;
                 foreach (char pieceChar in ranks[r])
                 {
                     switch (pieceChar)
                     {
+                        case '+':
+                            promoteNextPiece = true;
+                            continue;
                         case 'K':
-                            board[fileIndex, 7 - r] = new Pieces.King(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 8 - r] = new Pieces.King(new Point(fileIndex, 8 - r), true);
                             break;
-                        case 'Q':
-                            board[fileIndex, 7 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 7 - r), true);
+                        case 'G':
+                            board[fileIndex, 8 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 8 - r), true);
+                            break;
+                        case 'S':
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.SilverGeneral(new Point(fileIndex, 8 - r), true);
                             break;
                         case 'R':
-                            board[fileIndex, 7 - r] = new Pieces.Rook(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedRook(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.Rook(new Point(fileIndex, 8 - r), true);
                             break;
                         case 'B':
-                            board[fileIndex, 7 - r] = new Pieces.Bishop(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedBishop(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.Bishop(new Point(fileIndex, 8 - r), true);
                             break;
                         case 'N':
-                            board[fileIndex, 7 - r] = new Pieces.Knight(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedKnight(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.Knight(new Point(fileIndex, 8 - r), true);
+                            break;
+                        case 'L':
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedLance(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.Lance(new Point(fileIndex, 8 - r), true);
                             break;
                         case 'P':
-                            board[fileIndex, 7 - r] = new Pieces.Pawn(new Point(fileIndex, 7 - r), true);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedPawn(new Point(fileIndex, 8 - r), true)
+                                : new Pieces.Pawn(new Point(fileIndex, 8 - r), true);
                             break;
                         case 'k':
-                            board[fileIndex, 7 - r] = new Pieces.King(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 8 - r] = new Pieces.King(new Point(fileIndex, 8 - r), false);
                             break;
-                        case 'q':
-                            board[fileIndex, 7 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 7 - r), false);
+                        case 'g':
+                            board[fileIndex, 8 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 8 - r), false);
+                            break;
+                        case 's':
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.SilverGeneral(new Point(fileIndex, 8 - r), false);
                             break;
                         case 'r':
-                            board[fileIndex, 7 - r] = new Pieces.Rook(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedRook(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.Rook(new Point(fileIndex, 8 - r), false);
                             break;
                         case 'b':
-                            board[fileIndex, 7 - r] = new Pieces.Bishop(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedBishop(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.Bishop(new Point(fileIndex, 8 - r), false);
                             break;
                         case 'n':
-                            board[fileIndex, 7 - r] = new Pieces.Knight(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedKnight(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.Knight(new Point(fileIndex, 8 - r), false);
+                            break;
+                        case 'l':
+                            board[fileIndex, 8 - r] = promoteNextPiece
+                                ? new Pieces.PromotedLance(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.Lance(new Point(fileIndex, 8 - r), false);
                             break;
                         case 'p':
-                            board[fileIndex, 7 - r] = new Pieces.Pawn(new Point(fileIndex, 7 - r), false);
+                            board[fileIndex, 8 - r] = promoteNextPiece 
+                                ? new Pieces.PromotedPawn(new Point(fileIndex, 8 - r), false)
+                                : new Pieces.Pawn(new Point(fileIndex, 8 - r), false);
                             break;
                         default:
                             if (pieceChar is > '0' and <= '9')
@@ -644,22 +716,105 @@ namespace Shogi
                             break;
                     }
                     fileIndex++;
+                    promoteNextPiece = false;
                 }
-                if (fileIndex != 8)
+                if (fileIndex != 9)
                 {
-                    throw new FormatException("Each rank in a board definition must contain definitions for 8 files");
+                    throw new FormatException("Each rank in a board definition must contain definitions for 9 files");
                 }
             }
 
-            bool currentTurnSente = fields[1] == "w" || (fields[1] == "b" ? false
+            bool currentTurnSente = fields[1] == "b" || (fields[1] == "w" ? false
                 : throw new FormatException("Current turn specifier must be either w or b"));
 
-            int staleMoves = int.Parse(fields[4]);
+            Dictionary<Type, int> sentePieceDrops = new()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
+            Dictionary<Type, int> gotePieceDrops = new()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
 
-            // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
-            // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
+            int numberToAdd = 1;
+            foreach (char pieceChar in fields[2])
+            {
+                switch (pieceChar)
+                {
+                    case '-':
+                        continue;
+                    case 'G':
+                        sentePieceDrops[typeof(Pieces.GoldGeneral)] += numberToAdd;
+                        break;
+                    case 'S':
+                        sentePieceDrops[typeof(Pieces.SilverGeneral)] += numberToAdd;
+                        break;
+                    case 'R':
+                        sentePieceDrops[typeof(Pieces.Rook)] += numberToAdd;
+                        break;
+                    case 'B':
+                        sentePieceDrops[typeof(Pieces.Bishop)] += numberToAdd;
+                        break;
+                    case 'N':
+                        sentePieceDrops[typeof(Pieces.Knight)] += numberToAdd;
+                        break;
+                    case 'L':
+                        sentePieceDrops[typeof(Pieces.Lance)] += numberToAdd;
+                        break;
+                    case 'P':
+                        sentePieceDrops[typeof(Pieces.Pawn)] += numberToAdd;
+                        break;
+                    case 'g':
+                        gotePieceDrops[typeof(Pieces.GoldGeneral)] += numberToAdd;
+                        break;
+                    case 's':
+                        gotePieceDrops[typeof(Pieces.SilverGeneral)] += numberToAdd;
+                        break;
+                    case 'r':
+                        gotePieceDrops[typeof(Pieces.Rook)] += numberToAdd;
+                        break;
+                    case 'b':
+                        gotePieceDrops[typeof(Pieces.Bishop)] += numberToAdd;
+                        break;
+                    case 'n':
+                        gotePieceDrops[typeof(Pieces.Knight)] += numberToAdd;
+                        break;
+                    case 'l':
+                        gotePieceDrops[typeof(Pieces.Lance)] += numberToAdd;
+                        break;
+                    case 'p':
+                        gotePieceDrops[typeof(Pieces.Pawn)] += numberToAdd;
+                        break;
+                    default:
+                        if (pieceChar is > '0' and <= '9')
+                        {
+                            // char - '0' gets numeric value of ASCII number
+                            numberToAdd = pieceChar - '0';
+                            continue;
+                        }
+                        else
+                        {
+                            throw new FormatException($"{pieceChar} is not a valid piece character");
+                        }
+                }
+                numberToAdd = 1;
+            }
+
+            // Shogi Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, null, null, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, sentePieceDrops, gotePieceDrops, new(), null);
         }
     }
 }

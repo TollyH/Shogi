@@ -224,7 +224,7 @@
             </StackPanel>
         </Border>
         <Button x:Name="startButton" Content="Start" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" Width="50" IsEnabled="False" Click="startButton_Click"/>
-        <Button x:Name="importButton" Content="Load Forsyth–Edwards" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,1,10,1" Margin="7" Click="importButton_Click"/>
+        <Button x:Name="importButton" Content="Load SFEN" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,1,10,1" Margin="7" Click="importButton_Click"/>
         <Border x:Name="goteDropsContainer" Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ToolTip="Left Click = Increment, Right Click = Decrement">
             <StackPanel x:Name="goteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" MouseUp="GoteDrop_MouseUp">
@@ -290,8 +290,8 @@
             </StackPanel>
         </Border>
         <Grid x:Name="importOverlay" Grid.ColumnSpan="2" Grid.RowSpan="3" Background="White" Visibility="Collapsed">
-            <Label Content="Enter a Forsyth–Edwards Notation board position string:" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16"/>
-            <TextBox x:Name="fenInput" Margin="12,45,12,10" VerticalAlignment="Top" FontSize="15" Text="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"/>
+            <Label Content="Enter a Shogi Forsyth–Edwards Notation (SFEN) board position string:" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16"/>
+            <TextBox x:Name="sfenInput" Margin="12,45,12,10" VerticalAlignment="Top" FontSize="15" Text="lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -"/>
             <Button x:Name="submitFenButton" Content="Submit" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" Width="64" Click="submitFenButton_Click"/>
             <Button x:Name="cancelFenButton" Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,10,84,10" Width="64" Click="cancelFenButton_Click"/>
         </Grid>

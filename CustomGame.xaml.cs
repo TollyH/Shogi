@@ -242,12 +242,12 @@ namespace Shogi
             GoteIsComputer = computerSelectGote.IsChecked ?? false;
             try
             {
-                GeneratedGame = ShogiGame.FromForsythEdwards(fenInput.Text);
+                GeneratedGame = ShogiGame.FromShogiForsythEdwards(sfenInput.Text);
                 Close();
             }
             catch (Exception ex)
             {
-                _ = MessageBox.Show(ex.Message, "Forsyth–Edwards Notation Error",
+                _ = MessageBox.Show(ex.Message, "Shogi Forsyth–Edwards Notation Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
