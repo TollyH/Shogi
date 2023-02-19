@@ -296,6 +296,28 @@ namespace Shogi
                 }
             }
 
+            if (selectedDropType is not null)
+            {
+                for (int x = 0; x < game.Board.GetLength(0); x++)
+                {
+                    for (int y = 0; y < game.Board.GetLength(1); y++)
+                    {
+                        if (game.IsDropPossible(selectedDropType, new System.Drawing.Point(x, y)))
+                        {
+                            Rectangle newRect = new()
+                            {
+                                Width = tileWidth,
+                                Height = tileHeight,
+                                Fill = new SolidColorBrush(config.AvailableMoveColor)
+                            };
+                            _ = shogiGameCanvas.Children.Add(newRect);
+                            Canvas.SetBottom(newRect, (boardFlipped ? 8 - y : y) * tileHeight);
+                            Canvas.SetLeft(newRect, (boardFlipped ? 8 - x : x) * tileWidth);
+                        }
+                    }
+                }
+            }
+
             for (int x = 0; x < game.Board.GetLength(0); x++)
             {
                 for (int y = 0; y < game.Board.GetLength(1); y++)
