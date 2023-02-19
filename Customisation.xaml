@@ -20,23 +20,19 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Label Grid.Column="0" Grid.Row="0" Margin="10" Content="Board"/>
         <xctk:ColorPicker x:Name="boardPicker" Grid.Column="1" Grid.Row="0" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="1" Margin="10" Content="Piece (Default)"/>
-        <xctk:ColorPicker x:Name="defaultPiecePicker" Grid.Column="1" Grid.Row="1" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="2" Margin="10" Content="Piece (Checked King)"/>
-        <xctk:ColorPicker x:Name="checkKingPicker" Grid.Column="1" Grid.Row="2" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="3" Margin="10" Content="Piece (Selected)"/>
-        <xctk:ColorPicker x:Name="selectedPiecePicker" Grid.Column="1" Grid.Row="3" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="4" Margin="10" Content="Checkmate Highlight"/>
-        <xctk:ColorPicker x:Name="checkmatePicker" Grid.Column="1" Grid.Row="4" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="5" Margin="10" Content="Last Move (Source)"/>
-        <xctk:ColorPicker x:Name="lastMoveSourcePicker" Grid.Column="1" Grid.Row="5" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
-        <Label Grid.Column="0" Grid.Row="6" Margin="10" Content="Last Move (Destination)"/>
-        <xctk:ColorPicker x:Name="lastMoveDestinationPicker" Grid.Column="1" Grid.Row="6" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
+        <Label Grid.Column="0" Grid.Row="1" Margin="10" Content="Piece (Checked King)"/>
+        <xctk:ColorPicker x:Name="checkKingPicker" Grid.Column="1" Grid.Row="1" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
+        <Label Grid.Column="0" Grid.Row="2" Margin="10" Content="Piece (Selected)"/>
+        <xctk:ColorPicker x:Name="selectedPiecePicker" Grid.Column="1" Grid.Row="2" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
+        <Label Grid.Column="0" Grid.Row="3" Margin="10" Content="Checkmate Highlight"/>
+        <xctk:ColorPicker x:Name="checkmatePicker" Grid.Column="1" Grid.Row="3" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
+        <Label Grid.Column="0" Grid.Row="4" Margin="10" Content="Last Move (Source)"/>
+        <xctk:ColorPicker x:Name="lastMoveSourcePicker" Grid.Column="1" Grid.Row="4" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
+        <Label Grid.Column="2" Grid.Row="4" Margin="20,10,10,10" Content="Last Move (Destination)"/>
+        <xctk:ColorPicker x:Name="lastMoveDestinationPicker" Grid.Column="3" Grid.Row="4" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
         <Label Grid.Column="2" Grid.Row="0" Margin="20,10,10,10" Content="Best Move (Source)"/>
         <xctk:ColorPicker x:Name="bestMoveSourcePicker" Grid.Column="3" Grid.Row="0" Margin="10" Width="180" ColorMode="ColorCanvas" SelectedColorChanged="Picker_SelectedColorChanged"/>
         <Label Grid.Column="2" Grid.Row="1" Margin="20,10,10,10" Content="Best Move (Destination)"/>

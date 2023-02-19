@@ -38,7 +38,7 @@ namespace Shogi
         private BoardAnalysis.PossibleMove? currentBestMove = null;
         private bool manuallyEvaluating = false;
 
-        private readonly Dictionary<Pieces.Piece, Image> pieceViews = new();
+        private readonly Dictionary<Pieces.Piece, Border> pieceViews = new();
 
         private CancellationTokenSource cancelMoveComputation = new();
 
@@ -296,31 +296,31 @@ namespace Shogi
                     Pieces.Piece? piece = game.Board[x, y];
                     if (piece is not null)
                     {
-                        Brush foregroundBrush;
+                        Brush? backgroundBrush = null;
                         if (piece is Pieces.King && ((piece.IsSente && state == GameState.CheckSente) || (!piece.IsSente && state == GameState.CheckGote)))
                         {
-                            foregroundBrush = new SolidColorBrush(config.CheckedKingColor);
+                            backgroundBrush = new SolidColorBrush(config.CheckedKingColor);
                         }
                         else if (highlightGrabbedMoves && piece == grabbedPiece)
                         {
-                            foregroundBrush = new SolidColorBrush(config.SelectedPieceColor);
-                        }
-                        else
-                        {
-                            foregroundBrush = new SolidColorBrush(config.DefaultPieceColor);
+                            backgroundBrush = new SolidColorBrush(config.SelectedPieceColor);
                         }
 
-                        Image newPiece = new()
+                        Border newPiece = new()
                         {
-                            Source = new BitmapImage(
+                            Child = new Image()
+                            {
+                                Source = new BitmapImage(
                                 new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
+                                RenderTransformOrigin = new Point(0.5, 0.5),
+                                RenderTransform = new RotateTransform()
+                                {
+                                    Angle = boardFlipped ? 180 : 0
+                                }
+                            },
                             Width = tileWidth,
                             Height = tileHeight,
-                            RenderTransformOrigin = new Point(0.5, 0.5),
-                            RenderTransform = new RotateTransform()
-                            {
-                                Angle = boardFlipped ? 180 : 0
-                            }
+                            Background = backgroundBrush
                         };
                         RenderOptions.SetBitmapScalingMode(newPiece, BitmapScalingMode.HighQuality);
                         pieceViews[piece] = newPiece;

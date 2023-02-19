@@ -13,7 +13,6 @@ namespace Shogi
         public string PieceSet { get; set; }
 
         public Color BoardColor { get; set; }
-        public Color DefaultPieceColor { get; set; }
         public Color CheckedKingColor { get; set; }
         public Color SelectedPieceColor { get; set; }
         public Color CheckMateHighlightColor { get; set; }
@@ -32,7 +31,6 @@ namespace Shogi
             PieceSet = "1kanji";
 
             BoardColor = Color.FromRgb(249, 184, 83);
-            DefaultPieceColor = Brushes.Black.Color;
             CheckedKingColor = Brushes.Red.Color;
             SelectedPieceColor = Brushes.Blue.Color;
             CheckMateHighlightColor = Brushes.IndianRed.Color;
@@ -46,16 +44,15 @@ namespace Shogi
 
         [JsonConstructor]
         public Settings(bool useSymbolsOnMoveList, bool flipBoard, bool updateEvalAfterBot, string pieceSet,
-            Color boardColor, Color defaultPieceColor,
-            Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor, Color lastMoveSourceColor, Color lastMoveDestinationColor,
-            Color bestMoveSourceColor, Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor)
+            Color boardColor, Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor,
+            Color lastMoveSourceColor, Color lastMoveDestinationColor, Color bestMoveSourceColor,
+            Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor)
         {
             UseSymbolsOnMoveList = useSymbolsOnMoveList;
             FlipBoard = flipBoard;
             UpdateEvalAfterBot = updateEvalAfterBot;
             PieceSet = pieceSet;
             BoardColor = boardColor;
-            DefaultPieceColor = defaultPieceColor;
             CheckedKingColor = checkedKingColor;
             SelectedPieceColor = selectedPieceColor;
             CheckMateHighlightColor = checkMateHighlightColor;

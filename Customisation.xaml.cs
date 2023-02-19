@@ -18,7 +18,6 @@ namespace Shogi
             InitializeComponent();
 
             boardPicker.SelectedColor = Config.BoardColor;
-            defaultPiecePicker.SelectedColor = Config.DefaultPieceColor;
             checkKingPicker.SelectedColor = Config.CheckedKingColor;
             selectedPiecePicker.SelectedColor = Config.SelectedPieceColor;
             checkmatePicker.SelectedColor = Config.CheckMateHighlightColor;
@@ -39,7 +38,6 @@ namespace Shogi
                 return;
             }
             Config.BoardColor = boardPicker.SelectedColor ?? default;
-            Config.DefaultPieceColor = defaultPiecePicker.SelectedColor ?? default;
             Config.CheckedKingColor = checkKingPicker.SelectedColor ?? default;
             Config.SelectedPieceColor = selectedPiecePicker.SelectedColor ?? default;
             Config.CheckMateHighlightColor = checkmatePicker.SelectedColor ?? default;
