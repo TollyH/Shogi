@@ -311,12 +311,7 @@ namespace Shogi
                             Child = new Image()
                             {
                                 Source = new BitmapImage(
-                                new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
-                                RenderTransformOrigin = new Point(0.5, 0.5),
-                                RenderTransform = new RotateTransform()
-                                {
-                                    Angle = boardFlipped ? 180 : 0
-                                }
+                                new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ^ boardFlipped ? "Sente" : "Gote")}/{piece.Name}.png"))
                             },
                             Width = tileWidth,
                             Height = tileHeight,
