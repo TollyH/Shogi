@@ -289,40 +289,6 @@ namespace Shogi
                 }
             }
 
-            foreach (System.Drawing.Point square in squareHighlights)
-            {
-                Ellipse ellipse = new()
-                {
-                    Fill = new SolidColorBrush(config.SelectedPieceColor),
-                    Opacity = 0.5,
-                    Width = tileWidth * 0.8,
-                    Height = tileHeight * 0.8
-                };
-                _ = shogiGameCanvas.Children.Add(ellipse);
-                Canvas.SetBottom(ellipse, ((boardFlipped ? 8 - square.Y : square.Y) * tileHeight) + (tileHeight * 0.1));
-                Canvas.SetLeft(ellipse, (boardFlipped ? 8 - square.X : square.X) * tileWidth + (tileWidth * 0.1));
-            }
-
-            foreach ((System.Drawing.Point lineStart, System.Drawing.Point lineEnd) in lineHighlights)
-            {
-                double arrowLength = Math.Min(tileWidth, tileHeight) / 4;
-                Petzold.Media2D.ArrowLine line = new()
-                {
-                    Stroke = new SolidColorBrush(config.SelectedPieceColor),
-                    Fill = new SolidColorBrush(config.SelectedPieceColor),
-                    Opacity = 0.5,
-                    StrokeThickness = 10,
-                    ArrowLength = arrowLength,
-                    ArrowAngle = 45,
-                    IsArrowClosed = true,
-                    X1 = (boardFlipped ? 8 - lineStart.X : lineStart.X) * tileWidth + (tileWidth / 2),
-                    X2 = (boardFlipped ? 8 - lineEnd.X : lineEnd.X) * tileWidth + (tileWidth / 2),
-                    Y1 = (boardFlipped ? lineStart.Y : 8 - lineStart.Y) * tileHeight + (tileHeight / 2),
-                    Y2 = (boardFlipped ? lineEnd.Y : 8 - lineEnd.Y) * tileHeight + (tileHeight / 2)
-                };
-                _ = shogiGameCanvas.Children.Add(line);
-            }
-
             for (int x = 0; x < game.Board.GetLength(0); x++)
             {
                 for (int y = 0; y < game.Board.GetLength(1); y++)
@@ -363,6 +329,40 @@ namespace Shogi
                         Canvas.SetLeft(newPiece, (boardFlipped ? 8 - x : x) * tileWidth);
                     }
                 }
+            }
+
+            foreach (System.Drawing.Point square in squareHighlights)
+            {
+                Ellipse ellipse = new()
+                {
+                    Fill = new SolidColorBrush(config.SelectedPieceColor),
+                    Opacity = 0.5,
+                    Width = tileWidth * 0.8,
+                    Height = tileHeight * 0.8
+                };
+                _ = shogiGameCanvas.Children.Add(ellipse);
+                Canvas.SetBottom(ellipse, ((boardFlipped ? 8 - square.Y : square.Y) * tileHeight) + (tileHeight * 0.1));
+                Canvas.SetLeft(ellipse, (boardFlipped ? 8 - square.X : square.X) * tileWidth + (tileWidth * 0.1));
+            }
+
+            foreach ((System.Drawing.Point lineStart, System.Drawing.Point lineEnd) in lineHighlights)
+            {
+                double arrowLength = Math.Min(tileWidth, tileHeight) / 4;
+                Petzold.Media2D.ArrowLine line = new()
+                {
+                    Stroke = new SolidColorBrush(config.SelectedPieceColor),
+                    Fill = new SolidColorBrush(config.SelectedPieceColor),
+                    Opacity = 0.5,
+                    StrokeThickness = 10,
+                    ArrowLength = arrowLength,
+                    ArrowAngle = 45,
+                    IsArrowClosed = true,
+                    X1 = (boardFlipped ? 8 - lineStart.X : lineStart.X) * tileWidth + (tileWidth / 2),
+                    X2 = (boardFlipped ? 8 - lineEnd.X : lineEnd.X) * tileWidth + (tileWidth / 2),
+                    Y1 = (boardFlipped ? lineStart.Y : 8 - lineStart.Y) * tileHeight + (tileHeight / 2),
+                    Y2 = (boardFlipped ? lineEnd.Y : 8 - lineEnd.Y) * tileHeight + (tileHeight / 2)
+                };
+                _ = shogiGameCanvas.Children.Add(line);
             }
         }
 
