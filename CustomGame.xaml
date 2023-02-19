@@ -4,9 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Shogi"
+        xmlns:pieces="clr-namespace:Shogi.Pieces"
         mc:Ignorable="d"
-        Title="Custom Game Setup" Width="720" Height="510" MouseUp="Window_MouseUp" Loaded="Window_Loaded" WindowStyle="ToolWindow" SizeChanged="Window_SizeChanged">
+        Title="Custom Game Setup" Width="720" Height="660" MouseUp="Window_MouseUp" Loaded="Window_Loaded" WindowStyle="ToolWindow" SizeChanged="Window_SizeChanged">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="75px"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="75px"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="210px"/>
@@ -187,7 +193,7 @@
             </Border>
             <Canvas x:Name="shogiGameCanvas" Grid.Column="1" Grid.Row="1" Margin="1"/>
         </Grid>
-        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1,0,0,0">
+        <Border Grid.Column="1" Grid.RowSpan="3" BorderBrush="Black" BorderThickness="1,0,0,0">
             <StackPanel>
                 <Label Content="Piece Selection (Click on Board)" Margin="5,5,5,1" Padding="0,0,0,0" FontSize="14"/>
                 <Label Content="Left Click = Sente, Right Click = Gote" Margin="5,1,5,5" Padding="0,0,0,0" FontSize="11"/>
@@ -217,9 +223,73 @@
                 </Grid>
             </StackPanel>
         </Border>
-        <Button x:Name="startButton" Content="Start" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" Width="50" IsEnabled="False" Click="startButton_Click"/>
-        <Button x:Name="importButton" Content="Load Forsyth–Edwards" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,1,10,1" Margin="7" Click="importButton_Click"/>
-        <Grid x:Name="importOverlay" Grid.ColumnSpan="2" Background="White" Visibility="Collapsed">
+        <Button x:Name="startButton" Content="Start" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" Width="50" IsEnabled="False" Click="startButton_Click"/>
+        <Button x:Name="importButton" Content="Load Forsyth–Edwards" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,1,10,1" Margin="7" Click="importButton_Click"/>
+        <Border x:Name="goteDropsContainer" Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ToolTip="Left Click = Increment, Right Click = Decrement">
+            <StackPanel x:Name="goteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Gold General.png" Tag="Gold General"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="goteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Silver General.png" Tag="Silver General"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="goteRookDrop" Tag="{x:Type pieces:Rook}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Rook.png" Tag="Rook"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="goteBishopDrop" Tag="{x:Type pieces:Bishop}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Bishop.png" Tag="Bishop"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="goteKnightDrop" Tag="{x:Type pieces:Knight}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Knight.png" Tag="Knight"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="goteLanceDrop" Tag="{x:Type pieces:Lance}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Lance.png" Tag="Lance"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="gotePawnDrop" Tag="{x:Type pieces:Pawn}" MouseUp="GoteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Gote/Pawn.png" Tag="Pawn"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Border x:Name="senteDropsContainer" Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto" ToolTip="Left Click = Increment, Right Click = Decrement">
+            <StackPanel x:Name="senteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid x:Name="senteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Gold General.png" Tag="Gold General"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="senteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Silver General.png" Tag="Silver General"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="senteRookDrop" Tag="{x:Type pieces:Rook}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Rook.png" Tag="Rook"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="senteBishopDrop" Tag="{x:Type pieces:Bishop}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Bishop.png" Tag="Bishop"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="senteKnightDrop" Tag="{x:Type pieces:Knight}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Knight.png" Tag="Knight"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="senteLanceDrop" Tag="{x:Type pieces:Lance}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Lance.png" Tag="Lance"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+                <Grid x:Name="sentePawnDrop" Tag="{x:Type pieces:Pawn}" MouseUp="SenteDrop_MouseUp">
+                    <Image Source="/Pieces/1kanji/Sente/Pawn.png" Tag="Pawn"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Grid x:Name="importOverlay" Grid.ColumnSpan="2" Grid.RowSpan="3" Background="White" Visibility="Collapsed">
             <Label Content="Enter a Forsyth–Edwards Notation board position string:" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16"/>
             <TextBox x:Name="fenInput" Margin="12,45,12,10" VerticalAlignment="Top" FontSize="15" Text="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"/>
             <Button x:Name="submitFenButton" Content="Submit" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" Width="64" Click="submitFenButton_Click"/>

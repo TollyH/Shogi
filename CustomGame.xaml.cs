@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Media;
+using System.Collections.Generic;
 
 namespace Shogi
 {
@@ -19,6 +20,27 @@ namespace Shogi
         public bool GoteIsComputer { get; private set; }
 
         private readonly Settings config;
+
+        private readonly Dictionary<Type, int> sentePieceDrops = new()
+        {
+            { typeof(Pieces.GoldGeneral), 0 },
+            { typeof(Pieces.SilverGeneral), 0 },
+            { typeof(Pieces.Rook), 0 },
+            { typeof(Pieces.Bishop), 0 },
+            { typeof(Pieces.Knight), 0 },
+            { typeof(Pieces.Lance), 0 },
+            { typeof(Pieces.Pawn), 0 },
+        };
+        private readonly Dictionary<Type, int> gotePieceDrops = new()
+        {
+            { typeof(Pieces.GoldGeneral), 0 },
+            { typeof(Pieces.SilverGeneral), 0 },
+            { typeof(Pieces.Rook), 0 },
+            { typeof(Pieces.Bishop), 0 },
+            { typeof(Pieces.Knight), 0 },
+            { typeof(Pieces.Lance), 0 },
+            { typeof(Pieces.Pawn), 0 },
+        };
 
         private Pieces.King? senteKing = null;
         private Pieces.King? goteKing = null;
@@ -64,6 +86,25 @@ namespace Shogi
                 }
             }
 
+            foreach (Grid dropItem in senteDropsPanel.Children)
+            {
+                Type pieceType = (Type)dropItem.Tag;
+                int heldCount = sentePieceDrops[pieceType];
+                dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                ((Label)dropItem.Children[1]).Content = heldCount;
+                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
+                    $"pack://application:,,,/Pieces/{config.PieceSet}/Sente/{((Image)dropItem.Children[0]).Tag}.png"));
+            }
+            foreach (Grid dropItem in goteDropsPanel.Children)
+            {
+                Type pieceType = (Type)dropItem.Tag;
+                int heldCount = gotePieceDrops[pieceType];
+                dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                ((Label)dropItem.Children[1]).Content = heldCount;
+                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
+                    $"pack://application:,,,/Pieces/{config.PieceSet}/Gote/{((Image)dropItem.Children[0]).Tag}.png"));
+            }
+
             startButton.IsEnabled = senteKing is not null && goteKing is not null;
         }
 
@@ -75,7 +116,7 @@ namespace Shogi
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             GeneratedGame = new ShogiGame(Board, currentTurnSente,
                 ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, null, null, 0, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, sentePieceDrops, gotePieceDrops, 0, new(), null);
             Close();
         }
 
@@ -218,6 +259,34 @@ namespace Shogi
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            UpdateBoard();
+        }
+
+        private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Type clickedType = (Type)((Grid)sender).Tag;
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                gotePieceDrops[clickedType]++;
+            }
+            else if (gotePieceDrops[clickedType] != 0)
+            {
+                gotePieceDrops[clickedType]--;
+            }
+            UpdateBoard();
+        }
+
+        private void SenteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            Type clickedType = (Type)((Grid)sender).Tag;
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                sentePieceDrops[clickedType]++;
+            }
+            else if (sentePieceDrops[clickedType] != 0)
+            {
+                sentePieceDrops[clickedType]--;
+            }
             UpdateBoard();
         }
     }
