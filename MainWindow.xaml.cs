@@ -832,26 +832,32 @@ namespace Shogi
 
         private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Type clickedType = (Type)((Grid)sender).Tag;
-            if (game.CurrentTurnSente || game.GotePieceDrops[clickedType] == 0)
+            if (e.ChangedButton == MouseButton.Left)
             {
-                return;
+                Type clickedType = (Type)((Grid)sender).Tag;
+                if (game.CurrentTurnSente || game.GotePieceDrops[clickedType] == 0)
+                {
+                    return;
+                }
+                selectedDropType = clickedType;
+                grabbedPiece = null;
+                highlightGrabbedMoves = false;
             }
-            selectedDropType = clickedType;
-            grabbedPiece = null;
-            highlightGrabbedMoves = false;
         }
 
         private void SenteDrop_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            Type clickedType = (Type)((Grid)sender).Tag;
-            if (!game.CurrentTurnSente || game.SentePieceDrops[clickedType] == 0)
+            if (e.ChangedButton == MouseButton.Left)
             {
-                return;
+                Type clickedType = (Type)((Grid)sender).Tag;
+                if (!game.CurrentTurnSente || game.SentePieceDrops[clickedType] == 0)
+                {
+                    return;
+                }
+                selectedDropType = clickedType;
+                grabbedPiece = null;
+                highlightGrabbedMoves = false;
             }
-            selectedDropType = clickedType;
-            grabbedPiece = null;
-            highlightGrabbedMoves = false;
         }
     }
 }
