@@ -177,7 +177,7 @@ namespace Shogi.Pieces
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
-                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx == 0) && dy != 0)
+                    if ((dy != 0 || dx != 0) && (dy != backwardsY || dx != 0) && dy != 0)
                     {
                         Point newPos = new(Position.X + dx, Position.Y + dy);
                         if (newPos.X >= 0 && newPos.Y >= 0 && newPos.X < board.GetLength(0) && newPos.Y < board.GetLength(1)
