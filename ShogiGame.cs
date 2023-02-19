@@ -354,12 +354,15 @@ namespace Shogi
                     }
                 }
 
+                bool promotionPossible = false;
+                bool promotionHappened = false;
                 Type pieceType = piece.GetType();
                 if (source.X != -1 && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
                     if ((piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
                         || (piece.IsSente ? source.Y >= 6 : source.Y <= 2))
                     {
+                        promotionPossible = true;
                         if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? 8 : 0)))
                             || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= 7 : destination.Y <= 1)))
                         {
@@ -375,6 +378,7 @@ namespace Shogi
                         AwaitingPromotionResponse = false;
                         if (doPromotion.Value)
                         {
+                            promotionHappened = true;
                             piece = (Pieces.Piece)Activator.CreateInstance(Pieces.Piece.PromotionMap[pieceType], piece.Position, piece.IsSente)!;
                         }
                         Board[source.X, source.Y] = piece;
@@ -402,63 +406,37 @@ namespace Shogi
 
                 if (updateMoveText)
                 {
-                    string newMove = destination.ToShogiCoordinate();
-                    if (source.X != -1 && oldGame!.Board[source.X, source.Y] is Pieces.Pawn)
-                    {
-                        if (oldGame!.Board[destination.X, destination.Y] is not null)
-                        {
-                            newMove = source.ToShogiCoordinate()[0] + "x" + newMove;
-                        }
-                        if (destination.Y == (piece.IsSente ? 7 : 0))
-                        {
-                            newMove += "=" + piece.SymbolLetter;
-                        }
-                    }
-                    else
-                    {
-                        if (oldGame!.Board[destination.X, destination.Y] is not null)
-                        {
-                            newMove = 'x' + newMove;
-                        }
+                    string newMove = (CurrentTurnSente ? "☖" : "☗")
+                        + (Moves.Count > 1 && destination == Moves[^2].Item2 ? "同" : destination.ToShogiCoordinate())
+                        + piece.SymbolLetter;
 
-                        // Disambiguate moving piece if two pieces of the same type can reach destination
-                        IEnumerable<Pieces.Piece> canReachDest = oldGame.Board.OfType<Pieces.Piece>().Where(
-                            p => piece.GetType() == p.GetType() && p.Position != source && p.IsSente == piece.IsSente
-                                && p.GetValidMoves(oldGame.Board, true).Contains(destination));
-                        if (canReachDest.Any())
+                    // Disambiguate moving piece if two pieces of the same type can reach destination
+                    IEnumerable<Pieces.Piece> canReachDest = oldGame!.Board.OfType<Pieces.Piece>().Where(
+                        p => piece.GetType() == p.GetType() && p.Position != source && p.IsSente == piece.IsSente
+                            && p.GetValidMoves(oldGame.Board, true).Contains(destination));
+                    if (canReachDest.Any())
+                    {
+                        if (source.X == -1)
                         {
-                            bool success = false;
-                            string coordinate = source.ToShogiCoordinate();
-                            // Other pieces on same file, disambiguate with rank
-                            if (canReachDest.Where(p => p.Position.X == source.X).Any())
-                            {
-                                success = true;
-                                newMove = coordinate[1] + newMove;
-                            }
-                            // Other pieces on same rank, disambiguate with file
-                            if (canReachDest.Where(p => p.Position.Y == source.Y).Any())
-                            {
-                                success = true;
-                                newMove = coordinate[0] + newMove;
-                            }
-                            if (!success)
-                            {
-                                // Pieces are on different rank and file, but can reach same square
-                                // Prefer disambiguating with file
-                                newMove = coordinate[0] + newMove;
-                            }
+                            newMove += '打';
                         }
-                        newMove = piece.SymbolLetter + newMove;
+                        else if (destination.Y > source.Y)
+                        {
+                            newMove += '上';
+                        }
+                        else if (destination.Y < source.Y)
+                        {
+                            newMove += '引';
+                        }
+                        else
+                        {
+                            newMove += '寄';
+                        }
                     }
 
-                    GameState state = DetermineGameState();
-                    if (state is GameState.CheckSente or GameState.CheckGote)
+                    if (promotionPossible)
                     {
-                        newMove += '+';
-                    }
-                    else if (state is GameState.CheckMateSente or GameState.CheckMateGote)
-                    {
-                        newMove += '#';
+                        newMove += promotionHappened ? "成" : "不成";
                     }
 
                     MoveText.Add(newMove);

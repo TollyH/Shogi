@@ -26,7 +26,7 @@ namespace Shogi.Pieces
         };
 
         public abstract string Name { get; }
-        public abstract char SymbolLetter { get; }
+        public abstract string SymbolLetter { get; }
         public abstract string SFENLetter { get; }
         public abstract double Value { get; }
         public abstract bool IsSente { get; }
@@ -62,7 +62,7 @@ namespace Shogi.Pieces
     public class King : Piece
     {
         public override string Name => "King";
-        public override char SymbolLetter { get; }
+        public override string SymbolLetter { get; }
         public override string SFENLetter => "K";
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
@@ -73,7 +73,7 @@ namespace Shogi.Pieces
         {
             Position = position;
             IsSente = isSente;
-            SymbolLetter = isSente ? '玉' : '王';
+            SymbolLetter = isSente ? "玉" : "王";
         }
 
         public override HashSet<Point> GetValidMoves(Piece?[,] board, bool enforceCheckLegality)
@@ -110,7 +110,7 @@ namespace Shogi.Pieces
     public class GoldGeneral : Piece
     {
         public override string Name => "Gold General";
-        public override char SymbolLetter => '金';
+        public override string SymbolLetter => "金";
         public override string SFENLetter => "G";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -157,7 +157,7 @@ namespace Shogi.Pieces
     public class SilverGeneral : Piece
     {
         public override string Name => "Silver General";
-        public override char SymbolLetter => '銀';
+        public override string SymbolLetter => "銀";
         public override string SFENLetter => "S";
         public override double Value => 10;
         public override bool IsSente { get; }
@@ -204,7 +204,7 @@ namespace Shogi.Pieces
     public class PromotedSilverGeneral : Piece
     {
         public override string Name => "Promoted Silver General";
-        public override char SymbolLetter => '全';
+        public override string SymbolLetter => "成銀";
         public override string SFENLetter => "+S";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -251,7 +251,7 @@ namespace Shogi.Pieces
     public class Rook : Piece
     {
         public override string Name => "Rook";
-        public override char SymbolLetter => '飛';
+        public override string SymbolLetter => "飛";
         public override string SFENLetter => "R";
         public override double Value => 19;
         public override bool IsSente { get; }
@@ -350,7 +350,7 @@ namespace Shogi.Pieces
     public class PromotedRook : Piece
     {
         public override string Name => "Promoted Rook";
-        public override char SymbolLetter => '龍';
+        public override string SymbolLetter => "龍";
         public override string SFENLetter => "+R";
         public override double Value => 22;
         public override bool IsSente { get; }
@@ -464,7 +464,7 @@ namespace Shogi.Pieces
     public class Bishop : Piece
     {
         public override string Name => "Bishop";
-        public override char SymbolLetter => '角';
+        public override string SymbolLetter => "角";
         public override string SFENLetter => "B";
         public override double Value => 17;
         public override bool IsSente { get; }
@@ -563,7 +563,7 @@ namespace Shogi.Pieces
     public class PromotedBishop : Piece
     {
         public override string Name => "Promoted Bishop";
-        public override char SymbolLetter => '馬';
+        public override string SymbolLetter => "馬";
         public override string SFENLetter => "+B";
         public override double Value => 20;
         public override bool IsSente { get; }
@@ -677,7 +677,7 @@ namespace Shogi.Pieces
     public class Knight : Piece
     {
         public override string Name => "Knight";
-        public override char SymbolLetter => '桂';
+        public override string SymbolLetter => "桂";
         public override string SFENLetter => "N";
         public override double Value => 6;
         public override bool IsSente { get; }
@@ -724,7 +724,7 @@ namespace Shogi.Pieces
     public class PromotedKnight : Piece
     {
         public override string Name => "Promoted Knight";
-        public override char SymbolLetter => '圭';
+        public override string SymbolLetter => "成桂";
         public override string SFENLetter => "+N";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -771,7 +771,7 @@ namespace Shogi.Pieces
     public class Lance : Piece
     {
         public override string Name => "Lance";
-        public override char SymbolLetter => '香';
+        public override string SymbolLetter => "香";
         public override string SFENLetter => "L";
         public override double Value => 6;
         public override bool IsSente { get; }
@@ -819,7 +819,7 @@ namespace Shogi.Pieces
     public class PromotedLance : Piece
     {
         public override string Name => "Promoted Lance";
-        public override char SymbolLetter => '杏';
+        public override string SymbolLetter => "成香";
         public override string SFENLetter => "+L";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -866,7 +866,7 @@ namespace Shogi.Pieces
     public class Pawn : Piece
     {
         public override string Name => "Pawn";
-        public override char SymbolLetter => '歩';
+        public override string SymbolLetter => "歩";
         public override string SFENLetter => "P";
         public override double Value => 1;
         public override bool IsSente { get; }
@@ -902,7 +902,7 @@ namespace Shogi.Pieces
     public class PromotedPawn : Piece
     {
         public override string Name => "Promoted Pawn";
-        public override char SymbolLetter => 'と';
+        public override string SymbolLetter => "と";
         public override string SFENLetter => "+P";
         public override double Value => 11;
         public override bool IsSente { get; }
