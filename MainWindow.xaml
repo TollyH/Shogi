@@ -32,6 +32,12 @@
                 <MenuItem x:Name="flipBoardItem" Header="_Flip the Board on Gote's Turn" Click="SettingsCheckItem_Click" IsCheckable="True"/>
                 <MenuItem x:Name="updateEvalAfterBotItem" Header="Update _Evaluation Meter Automatically After Computer Move" Click="SettingsCheckItem_Click" IsCheckable="True"/>
                 <Separator/>
+                <MenuItem x:Name="pieceSetItem" Header="_Piece Set">
+                    <MenuItem Header="Japanese (_Traditional - 2 Kanji, All Black)" Click="PieceSetItem_Click" IsCheckable="True" Tag="2kanji"/>
+                    <MenuItem Header="Japanese (_Simplified - 1 Kanji, Black with Red Promotions)" Click="PieceSetItem_Click" IsCheckable="True" Tag="1kanji"/>
+                    <MenuItem Header="_Western (Symbols, Black with Red Promotions)" Click="PieceSetItem_Click" IsCheckable="True" Tag="western"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="Customise..." Click="CustomiseItem_Click"/>
             </MenuItem>
         </Menu>

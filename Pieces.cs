@@ -28,8 +28,6 @@ namespace Shogi.Pieces
 
         public abstract string Name { get; }
         public abstract char SymbolLetter { get; }
-        // TODO: Remove once image rendering is implemented
-        public char SymbolSpecial => '?';
         public abstract double Value { get; }
         public abstract bool IsSente { get; }
         public abstract Point Position { get; protected set; }

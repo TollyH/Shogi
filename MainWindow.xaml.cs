@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace Shogi
@@ -37,7 +38,7 @@ namespace Shogi
         private BoardAnalysis.PossibleMove? currentBestMove = null;
         private bool manuallyEvaluating = false;
 
-        private readonly Dictionary<Pieces.Piece, Viewbox> pieceViews = new();
+        private readonly Dictionary<Pieces.Piece, Image> pieceViews = new();
 
         private CancellationTokenSource cancelMoveComputation = new();
 
@@ -57,6 +58,10 @@ namespace Shogi
             moveListSymbolsItem.IsChecked = config.UseSymbolsOnMoveList;
             flipBoardItem.IsChecked = config.FlipBoard;
             updateEvalAfterBotItem.IsChecked = config.UpdateEvalAfterBot;
+            foreach (MenuItem item in pieceSetItem.Items)
+            {
+                item.IsChecked = config.PieceSet == (string)item.Tag;
+            }
         }
 
         public void UpdateGameDisplay()
@@ -339,17 +344,14 @@ namespace Shogi
                             foregroundBrush = new SolidColorBrush(config.DefaultPieceColor);
                         }
 
-                        Viewbox newPiece = new()
+                        Image newPiece = new()
                         {
-                            Child = new TextBlock()
-                            {
-                                Text = piece.SymbolSpecial.ToString(),
-                                FontFamily = new("Segoe UI Symbol"),
-                                Foreground = foregroundBrush
-                            },
+                            Source = new BitmapImage(
+                                new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
                             Width = tileWidth,
                             Height = tileHeight
                         };
+                        RenderOptions.SetBitmapScalingMode(newPiece, BitmapScalingMode.HighQuality);
                         pieceViews[piece] = newPiece;
                         _ = shogiGameCanvas.Children.Add(newPiece);
                         Canvas.SetBottom(newPiece, (boardFlipped ? 7 - y : y) * tileHeight);
@@ -751,7 +753,7 @@ namespace Shogi
             manuallyEvaluating = false;
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            CustomGame customDialog = new();
+            CustomGame customDialog = new(config);
             _ = customDialog.ShowDialog();
             if (customDialog.GeneratedGame is not null)
             {
@@ -787,6 +789,17 @@ namespace Shogi
         {
             _ = new Customisation(config).ShowDialog();
             shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
+            UpdateGameDisplay();
+        }
+
+        private void PieceSetItem_Click(object sender, RoutedEventArgs e)
+        {
+            string chosenSet = (string)((MenuItem)sender).Tag;
+            config.PieceSet = chosenSet;
+            foreach (MenuItem item in pieceSetItem.Items)
+            {
+                item.IsChecked = chosenSet == (string)item.Tag;
+            }
             UpdateGameDisplay();
         }
     }

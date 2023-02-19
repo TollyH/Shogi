@@ -2,8 +2,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace Shogi
 {
@@ -18,16 +18,19 @@ namespace Shogi
         public bool SenteIsComputer { get; private set; }
         public bool GoteIsComputer { get; private set; }
 
+        private readonly Settings config;
+
         private Pieces.King? senteKing = null;
         private Pieces.King? goteKing = null;
 
         private double tileWidth;
         private double tileHeight;
 
-        public CustomGame()
+        public CustomGame(Settings config)
         {
             Board = new Pieces.Piece?[9, 9];
             GeneratedGame = null;
+            this.config = config;
 
             InitializeComponent();
         }
@@ -46,16 +49,14 @@ namespace Shogi
                     Pieces.Piece? piece = Board[x, y];
                     if (piece is not null)
                     {
-                        Viewbox newPiece = new()
+                        Image newPiece = new()
                         {
-                            Child = new TextBlock()
-                            {
-                                Text = piece.SymbolSpecial.ToString(),
-                                FontFamily = new("Segoe UI Symbol")
-                            },
+                            Source = new BitmapImage(
+                                new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
                             Width = tileWidth,
                             Height = tileHeight
                         };
+                        RenderOptions.SetBitmapScalingMode(newPiece, BitmapScalingMode.HighQuality);
                         _ = shogiGameCanvas.Children.Add(newPiece);
                         Canvas.SetBottom(newPiece, y * tileHeight);
                         Canvas.SetLeft(newPiece, x * tileWidth);
