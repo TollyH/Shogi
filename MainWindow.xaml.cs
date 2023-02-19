@@ -171,13 +171,9 @@ namespace Shogi
             }
 
             movesPanel.Children.Clear();
-            for (int i = 0; i < game.MoveText.Count; i += 2)
+            for (int i = 0; i < game.MoveText.Count; i++)
             {
-                string text = $"{(i / 2) + 1}. {game.MoveText[i]}";
-                if (i + 1 < game.MoveText.Count)
-                {
-                    text += $" {game.MoveText[i + 1]}";
-                }
+                string text = $"{i + 1}. {game.MoveText[i]}";
                 _ = movesPanel.Children.Add(new Label()
                 {
                     Content = text,
