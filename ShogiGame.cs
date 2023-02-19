@@ -372,10 +372,12 @@ namespace Shogi
                             // Always promote knights upon reaching the last two ranks
                             doPromotion = true;
                         }
+                        AwaitingPromotionResponse = true;
                         doPromotion ??= System.Windows.MessageBox.Show(
                             $"Do you want to promote the {piece.Name} you just moved?", "Promotion",
                             System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question
                         ) == System.Windows.MessageBoxResult.Yes;
+                        AwaitingPromotionResponse = false;
                         if (doPromotion.Value)
                         {
                             piece = (Pieces.Piece)Activator.CreateInstance(Pieces.Piece.PromotionMap[pieceType], piece.Position, piece.IsSente)!;
