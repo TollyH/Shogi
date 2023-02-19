@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Shogi.Pieces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -78,23 +79,26 @@ namespace Shogi
             tileWidth = shogiGameCanvas.ActualWidth / game.Board.GetLength(0);
             tileHeight = shogiGameCanvas.ActualHeight / game.Board.GetLength(1);
 
-            senteCaptures.Content = 0;
-            senteCaptures.ToolTip = "";
-            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => p.IsSente))
+            foreach (Grid dropItem in senteDropsPanel.Children)
             {
-                senteCaptures.Content = (int)senteCaptures.Content + 1;
-                senteCaptures.ToolTip = (string)senteCaptures.ToolTip + capturedPiece.Name + "\r\n";
+                Type pieceType = (Type)dropItem.Tag;
+                int heldCount = game.SentePieceDrops[pieceType];
+                dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                ((Label)dropItem.Children[1]).Content = heldCount;
+                ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Bottom : VerticalAlignment.Top;
+                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
+                    $"pack://application:,,,/Pieces/{config.PieceSet}/{(boardFlipped ? "Gote" : "Sente")}/{((Image)dropItem.Children[0]).Tag}.png"));
             }
-            senteCaptures.ToolTip = ((string)senteCaptures.ToolTip).TrimEnd();
-
-            goteCaptures.Content = 0;
-            goteCaptures.ToolTip = "";
-            foreach (Pieces.Piece capturedPiece in game.CapturedPieces.Where(p => !p.IsSente))
+            foreach (Grid dropItem in goteDropsPanel.Children)
             {
-                goteCaptures.Content = (int)goteCaptures.Content + 1;
-                goteCaptures.ToolTip = (string)goteCaptures.ToolTip + capturedPiece.Name + "\r\n";
+                Type pieceType = (Type)dropItem.Tag;
+                int heldCount = game.GotePieceDrops[pieceType];
+                dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
+                ((Label)dropItem.Children[1]).Content = heldCount;
+                ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Top : VerticalAlignment.Bottom;
+                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
+                    $"pack://application:,,,/Pieces/{config.PieceSet}/{(boardFlipped ? "Sente" : "Gote")}/{((Image)dropItem.Children[0]).Tag}.png"));
             }
-            goteCaptures.ToolTip = ((string)goteCaptures.ToolTip).TrimEnd();
 
             if (currentBestMove is null && !manuallyEvaluating)
             {
@@ -115,10 +119,8 @@ namespace Shogi
                 Grid.SetColumn(goteEvaluationView, 0);
                 Grid.SetRow(goteEvaluationView, 2);
 
-                Grid.SetColumn(senteCapturesView, 0);
-                Grid.SetRow(senteCapturesView, 0);
-                Grid.SetColumn(goteCapturesView, 2);
-                Grid.SetRow(goteCapturesView, 2);
+                Grid.SetRow(senteDropsContainer, 1);
+                Grid.SetRow(goteDropsContainer, 3);
 
                 foreach (UIElement child in ranksLeft.Children)
                 {
@@ -144,10 +146,8 @@ namespace Shogi
                 Grid.SetColumn(goteEvaluationView, 2);
                 Grid.SetRow(goteEvaluationView, 0);
 
-                Grid.SetColumn(senteCapturesView, 2);
-                Grid.SetRow(senteCapturesView, 2);
-                Grid.SetColumn(goteCapturesView, 0);
-                Grid.SetRow(goteCapturesView, 0);
+                Grid.SetRow(senteDropsContainer, 3);
+                Grid.SetRow(goteDropsContainer, 1);
 
                 foreach (UIElement child in ranksLeft.Children)
                 {

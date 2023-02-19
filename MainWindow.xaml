@@ -4,12 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Shogi"
+        xmlns:pieces="clr-namespace:Shogi.Pieces"
         mc:Ignorable="d"
-        Title="Shogi" Height="770" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing">
+        Title="Shogi" Height="970" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="100px"/>
             <RowDefinition Height="1*"/>
+            <RowDefinition Height="100px"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
@@ -41,7 +44,7 @@
                 <MenuItem Header="Customise..." Click="CustomiseItem_Click"/>
             </MenuItem>
         </Menu>
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="12*"/>
@@ -174,12 +177,6 @@
             <Viewbox x:Name="goteEvaluationView" Grid.Column="2" Grid.Row="0">
                 <Label x:Name="goteEvaluation" Content="?" Foreground="Navy" MouseUp="evaluation_MouseUp"/>
             </Viewbox>
-            <Viewbox x:Name="goteCapturesView" Grid.Column="0" Grid.Row="0">
-                <Label x:Name="goteCaptures" Content="0" Foreground="Crimson"/>
-            </Viewbox>
-            <Viewbox x:Name="senteCapturesView" Grid.Column="2" Grid.Row="2">
-                <Label x:Name="senteCaptures" Content="0" Foreground="Crimson"/>
-            </Viewbox>
             <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1">
                 <Grid x:Name="shogiBoardBackground">
                     <Grid.RowDefinitions>
@@ -229,10 +226,74 @@
             </Border>
             <Canvas Grid.Column="1" Grid.Row="1" x:Name="shogiGameCanvas" Margin="1"/>
         </Grid>
-        <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="1,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+        <Border Grid.Row="1" Grid.RowSpan="3" Grid.Column="1" BorderBrush="Black" BorderThickness="1,0,0,0" ScrollViewer.HorizontalScrollBarVisibility="Auto">
             <ScrollViewer x:Name="movesScroll">
                 <StackPanel x:Name="movesPanel"/>
             </ScrollViewer>
+        </Border>
+        <Border x:Name="goteDropsContainer" Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <StackPanel x:Name="goteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}">
+                    <Image Source="/Pieces/1kanji/Gote/Gold General.png" Tag="Gold General"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="goteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}">
+                    <Image Source="/Pieces/1kanji/Gote/Silver General.png" Tag="Silver General"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="goteRookDrop" Tag="{x:Type pieces:Rook}">
+                    <Image Source="/Pieces/1kanji/Gote/Rook.png" Tag="Rook"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="goteBishopDrop" Tag="{x:Type pieces:Bishop}">
+                    <Image Source="/Pieces/1kanji/Gote/Bishop.png" Tag="Bishop"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="goteKnightDrop" Tag="{x:Type pieces:Knight}">
+                    <Image Source="/Pieces/1kanji/Gote/Knight.png" Tag="Knight"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="goteLanceDrop" Tag="{x:Type pieces:Lance}">
+                    <Image Source="/Pieces/1kanji/Gote/Lance.png" Tag="Lance"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="gotePawnDrop" Tag="{x:Type pieces:Pawn}">
+                    <Image Source="/Pieces/1kanji/Gote/Pawn.png" Tag="Pawn"/>
+                    <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Border x:Name="senteDropsContainer" Grid.Row="3" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <StackPanel x:Name="senteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid x:Name="senteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}">
+                    <Image Source="/Pieces/1kanji/Sente/Gold General.png" Tag="Gold General"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="senteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}">
+                    <Image Source="/Pieces/1kanji/Sente/Silver General.png" Tag="Silver General"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="senteRookDrop" Tag="{x:Type pieces:Rook}">
+                    <Image Source="/Pieces/1kanji/Sente/Rook.png" Tag="Rook"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="senteBishopDrop" Tag="{x:Type pieces:Bishop}">
+                    <Image Source="/Pieces/1kanji/Sente/Bishop.png" Tag="Bishop"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="senteKnightDrop" Tag="{x:Type pieces:Knight}">
+                    <Image Source="/Pieces/1kanji/Sente/Knight.png" Tag="Knight"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="senteLanceDrop" Tag="{x:Type pieces:Lance}">
+                    <Image Source="/Pieces/1kanji/Sente/Lance.png" Tag="Lance"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+                <Grid x:Name="sentePawnDrop" Tag="{x:Type pieces:Pawn}">
+                    <Image Source="/Pieces/1kanji/Sente/Pawn.png" Tag="Pawn"/>
+                    <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="18"/>
+                </Grid>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

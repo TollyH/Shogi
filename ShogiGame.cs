@@ -51,7 +51,8 @@ namespace Shogi
         /// </summary>
         public List<(Point, Point)> Moves { get; }
         public List<string> MoveText { get; }
-        public List<Pieces.Piece> CapturedPieces { get; }
+        public Dictionary<Type, int> SentePieceDrops { get; }
+        public Dictionary<Type, int> GotePieceDrops { get; }
 
         // Used for the 50-move rule
         public int StaleMoveCounter { get; private set; }
@@ -72,7 +73,26 @@ namespace Shogi
 
             Moves = new List<(Point, Point)>();
             MoveText = new List<string>();
-            CapturedPieces = new List<Pieces.Piece>();
+            SentePieceDrops = new Dictionary<Type, int>()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
+            GotePieceDrops = new Dictionary<Type, int>()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
 
             StaleMoveCounter = 0;
             BoardCounts = new Dictionary<string, int>();
@@ -97,8 +117,8 @@ namespace Shogi
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
         public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
-            List<Pieces.Piece> capturedPieces, int staleMoveCounter, Dictionary<string, int> boardCounts,
-            string? initialState)
+            Dictionary<Type, int>? sentePieceDrops, Dictionary<Type, int>? gotePieceDrops, int staleMoveCounter,
+            Dictionary<string, int> boardCounts, string? initialState)
         {
             if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
             {
@@ -113,7 +133,26 @@ namespace Shogi
             GameOver = gameOver;
             Moves = moves;
             MoveText = moveText;
-            CapturedPieces = capturedPieces;
+            SentePieceDrops = sentePieceDrops ?? new Dictionary<Type, int>()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
+            GotePieceDrops = gotePieceDrops ?? new Dictionary<Type, int>()
+            {
+                { typeof(Pieces.GoldGeneral), 0 },
+                { typeof(Pieces.SilverGeneral), 0 },
+                { typeof(Pieces.Rook), 0 },
+                { typeof(Pieces.Bishop), 0 },
+                { typeof(Pieces.Knight), 0 },
+                { typeof(Pieces.Lance), 0 },
+                { typeof(Pieces.Pawn), 0 },
+            };
             StaleMoveCounter = staleMoveCounter;
             BoardCounts = boardCounts;
 
@@ -135,7 +174,7 @@ namespace Shogi
             }
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
-                CapturedPieces.Select(c => c.Clone()).ToList(), StaleMoveCounter,
+                new Dictionary<Type, int>(SentePieceDrops), new Dictionary<Type, int>(GotePieceDrops), StaleMoveCounter,
                 new(BoardCounts), InitialState);
         }
 
@@ -210,8 +249,22 @@ namespace Shogi
                 Moves.Add((source, destination));
                 if (Board[destination.X, destination.Y] is not null)
                 {
-                    CapturedPieces.Add(Board[destination.X, destination.Y]!);
-                    StaleMoveCounter = 0;
+                    Type targetPiece = Board[destination.X, destination.Y]!.GetType();
+                    if (Pieces.Piece.DemotionMap.ContainsKey(targetPiece))
+                    {
+                        targetPiece = Pieces.Piece.DemotionMap[targetPiece];
+                    }
+                    if (SentePieceDrops.ContainsKey(targetPiece))
+                    {
+                        if (CurrentTurnSente)
+                        {
+                            SentePieceDrops[targetPiece]++;
+                        }
+                        else
+                        {
+                            GotePieceDrops[targetPiece]++;
+                        }
+                    }
                 }
 
                 Type pieceType = piece.GetType();
@@ -512,7 +565,7 @@ namespace Shogi
             // Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, new(), staleMoves, new(), null);
+                new(), currentTurnSente ? new() : new() { "..." }, null, null, staleMoves, new(), null);
         }
     }
 }
