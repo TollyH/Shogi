@@ -219,15 +219,24 @@ namespace Shogi
         }
 
         /// <summary>
-        /// Calculate the value of the given board based on the remaining pieces
+        /// Calculate the value of the given game based on the pieces on the board and in hand
         /// </summary>
         /// <returns>
-        /// A <see cref="double"/> representing the total piece value of the entire board.
+        /// A <see cref="double"/> representing the total piece value of the game.
         /// Positive means sente has stronger material, negative means gote does.
         /// </returns>
-        public static double CalculateBoardValue(Pieces.Piece?[,] board)
+        public static double CalculateGameValue(ShogiGame game)
         {
-            return board.OfType<Pieces.Piece>().Sum(p => p.IsSente ? p.Value : -p.Value);
+            double inHandTotal = 0;
+            foreach ((Type dropType, int count) in game.SentePieceDrops)
+            {
+                inHandTotal += count * ((Pieces.Piece)Activator.CreateInstance(dropType, new Point(), true)!).Value;
+            }
+            foreach ((Type dropType, int count) in game.GotePieceDrops)
+            {
+                inHandTotal -= count * ((Pieces.Piece)Activator.CreateInstance(dropType, new Point(), false)!).Value;
+            }
+            return inHandTotal + game.Board.OfType<Pieces.Piece>().Sum(p => p.IsSente ? p.Value : -p.Value);
         }
 
         public readonly struct PossibleMove
@@ -377,6 +386,46 @@ namespace Shogi
                 }
             }
 
+            Dictionary<Type, int> dropCounts = game.CurrentTurnSente ? game.SentePieceDrops : game.GotePieceDrops;
+            foreach ((Type dropType, int count) in dropCounts)
+            {
+                if (count > 0)
+                {
+                    for (int x = 0; x < game.Board.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < game.Board.GetLength(1); y++)
+                        {
+                            Point pt = new(x, y);
+                            if (game.IsDropPossible(dropType, pt))
+                            {
+                                remainingThreads++;
+                                Point thisDropPoint = pt;
+                                Point thisDropSource = ShogiGame.PieceDropSources[dropType];
+                                ShogiGame gameClone = game.Clone();
+                                List<(Point, Point, bool)> thisLine = new() { (thisDropSource, thisDropPoint, false) };
+                                _ = gameClone.MovePiece(thisDropSource, thisDropPoint, true,
+                                    doPromotion: false, updateMoveText: false);
+
+                                Thread processThread = new(() =>
+                                {
+                                    PossibleMove bestSubMove = MinimaxMove(gameClone,
+                                        double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
+                                    // Don't include default value in results
+                                    if (bestSubMove.Source != bestSubMove.Destination)
+                                    {
+                                        possibleMoves.Add(new PossibleMove(thisDropSource, pt,
+                                            bestSubMove.EvaluatedFutureValue, bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                            bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine));
+                                    }
+                                    remainingThreads--;
+                                });
+                                processThread.Start();
+                            }
+                        }
+                    }
+                }
+            }
+
             await Task.Run(async () =>
             {
                 while (remainingThreads > 0 || cancellationToken.IsCancellationRequested)
@@ -422,7 +471,7 @@ namespace Shogi
             }
             if (depth > maxDepth)
             {
-                return new PossibleMove(lastMove.Item1, lastMove.Item2, CalculateBoardValue(game.Board), false, false, 0, 0, false, currentLine);
+                return new PossibleMove(lastMove.Item1, lastMove.Item2, CalculateGameValue(game), false, false, 0, 0, false, currentLine);
             }
 
             PossibleMove bestMove = new(default, default,
@@ -501,6 +550,77 @@ namespace Shogi
                                 if (potentialMove.EvaluatedFutureValue < beta)
                                 {
                                     beta = potentialMove.EvaluatedFutureValue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Dictionary<Type, int> dropCounts = game.CurrentTurnSente ? game.SentePieceDrops : game.GotePieceDrops;
+            foreach ((Type dropType, int count) in dropCounts)
+            {
+                if (count > 0)
+                {
+                    for (int x = 0; x < game.Board.GetLength(0); x++)
+                    {
+                        for (int y = 0; y < game.Board.GetLength(1); y++)
+                        {
+                            Point pt = new(x, y);
+                            if (game.IsDropPossible(dropType, pt))
+                            {
+                                ShogiGame gameClone = game.Clone();
+                                Point dropPoint = pt;
+                                Point dropSource = ShogiGame.PieceDropSources[dropType];
+                                List<(Point, Point, bool)> newLine = new(currentLine) { (dropSource, dropPoint, false) };
+                                _ = gameClone.MovePiece(dropSource, dropPoint, true,
+                                    doPromotion: true, updateMoveText: false);
+                                PossibleMove potentialMove = MinimaxMove(gameClone, alpha, beta, depth + 1, maxDepth, newLine, cancellationToken);
+                                if (cancellationToken.IsCancellationRequested)
+                                {
+                                    return bestMove;
+                                }
+                                if (game.CurrentTurnSente)
+                                {
+                                    if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
+                                        || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
+                                        || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
+                                        || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
+                                            && potentialMove.DepthToGoteMate < bestMove.DepthToGoteMate))
+                                    {
+                                        bestMove = new PossibleMove(dropSource, dropPoint, potentialMove.EvaluatedFutureValue,
+                                            potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                            potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, potentialMove.DoPromotion, potentialMove.BestLine);
+                                    }
+                                    if (potentialMove.EvaluatedFutureValue >= beta && !bestMove.GoteMateLocated)
+                                    {
+                                        return bestMove;
+                                    }
+                                    if (potentialMove.EvaluatedFutureValue > alpha)
+                                    {
+                                        alpha = potentialMove.EvaluatedFutureValue;
+                                    }
+                                }
+                                else
+                                {
+                                    if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
+                                        || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
+                                        || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
+                                        || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
+                                            && potentialMove.DepthToSenteMate < bestMove.DepthToSenteMate))
+                                    {
+                                        bestMove = new PossibleMove(dropSource, dropPoint, potentialMove.EvaluatedFutureValue,
+                                            potentialMove.SenteMateLocated, potentialMove.GoteMateLocated,
+                                            potentialMove.DepthToSenteMate, potentialMove.DepthToGoteMate, potentialMove.DoPromotion, potentialMove.BestLine);
+                                    }
+                                    if (potentialMove.EvaluatedFutureValue <= alpha && !bestMove.SenteMateLocated)
+                                    {
+                                        return bestMove;
+                                    }
+                                    if (potentialMove.EvaluatedFutureValue < beta)
+                                    {
+                                        beta = potentialMove.EvaluatedFutureValue;
+                                    }
                                 }
                             }
                         }

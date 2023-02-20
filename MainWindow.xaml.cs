@@ -83,8 +83,30 @@ namespace Shogi
                 Type pieceType = (Type)dropItem.Tag;
                 int heldCount = game.SentePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
-                dropItem.Background = selectedDropType == pieceType && game.CurrentTurnSente
-                    ? new SolidColorBrush(config.SelectedPieceColor) : Brushes.Transparent;
+
+                SolidColorBrush dropBackground;
+                if (game.CurrentTurnSente)
+                {
+                    if (currentBestMove is not null && currentBestMove.Value.Source.X == -1
+                        && ShogiGame.DropTypeOrder[currentBestMove.Value.Source.Y] == pieceType)
+                    {
+                        dropBackground = new SolidColorBrush(config.BestMoveSourceColor);
+                    }
+                    else if (selectedDropType == pieceType)
+                    {
+                        dropBackground = new SolidColorBrush(config.SelectedPieceColor);
+                    }
+                    else
+                    {
+                        dropBackground = Brushes.Transparent;
+                    }
+                }
+                else
+                {
+                    dropBackground = Brushes.Transparent;
+                }
+                dropItem.Background = dropBackground;
+
                 ((Label)dropItem.Children[1]).Content = heldCount;
                 ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Bottom : VerticalAlignment.Top;
                 ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
@@ -95,8 +117,30 @@ namespace Shogi
                 Type pieceType = (Type)dropItem.Tag;
                 int heldCount = game.GotePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
-                dropItem.Background = selectedDropType == pieceType && !game.CurrentTurnSente
-                    ? new SolidColorBrush(config.SelectedPieceColor) : Brushes.Transparent;
+
+                SolidColorBrush dropBackground;
+                if (!game.CurrentTurnSente)
+                {
+                    if (currentBestMove is not null && currentBestMove.Value.Source.X == -1
+                        && ShogiGame.DropTypeOrder[currentBestMove.Value.Source.Y] == pieceType)
+                    {
+                        dropBackground = new SolidColorBrush(config.BestMoveSourceColor);
+                    }
+                    else if (selectedDropType == pieceType)
+                    {
+                        dropBackground = new SolidColorBrush(config.SelectedPieceColor);
+                    }
+                    else
+                    {
+                        dropBackground = Brushes.Transparent;
+                    }
+                }
+                else
+                {
+                    dropBackground = Brushes.Transparent;
+                }
+                dropItem.Background = dropBackground;
+
                 ((Label)dropItem.Children[1]).Content = heldCount;
                 ((Label)dropItem.Children[1]).VerticalAlignment = boardFlipped ? VerticalAlignment.Top : VerticalAlignment.Bottom;
                 ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
@@ -230,17 +274,20 @@ namespace Shogi
                 // Prevent cases where there are no valid moves highlighting (0, 0)
                 && currentBestMove.Value.Source != currentBestMove.Value.Destination)
             {
-                Rectangle bestMoveSrcHighlight = new()
+                if (currentBestMove.Value.Source.X != -1)
                 {
-                    Width = tileWidth,
-                    Height = tileHeight,
-                    Fill = new SolidColorBrush(config.BestMoveSourceColor)
-                };
-                _ = shogiGameCanvas.Children.Add(bestMoveSrcHighlight);
-                Canvas.SetBottom(bestMoveSrcHighlight,
-                    (boardFlipped ? 8 - currentBestMove.Value.Source.Y : currentBestMove.Value.Source.Y) * tileHeight);
-                Canvas.SetLeft(bestMoveSrcHighlight,
-                    (boardFlipped ? 8 - currentBestMove.Value.Source.X : currentBestMove.Value.Source.X) * tileWidth);
+                    Rectangle bestMoveSrcHighlight = new()
+                    {
+                        Width = tileWidth,
+                        Height = tileHeight,
+                        Fill = new SolidColorBrush(config.BestMoveSourceColor)
+                    };
+                    _ = shogiGameCanvas.Children.Add(bestMoveSrcHighlight);
+                    Canvas.SetBottom(bestMoveSrcHighlight,
+                        (boardFlipped ? 8 - currentBestMove.Value.Source.Y : currentBestMove.Value.Source.Y) * tileHeight);
+                    Canvas.SetLeft(bestMoveSrcHighlight,
+                        (boardFlipped ? 8 - currentBestMove.Value.Source.X : currentBestMove.Value.Source.X) * tileWidth);
+                }
 
                 Rectangle bestMoveDstHighlight = new()
                 {
