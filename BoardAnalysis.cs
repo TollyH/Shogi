@@ -230,11 +230,11 @@ namespace Shogi
             double inHandTotal = 0;
             foreach ((Type dropType, int count) in game.SentePieceDrops)
             {
-                inHandTotal += count * ((Pieces.Piece)Activator.CreateInstance(dropType, new Point(), true)!).Value;
+                inHandTotal += count * Pieces.Piece.DefaultPieces[dropType].Value;
             }
             foreach ((Type dropType, int count) in game.GotePieceDrops)
             {
-                inHandTotal -= count * ((Pieces.Piece)Activator.CreateInstance(dropType, new Point(), false)!).Value;
+                inHandTotal -= count * Pieces.Piece.DefaultPieces[dropType].Value;
             }
             return inHandTotal + game.Board.OfType<Pieces.Piece>().Sum(p => p.IsSente ? p.Value : -p.Value);
         }

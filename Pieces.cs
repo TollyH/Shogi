@@ -24,6 +24,27 @@ namespace Shogi.Pieces
             { typeof(PromotedLance), typeof(Lance) },
             { typeof(PromotedPawn), typeof(Pawn) }
         };
+        /// <summary>
+        /// Stores a default state of each piece type so that data can still be accessed
+        /// without a instance of a piece (for example with pieces-in-hand).
+        /// </summary>
+        public static readonly Dictionary<Type, Piece> DefaultPieces = new()
+        {
+            { typeof(King), new King(new(), false) },
+            { typeof(GoldGeneral), new GoldGeneral(new(), false) },
+            { typeof(SilverGeneral), new SilverGeneral(new(), false) },
+            { typeof(PromotedSilverGeneral), new PromotedSilverGeneral(new(), false) },
+            { typeof(Rook), new Rook(new(), false) },
+            { typeof(PromotedRook), new PromotedRook(new(), false) },
+            { typeof(Bishop), new Bishop(new(), false) },
+            { typeof(PromotedBishop), new PromotedBishop(new(), false) },
+            { typeof(Knight), new Knight(new(), false) },
+            { typeof(PromotedKnight), new PromotedKnight(new(), false) },
+            { typeof(Lance), new Lance(new(), false) },
+            { typeof(PromotedLance), new PromotedLance(new(), false) },
+            { typeof(Pawn), new Pawn(new(), false) },
+            { typeof(PromotedPawn), new PromotedPawn(new(), false) },
+        };
 
         public abstract string Name { get; }
         public abstract string SymbolLetter { get; }

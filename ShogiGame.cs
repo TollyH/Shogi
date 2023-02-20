@@ -230,13 +230,14 @@ namespace Shogi
             {
                 return false;
             }
-            Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(dropType, destination, CurrentTurnSente)!;
             if (Board[destination.X, destination.Y] is not null)
             {
                 return false;
             }
-            if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? 8 : 0)))
-                || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= 7 : destination.Y <= 1)))
+            if (((dropType == typeof(Pieces.Pawn) || dropType == typeof(Pieces.Lance))
+                    && (destination.Y == (CurrentTurnSente ? 8 : 0)))
+                || (dropType == typeof(Pieces.Knight)
+                    && (CurrentTurnSente ? destination.Y >= 7 : destination.Y <= 1)))
             {
                 return false;
             }
@@ -265,7 +266,7 @@ namespace Shogi
                 return false;
             }
 
-            if (piece is Pieces.Pawn && (pawnPresentOnFile
+            if (dropType == typeof(Pieces.Pawn) && (pawnPresentOnFile
                 || resultingGameState is GameState.CheckMateSente or GameState.CheckMateGote))
             {
                 return false;
@@ -526,7 +527,6 @@ namespace Shogi
             bool anyHeldPieces = false;
             foreach ((Type pieceType, int count) in SentePieceDrops)
             {
-                Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(pieceType, new Point(), CurrentTurnSente)!;
                 if (count == 0)
                 {
                     continue;
@@ -536,11 +536,10 @@ namespace Shogi
                 {
                     _ = result.Append(count);
                 }
-                _ = result.Append(piece.SFENLetter.ToUpper());
+                _ = result.Append(Pieces.Piece.DefaultPieces[pieceType].SFENLetter.ToUpper());
             }
             foreach ((Type pieceType, int count) in GotePieceDrops)
             {
-                Pieces.Piece piece = (Pieces.Piece)Activator.CreateInstance(pieceType, new Point(), CurrentTurnSente)!;
                 if (count == 0)
                 {
                     continue;
@@ -550,7 +549,7 @@ namespace Shogi
                 {
                     _ = result.Append(count);
                 }
-                _ = result.Append(piece.SFENLetter.ToLower());
+                _ = result.Append(Pieces.Piece.DefaultPieces[pieceType].SFENLetter.ToLower());
             }
             if (!anyHeldPieces)
             {
