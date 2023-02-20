@@ -521,6 +521,7 @@ namespace Shogi
                 {
                     continue;
                 }
+                anyHeldPieces = true;
                 if (count != 1)
                 {
                     _ = result.Append(count);
