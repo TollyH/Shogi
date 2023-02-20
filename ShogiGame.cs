@@ -230,6 +230,11 @@ namespace Shogi
             {
                 return false;
             }
+            if ((CurrentTurnSente && SentePieceDrops[dropType] == 0)
+                || (!CurrentTurnSente && GotePieceDrops[dropType] == 0))
+            {
+                return false;
+            }
             if (Board[destination.X, destination.Y] is not null)
             {
                 return false;
@@ -279,9 +284,6 @@ namespace Shogi
         /// Move a piece on the board from a <paramref name="source"/> coordinate to a <paramref name="destination"/> coordinate.
         /// To perform a piece drop, set <paramref name="source"/> to a value within <see cref="PieceDropSources"/>.
         /// </summary>
-        /// <param name="forceMove">
-        /// Whether or not a move should always be allowed to occur. If <see langword="true"/> when performing a piece drop, the held piece counters will not be decremented.
-        /// </param>
         /// <param name="doPromotion">
         /// If a piece can be promoted, should it be? <see langword="null"/> means the user should be prompted.
         /// </param>
@@ -308,16 +310,13 @@ namespace Shogi
                 {
                     return false;
                 }
-                if (!forceMove)
+                if (CurrentTurnSente && SentePieceDrops[dropType] > 0)
                 {
-                    if (CurrentTurnSente)
-                    {
-                        SentePieceDrops[dropType]--;
-                    }
-                    else
-                    {
-                        GotePieceDrops[dropType]--;
-                    }
+                    SentePieceDrops[dropType]--;
+                }
+                else if (GotePieceDrops[dropType] > 0)
+                {
+                    GotePieceDrops[dropType]--;
                 }
             }
             else
