@@ -892,7 +892,7 @@ namespace Shogi
             if (e.ChangedButton == MouseButton.Left && !game.GameOver)
             {
                 Type clickedType = (Type)((Grid)sender).Tag;
-                if (game.CurrentTurnSente || game.GotePieceDrops[clickedType] == 0)
+                if (game.CurrentTurnSente || goteIsComputer || game.GotePieceDrops[clickedType] == 0)
                 {
                     return;
                 }
@@ -907,7 +907,7 @@ namespace Shogi
             if (e.ChangedButton == MouseButton.Left && !game.GameOver)
             {
                 Type clickedType = (Type)((Grid)sender).Tag;
-                if (!game.CurrentTurnSente || game.SentePieceDrops[clickedType] == 0)
+                if (!game.CurrentTurnSente || senteIsComputer || game.SentePieceDrops[clickedType] == 0)
                 {
                     return;
                 }
