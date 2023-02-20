@@ -523,6 +523,7 @@ namespace Shogi
             manuallyEvaluating = false;
             grabbedPiece = null;
             highlightGrabbedMoves = false;
+            selectedDropType = null;
             senteEvaluation.Content = "?";
             goteEvaluation.Content = "?";
             UpdateGameDisplay();
@@ -721,6 +722,7 @@ namespace Shogi
             manuallyEvaluating = true;
             grabbedPiece = null;
             highlightGrabbedMoves = false;
+            selectedDropType = null;
             UpdateEvaluationMeter(null, game.CurrentTurnSente);
             UpdateGameDisplay();
             UpdateCursor();
@@ -797,6 +799,7 @@ namespace Shogi
                 goteIsComputer = customDialog.GoteIsComputer;
                 grabbedPiece = null;
                 highlightGrabbedMoves = false;
+                selectedDropType = null;
                 currentBestMove = null;
                 senteEvaluation.Content = "?";
                 goteEvaluation.Content = "?";
