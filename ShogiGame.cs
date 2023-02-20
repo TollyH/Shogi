@@ -255,8 +255,18 @@ namespace Shogi
             ShogiGame checkmateTest = Clone();
             _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
                 destination, forceMove: true, updateMoveText: false);
+            GameState resultingGameState = checkmateTest.DetermineGameState();
+
+            if ((CurrentTurnSente && resultingGameState is GameState.CheckSente or GameState.CheckMateSente
+                    or GameState.PerpetualCheckSente)
+                || (!CurrentTurnSente && resultingGameState is GameState.CheckGote or GameState.CheckMateGote
+                    or GameState.PerpetualCheckGote))
+            {
+                return false;
+            }
+
             if (piece is Pieces.Pawn && (pawnPresentOnFile
-                || checkmateTest.DetermineGameState() is GameState.CheckMateSente or GameState.CheckMateGote))
+                || resultingGameState is GameState.CheckMateSente or GameState.CheckMateGote))
             {
                 return false;
             }
