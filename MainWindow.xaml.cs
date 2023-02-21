@@ -478,12 +478,12 @@ namespace Shogi
             if ((bestMove.Value.SenteMateLocated && !bestMove.Value.GoteMateLocated)
                 || bestMove.Value.EvaluatedFutureValue == double.NegativeInfinity)
             {
-                toUpdate.Content = $"-M{(int)Math.Ceiling(bestMove.Value.DepthToSenteMate / 2d)}";
+                toUpdate.Content = $"-M{bestMove.Value.DepthToSenteMate}";
             }
             else if ((bestMove.Value.GoteMateLocated && !bestMove.Value.SenteMateLocated)
                 || bestMove.Value.EvaluatedFutureValue == double.PositiveInfinity)
             {
-                toUpdate.Content = $"+M{(int)Math.Ceiling(bestMove.Value.DepthToGoteMate / 2d)}";
+                toUpdate.Content = $"+M{bestMove.Value.DepthToGoteMate}";
             }
             else
             {
