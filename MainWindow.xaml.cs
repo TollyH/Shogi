@@ -243,7 +243,7 @@ namespace Shogi
 
             if (game.Moves.Count > 0)
             {
-                (System.Drawing.Point lastMoveSource, System.Drawing.Point lastMoveDestination) = game.Moves[^1];
+                (_, System.Drawing.Point lastMoveSource, System.Drawing.Point lastMoveDestination, _, _) = game.Moves[^1];
 
                 if (lastMoveSource.X != -1)
                 {
@@ -823,12 +823,12 @@ namespace Shogi
             File.WriteAllText(jsonPath, JsonConvert.SerializeObject(config));
         }
 
-        private async void PGNExport_Click(object sender, RoutedEventArgs e)
+        private async void KIFExport_Click(object sender, RoutedEventArgs e)
         {
             manuallyEvaluating = false;
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            _ = new PGNExport(game, senteIsComputer, goteIsComputer).ShowDialog();
+            _ = new KIFExport(game, senteIsComputer, goteIsComputer).ShowDialog();
             await CheckComputerMove();
         }
 

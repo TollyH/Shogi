@@ -48,6 +48,7 @@ namespace Shogi.Pieces
 
         public abstract string Name { get; }
         public abstract string SymbolLetter { get; }
+        public abstract char SingleLetter { get; }
         public abstract string SFENLetter { get; }
         public abstract double Value { get; }
         public abstract bool IsSente { get; }
@@ -84,6 +85,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "King";
         public override string SymbolLetter => "玉";
+        public override char SingleLetter => '玉';
         public override string SFENLetter => "K";
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
@@ -131,6 +133,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Gold General";
         public override string SymbolLetter => "金";
+        public override char SingleLetter => '金';
         public override string SFENLetter => "G";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -178,6 +181,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Silver General";
         public override string SymbolLetter => "銀";
+        public override char SingleLetter => '銀';
         public override string SFENLetter => "S";
         public override double Value => 10;
         public override bool IsSente { get; }
@@ -225,6 +229,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Silver General";
         public override string SymbolLetter => "成銀";
+        public override char SingleLetter => '全';
         public override string SFENLetter => "+S";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -272,6 +277,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Rook";
         public override string SymbolLetter => "飛";
+        public override char SingleLetter => '飛';
         public override string SFENLetter => "R";
         public override double Value => 19;
         public override bool IsSente { get; }
@@ -371,6 +377,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Rook";
         public override string SymbolLetter => "龍";
+        public override char SingleLetter => '龍';
         public override string SFENLetter => "+R";
         public override double Value => 22;
         public override bool IsSente { get; }
@@ -485,6 +492,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Bishop";
         public override string SymbolLetter => "角";
+        public override char SingleLetter => '角';
         public override string SFENLetter => "B";
         public override double Value => 17;
         public override bool IsSente { get; }
@@ -584,6 +592,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Bishop";
         public override string SymbolLetter => "馬";
+        public override char SingleLetter => '馬';
         public override string SFENLetter => "+B";
         public override double Value => 20;
         public override bool IsSente { get; }
@@ -698,6 +707,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Knight";
         public override string SymbolLetter => "桂";
+        public override char SingleLetter => '桂';
         public override string SFENLetter => "N";
         public override double Value => 6;
         public override bool IsSente { get; }
@@ -745,6 +755,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Knight";
         public override string SymbolLetter => "成桂";
+        public override char SingleLetter => '圭';
         public override string SFENLetter => "+N";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -792,6 +803,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Lance";
         public override string SymbolLetter => "香";
+        public override char SingleLetter => '香';
         public override string SFENLetter => "L";
         public override double Value => 6;
         public override bool IsSente { get; }
@@ -840,6 +852,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Lance";
         public override string SymbolLetter => "成香";
+        public override char SingleLetter => '杏';
         public override string SFENLetter => "+L";
         public override double Value => 11;
         public override bool IsSente { get; }
@@ -887,6 +900,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Pawn";
         public override string SymbolLetter => "歩";
+        public override char SingleLetter => '歩';
         public override string SFENLetter => "P";
         public override double Value => 1;
         public override bool IsSente { get; }
@@ -923,6 +937,7 @@ namespace Shogi.Pieces
     {
         public override string Name => "Promoted Pawn";
         public override string SymbolLetter => "と";
+        public override char SingleLetter => 'と';
         public override string SFENLetter => "+P";
         public override double Value => 11;
         public override bool IsSente { get; }

@@ -6,15 +6,15 @@ using System.Windows;
 namespace Shogi
 {
     /// <summary>
-    /// Interaction logic for PGNExport.xaml
+    /// Interaction logic for KIFExport.xaml
     /// </summary>
-    public partial class PGNExport : Window
+    public partial class KIFExport : Window
     {
         private readonly ShogiGame game;
         private readonly bool senteIsComputer;
         private readonly bool goteIsComputer;
 
-        public PGNExport(ShogiGame game, bool senteIsComputer, bool goteIsComputer)
+        public KIFExport(ShogiGame game, bool senteIsComputer, bool goteIsComputer)
         {
             this.game = game;
             this.senteIsComputer = senteIsComputer;
@@ -40,8 +40,8 @@ namespace Shogi
             SaveFileDialog saveDialog = new()
             {
                 AddExtension = true,
-                DefaultExt = ".pgn",
-                Filter = "Portable Game Notation|*.pgn",
+                DefaultExt = ".kifu",
+                Filter = "Kifu File|*.kifu",
                 CheckPathExists = true
             };
             if (!saveDialog.ShowDialog() ?? true)
@@ -53,7 +53,7 @@ namespace Shogi
             DateOnly? date = dateBox.SelectedDate is null ? null : DateOnly.FromDateTime(dateBox.SelectedDate.Value);
             string senteName = senteNameBox.Text.Trim();
             string goteName = goteNameBox.Text.Trim();
-            File.WriteAllText(saveDialog.FileName, game.ToPGN(eventName != "" ? eventName : null,
+            File.WriteAllText(saveDialog.FileName, game.ToKIF(eventName != "" ? eventName : null,
                 locationName != "" ? locationName : null, date, senteName != "" ? senteName : "Player",
                 goteName != "" ? goteName : "Player", senteIsComputer, goteIsComputer));
             Close();

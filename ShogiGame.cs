@@ -68,9 +68,10 @@ namespace Shogi
         public bool AwaitingPromotionResponse { get; private set; }
 
         /// <summary>
-        /// A list of the moves made this game as (sourcePosition, destinationPosition)
+        /// A list of the moves made this game as
+        /// (pieceLetter, sourcePosition, destinationPosition, promotionHappened, dropHappened)
         /// </summary>
-        public List<(Point, Point)> Moves { get; }
+        public List<(string, Point, Point, bool, bool)> Moves { get; }
         public List<string> MoveText { get; }
         public Dictionary<Type, int> SentePieceDrops { get; }
         public Dictionary<Type, int> GotePieceDrops { get; }
@@ -90,7 +91,7 @@ namespace Shogi
             SenteKing = new Pieces.King(new Point(4, 0), true);
             GoteKing = new Pieces.King(new Point(4, 8), false);
 
-            Moves = new List<(Point, Point)>();
+            Moves = new List<(string, Point, Point, bool, bool)>();
             MoveText = new List<string>();
             SentePieceDrops = new Dictionary<Type, int>()
             {
@@ -134,7 +135,8 @@ namespace Shogi
         /// <summary>
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
-        public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver, List<(Point, Point)> moves, List<string> moveText,
+        public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver,
+            List<(string, Point, Point, bool, bool)> moves, List<string> moveText,
             Dictionary<Type, int>? sentePieceDrops, Dictionary<Type, int>? gotePieceDrops,
             Dictionary<string, int> boardCounts, string? initialState)
         {
@@ -459,7 +461,7 @@ namespace Shogi
                 if (updateMoveText)
                 {
                     string newMove = (CurrentTurnSente ? "☖" : "☗")
-                        + (Moves.Count > 1 && destination == Moves[^2].Item2 ? "同　" : destination.ToShogiCoordinate())
+                        + (Moves.Count > 1 && destination == Moves[^2].Item3 ? "同　" : destination.ToShogiCoordinate())
                         + beforePromotion.SymbolLetter;
 
                     // Disambiguate moving piece if two pieces of the same type can reach destination
@@ -605,42 +607,109 @@ namespace Shogi
         }
 
         /// <summary>
-        /// Convert this game to a PGN file for use in other shogi programs
+        /// Convert this game to a KIF file for use in other shogi programs
         /// </summary>
-        public string ToPGN(string? eventName, string? siteName, DateOnly? startDate, string senteName, string goteName,
+        public string ToKIF(string? eventName, string? siteName, DateOnly? startDate, string senteName, string goteName,
             bool senteIsComputer, bool goteIsComputer)
         {
             GameState state = DetermineGameState();
-            string pgn = $"[Event \"{eventName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Site \"{siteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Date \"{startDate?.ToString("yyyy.MM.dd") ?? "????.??.??"}\"]\n" +
-                "[Round \"?\"]\n" +
-                $"[White \"{senteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Black \"{goteName?.Replace("\\", "\\\\")?.Replace("\"", "\\\"") ?? "?"}\"]\n" +
-                $"[Result \"{(!GameOver ? "*" : state == GameState.CheckMateGote ? "1-0" : state == GameState.CheckMateSente ? "0-1" : "1/2-1/2")}\"]\n" +
-                $"[WhiteType \"{(senteIsComputer ? "program" : "human")}\"]\n" +
-                $"[BlackType \"{(goteIsComputer ? "program" : "human")}\"]\n\n";
+            string kif = $"先手：{senteName}\n" +
+                $"後手：{goteName}\n" +
+                (startDate is not null ? $"開始日時：{startDate.Value:yyyy'/'MM'/'dd}\n" : "") +
+                (eventName is not null ? $"棋戦：{eventName}\n" : "") +
+                (siteName is not null ? $"場所：{siteName}\n" : "") +
+                $"先手タイプ：{(senteIsComputer ? "プログラム" : "人間")}\n" +
+                $"後手タイプ：{(goteIsComputer ? "プログラム" : "人間")}\n";
 
             // Include initial state if not a standard shogi game
-            if (InitialState != "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+            if (InitialState != "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -")
             {
-                // Strip last newline
-                pgn = pgn[..^1] + $"[SetUp \"1\"]\n[FEN \"{InitialState}\"]\n\n";
+                kif += "後手の持駒：";
+                ShogiGame initialGame = FromShogiForsythEdwards(InitialState);
+
+                bool anyDrops = false;
+                foreach ((Type dropType, int count) in initialGame.GotePieceDrops)
+                {
+                    if (count != 0)
+                    {
+                        anyDrops = true;
+                        kif += $" {Pieces.Piece.DefaultPieces[dropType].SymbolLetter}{count.ToJapaneseKanji()}";
+                    }
+                }
+                if (!anyDrops)
+                {
+                    kif += " なし";
+                }
+
+                kif += "\n９ ８ ７ ６ ５ ４ ３ ２ １\n+---------------------------+";
+                for (int y = initialGame.Board.GetLength(1) - 1; y >= 0; y--)
+                {
+                    kif += "\n|";
+                    for (int x = 0; x < initialGame.Board.GetLength(0); x++)
+                    {
+                        if (initialGame.Board[x, y] is null)
+                        {
+                            kif += " ・";
+                            continue;
+                        }
+                        Pieces.Piece piece = initialGame.Board[x, y]!;
+                        kif += $"{(piece.IsSente ? ' ' : 'v')}{piece.SingleLetter}";
+                    }
+                    kif += $"|{(9 - y).ToJapaneseKanji()}";
+                }
+
+                kif += "\n+---------------------------+\n先手の持駒：";
+                anyDrops = false;
+                foreach ((Type dropType, int count) in initialGame.SentePieceDrops)
+                {
+                    if (count != 0)
+                    {
+                        anyDrops = true;
+                        kif += $" {Pieces.Piece.DefaultPieces[dropType].SymbolLetter}{count.ToJapaneseKanji()}";
+                    }
+                }
+                if (!anyDrops)
+                {
+                    kif += " なし";
+                }
+                if (!initialGame.CurrentTurnSente)
+                {
+                    kif += "\n後手番";
+                }
+                kif += '\n';
             }
 
             string compiledMoveText = "";
-            for (int i = 0; i < MoveText.Count; i += 2)
+            Point lastDest = new(-1, -1);
+            for (int i = 0; i < Moves.Count; i += 1)
             {
-                compiledMoveText += $" {(i / 2) + 1}. {MoveText[i]}";
-                if (i + 1 < MoveText.Count)
+                (string pieceLetter, Point source, Point destination, bool promotion, bool drop) = Moves[i];
+                compiledMoveText += $"\n {i + 1}  {(destination == lastDest ? "同　" : destination.ToShogiCoordinate())}{pieceLetter}";
+                if (promotion)
                 {
-                    compiledMoveText += $" {MoveText[i + 1]}";
+                    compiledMoveText += '成';
                 }
-            }
-            pgn += compiledMoveText.Trim();
-            pgn += !GameOver ? " *\n\n" : state == GameState.CheckMateGote ? " 1-0\n\n" : state == GameState.CheckMateSente ? " 0-1\n\n" : " 1/2-1/2\n\n";
+                if (drop)
+                {
+                    compiledMoveText += '打';
+                }
+                else
+                {
+                    compiledMoveText += $"({9 - source.X}{9 - source.Y})";
+                }
+                lastDest = destination;
 
-            return pgn;
+            }
+            if (compiledMoveText.Length > 0)
+            {
+                // Trim starting newline
+                compiledMoveText = compiledMoveText[1..] + '\n';
+            }
+            kif += compiledMoveText + $" {Moves.Count + 1}  ";
+            kif += !GameOver ? "中断\n\n" : state == GameState.DrawRepetition ? "千日手\n\n"
+                : state is GameState.PerpetualCheckGote or GameState.PerpetualCheckSente ? "反則勝ち\n\n" : "詰み\n\n";
+
+            return kif;
         }
 
         /// <summary>
@@ -856,7 +925,7 @@ namespace Shogi
 
             // Shogi Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, sentePieceDrops, gotePieceDrops, new(), null);
+                new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
         }
     }
 }

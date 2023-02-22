@@ -27,7 +27,7 @@
                 <Separator/>
                 <MenuItem Header="Custom _Game..." Click="CustomGame_Click"/>
                 <Separator/>
-                <MenuItem Header="Export to _PGN" Click="PGNExport_Click"/>
+                <MenuItem Header="Export to _KIF" Click="KIFExport_Click"/>
                 <MenuItem Header="Copy SFEN _to Clipboard" Click="FENCopy_Click"/>
             </MenuItem>
             <MenuItem Header="_Settings" Margin="2">

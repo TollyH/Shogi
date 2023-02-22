@@ -449,29 +449,29 @@ namespace Shogi
         private static PossibleMove MinimaxMove(ShogiGame game, double alpha, double beta, int depth, int maxDepth,
             List<(Point, Point, bool)> currentLine, CancellationToken cancellationToken)
         {
-            (Point, Point) lastMove = game.Moves.Last();
+            (_, Point lastMoveSrc, Point lastMoveDst, _, _) = game.Moves.Last();
             if (game.GameOver)
             {
                 GameState state = game.DetermineGameState();
                 if (state == GameState.CheckMateSente)
                 {
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.NegativeInfinity, true, false, depth, 0, false,
+                    return new PossibleMove(lastMoveSrc, lastMoveDst, double.NegativeInfinity, true, false, depth, 0, false,
                         currentLine);
                 }
                 else if (state == GameState.CheckMateGote)
                 {
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, double.PositiveInfinity, false, true, 0, depth, false,
+                    return new PossibleMove(lastMoveSrc, lastMoveDst, double.PositiveInfinity, false, true, 0, depth, false,
                         currentLine);
                 }
                 else
                 {
                     // Draw
-                    return new PossibleMove(lastMove.Item1, lastMove.Item2, 0, false, false, 0, 0, false, currentLine);
+                    return new PossibleMove(lastMoveSrc, lastMoveDst, 0, false, false, 0, 0, false, currentLine);
                 }
             }
             if (depth > maxDepth)
             {
-                return new PossibleMove(lastMove.Item1, lastMove.Item2, CalculateGameValue(game), false, false, 0, 0, false, currentLine);
+                return new PossibleMove(lastMoveSrc, lastMoveDst, CalculateGameValue(game), false, false, 0, 0, false, currentLine);
             }
 
             PossibleMove bestMove = new(default, default,

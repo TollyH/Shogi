@@ -113,10 +113,9 @@ namespace Shogi
             SenteIsComputer = computerSelectSente.IsChecked ?? false;
             GoteIsComputer = computerSelectGote.IsChecked ?? false;
             bool currentTurnSente = turnSelectSente.IsChecked ?? false;
-            // For the PGN standard, if gote moves first then a single move "..." is added to the start of the move text list
             GeneratedGame = new ShogiGame(Board, currentTurnSente,
                 ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
-                new(), currentTurnSente ? new() : new() { "..." }, sentePieceDrops, gotePieceDrops, new(), null);
+                new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
             Close();
         }
 
