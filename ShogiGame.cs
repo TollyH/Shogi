@@ -207,7 +207,42 @@ namespace Shogi
                 SenteKing.Position, GoteKing.Position);
             if (EndingStates.Contains(staticState))
             {
-                return staticState;
+                bool endAvoidableWithDrop = false;
+                foreach ((Type dropType, int count) in CurrentTurnSente ? SentePieceDrops : GotePieceDrops)
+                {
+                    if (count > 0)
+                    {
+                        for (int x = 0; x < Board.GetLength(0); x++)
+                        {
+                            for (int y = 0; y < Board.GetLength(1); y++)
+                            {
+                                Point pt = new(x, y);
+                                if (IsDropPossible(dropType, pt))
+                                {
+                                    endAvoidableWithDrop = true;
+                                    break;
+                                }
+                            }
+                            if (endAvoidableWithDrop)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    if (endAvoidableWithDrop)
+                    {
+                        break;
+                    }
+                }
+                if (!endAvoidableWithDrop)
+                {
+                    return staticState;
+                }
+                else
+                {
+                    staticState = staticState is GameState.CheckMateSente or GameState.StalemateSente
+                        ? GameState.CheckSente : GameState.CheckGote;
+                }
             }
             if (includeRepetition && BoardCounts.GetValueOrDefault(ToString(true)) >= 4)
             {
@@ -247,6 +282,20 @@ namespace Shogi
                 return false;
             }
 
+            ShogiGame checkmateTest = Clone();
+            _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
+                destination, forceMove: true, updateMoveText: false, determineGameState: false);
+            GameState resultingGameState = BoardAnalysis.DetermineGameState(checkmateTest.Board, checkmateTest.CurrentTurnSente,
+                checkmateTest.SenteKing.Position, checkmateTest.GoteKing.Position);
+
+            if ((CurrentTurnSente && BoardAnalysis.IsKingReachable(checkmateTest.Board,
+                    true, checkmateTest.SenteKing.Position))
+                || (!CurrentTurnSente && BoardAnalysis.IsKingReachable(checkmateTest.Board,
+                    false, checkmateTest.GoteKing.Position)))
+            {
+                return false;
+            }
+
             bool pawnPresentOnFile = false;
             for (int y = 0; y < Board.GetLength(1); y++)
             {
@@ -256,19 +305,6 @@ namespace Shogi
                     pawnPresentOnFile = true;
                     break;
                 }
-            }
-
-            ShogiGame checkmateTest = Clone();
-            _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
-                destination, forceMove: true, updateMoveText: false);
-            GameState resultingGameState = checkmateTest.DetermineGameState();
-
-            if ((CurrentTurnSente && resultingGameState is GameState.CheckSente or GameState.CheckMateSente
-                    or GameState.PerpetualCheckSente)
-                || (!CurrentTurnSente && resultingGameState is GameState.CheckGote or GameState.CheckMateGote
-                    or GameState.PerpetualCheckGote))
-            {
-                return false;
             }
 
             if (dropType == typeof(Pieces.Pawn) && (pawnPresentOnFile
@@ -293,7 +329,8 @@ namespace Shogi
         /// </param>
         /// <returns><see langword="true"/> if the move was valid and executed, <see langword="false"/> otherwise</returns>
         /// <remarks>This method will check if the move is completely valid, unless <paramref name="forceMove"/> is <see langword="true"/>. No other validity checks are required.</remarks>
-        public bool MovePiece(Point source, Point destination, bool forceMove = false, bool? doPromotion = null, bool updateMoveText = true)
+        public bool MovePiece(Point source, Point destination, bool forceMove = false, bool? doPromotion = null, bool updateMoveText = true,
+            bool determineGameState = true)
         {
             if (!forceMove && GameOver)
             {
@@ -413,7 +450,10 @@ namespace Shogi
                 {
                     BoardCounts[newBoardString] = 1;
                 }
-                GameOver = EndingStates.Contains(DetermineGameState());
+                if (determineGameState)
+                {
+                    GameOver = EndingStates.Contains(DetermineGameState());
+                }
 
                 if (updateMoveText)
                 {
@@ -556,8 +596,9 @@ namespace Shogi
             }
 
             // Append whether in check or not for checking whether perpetual check occurred
+            Pieces.King currentKing = CurrentTurnSente ? SenteKing : GoteKing;
             _ = !appendCheckStatus ? null
-                : result.Append(DetermineGameState(false) is GameState.CheckSente or GameState.CheckGote ? " !" : " -");
+                : result.Append(BoardAnalysis.IsKingReachable(Board, CurrentTurnSente, currentKing.Position) ? " !" : " -");
 
             return result.ToString();
         }
