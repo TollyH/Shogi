@@ -265,11 +265,11 @@ namespace Shogi
         private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Type clickedType = (Type)((Grid)sender).Tag;
-            if (e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left && gotePieceDrops[clickedType] < 9)
             {
                 gotePieceDrops[clickedType]++;
             }
-            else if (gotePieceDrops[clickedType] != 0)
+            else if (e.ChangedButton == MouseButton.Right && gotePieceDrops[clickedType] != 0)
             {
                 gotePieceDrops[clickedType]--;
             }
@@ -279,11 +279,11 @@ namespace Shogi
         private void SenteDrop_MouseUp(object sender, MouseButtonEventArgs e)
         {
             Type clickedType = (Type)((Grid)sender).Tag;
-            if (e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left && sentePieceDrops[clickedType] < 9)
             {
                 sentePieceDrops[clickedType]++;
             }
-            else if (sentePieceDrops[clickedType] != 0)
+            else if (e.ChangedButton == MouseButton.Right && sentePieceDrops[clickedType] != 0)
             {
                 sentePieceDrops[clickedType]--;
             }
