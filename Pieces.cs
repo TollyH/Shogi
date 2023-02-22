@@ -877,9 +877,9 @@ namespace Shogi.Pieces
             return moves;
         }
 
-        public override Lance Clone()
+        public override PromotedLance Clone()
         {
-            return new Lance(Position, IsSente);
+            return new PromotedLance(Position, IsSente);
         }
     }
 
