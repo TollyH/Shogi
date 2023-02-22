@@ -30,31 +30,31 @@
             </Grid.RowDefinitions>
             <DockPanel x:Name="filesTop" Grid.Column="1" Grid.Row="0">
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="9"/>
+                    <Label Content="９"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="8"/>
+                    <Label Content="８"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="7"/>
+                    <Label Content="７"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="6"/>
+                    <Label Content="６"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="5"/>
+                    <Label Content="５"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="4"/>
+                    <Label Content="４"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="3"/>
+                    <Label Content="３"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="2"/>
+                    <Label Content="２"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="1"/>
+                    <Label Content="１"/>
                 </Viewbox>
             </DockPanel>
             <DockPanel x:Name="ranksLeft" Grid.Column="0" Grid.Row="1">
@@ -88,28 +88,28 @@
             </DockPanel>
             <DockPanel x:Name="filesBottom" Grid.Column="1" Grid.Row="2">
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="9"/>
+                    <Label Content="９"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="8"/>
+                    <Label Content="８"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="7"/>
+                    <Label Content="７"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="6"/>
+                    <Label Content="６"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="5"/>
+                    <Label Content="５"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="4"/>
+                    <Label Content="４"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="3"/>
+                    <Label Content="３"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
-                    <Label Content="2"/>
+                    <Label Content="２"/>
                 </Viewbox>
                 <Viewbox Width="{Binding ActualWidth, ElementName=sizeReference, Mode=OneWay}">
                     <Label Content="1"/>
