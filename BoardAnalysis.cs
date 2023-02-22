@@ -179,7 +179,7 @@ namespace Shogi
             // Pawn checks
             int pawnYDiff = isSente ? 1 : -1;
             int newY = target.Value.Y + pawnYDiff;
-            if (newY < board.GetLength(1) && newY > 0)
+            if (newY < board.GetLength(1) && newY >= 0)
             {
                 if (board[target.Value.X, newY] is Pieces.Pawn && board[target.Value.X, newY]!.IsSente != isSente)
                 {
