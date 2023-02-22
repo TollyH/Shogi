@@ -458,7 +458,7 @@ namespace Shogi
                 if (updateMoveText)
                 {
                     string newMove = (CurrentTurnSente ? "☖" : "☗")
-                        + (Moves.Count > 1 && destination == Moves[^2].Item2 ? "同" : destination.ToShogiCoordinate())
+                        + (Moves.Count > 1 && destination == Moves[^2].Item2 ? "同　" : destination.ToShogiCoordinate())
                         + beforePromotion.SymbolLetter;
 
                     // Disambiguate moving piece if two pieces of the same type can reach destination
