@@ -380,7 +380,7 @@ namespace Shogi
 
             if (pieceMoved)
             {
-                Moves.Add((source, destination));
+                Moves.Add((piece.SymbolLetter, source, destination, false, source.X == -1));
                 if (Board[destination.X, destination.Y] is not null)
                 {
                     Type targetPiece = Board[destination.X, destination.Y]!.GetType();
@@ -427,6 +427,7 @@ namespace Shogi
                         if (doPromotion.Value)
                         {
                             promotionHappened = true;
+                            Moves[^1] = (Moves[^1].Item1, source, destination, true, false);
                             piece = (Pieces.Piece)Activator.CreateInstance(Pieces.Piece.PromotionMap[pieceType], piece.Position, piece.IsSente)!;
                         }
                         Board[source.X, source.Y] = piece;
