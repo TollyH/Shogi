@@ -860,6 +860,7 @@ namespace Shogi
             };
 
             int numberToAdd = 1;
+            bool numberChanged = false;
             foreach (char pieceChar in fields[2])
             {
                 switch (pieceChar)
@@ -912,7 +913,17 @@ namespace Shogi
                         if (pieceChar is > '0' and <= '9')
                         {
                             // char - '0' gets numeric value of ASCII number
-                            numberToAdd = pieceChar - '0';
+                            int charValue = pieceChar - '0';
+                            if (!numberChanged)
+                            {
+                                numberToAdd = charValue;
+                                numberChanged = true;
+                            }
+                            else
+                            {
+                                numberToAdd *= 10;
+                                numberToAdd += charValue;
+                            }
                             continue;
                         }
                         else
@@ -921,6 +932,7 @@ namespace Shogi
                         }
                 }
                 numberToAdd = 1;
+                numberChanged = false;
             }
 
             // Shogi Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
