@@ -453,12 +453,12 @@ namespace Shogi
             if (game.GameOver)
             {
                 GameState state = game.DetermineGameState();
-                if (state == GameState.CheckMateSente)
+                if (state is GameState.CheckMateSente or GameState.PerpetualCheckGote or GameState.StalemateSente)
                 {
                     return new PossibleMove(lastMoveSrc, lastMoveDst, double.NegativeInfinity, true, false, depth, 0, false,
                         currentLine);
                 }
-                else if (state == GameState.CheckMateGote)
+                else if (state is GameState.CheckMateGote or GameState.PerpetualCheckSente or GameState.StalemateGote)
                 {
                     return new PossibleMove(lastMoveSrc, lastMoveDst, double.PositiveInfinity, false, true, 0, depth, false,
                         currentLine);

@@ -272,7 +272,7 @@ namespace Shogi
             {
                 if (ToString(true)[^1] == '!')
                 {
-                    return CurrentTurnSente ? GameState.PerpetualCheckGote : GameState.PerpetualCheckSente;
+                    return CurrentTurnSente ? GameState.PerpetualCheckSente : GameState.PerpetualCheckGote;
                 }
                 return GameState.DrawRepetition;
             }
