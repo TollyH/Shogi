@@ -646,7 +646,8 @@ namespace Shogi
             bool minishogi = Board.GetLength(0) == 5;
 
             GameState state = DetermineGameState();
-            string kif = $"先手：{senteName}\n" +
+            string kif = (minishogi ? "手合割：5五将棋\n" : "") +
+                $"先手：{senteName}\n" +
                 $"後手：{goteName}\n" +
                 (startDate is not null ? $"開始日時：{startDate.Value:yyyy'/'MM'/'dd}\n" : "") +
                 (eventName is not null ? $"棋戦：{eventName}\n" : "") +
@@ -655,7 +656,8 @@ namespace Shogi
                 $"後手タイプ：{(goteIsComputer ? "プログラム" : "人間")}\n";
 
             // Include initial state if not a standard shogi game
-            if (InitialState != "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -")
+            if ((InitialState != "lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -" && !minishogi)
+                || (InitialState != "rbsgk/4p/5/P4/KGSBR b -" && minishogi))
             {
                 kif += "後手の持駒：";
                 ShogiGame initialGame = FromShogiForsythEdwards(InitialState);
@@ -674,7 +676,7 @@ namespace Shogi
                     kif += " なし";
                 }
 
-                kif += "\n９ ８ ７ ６ ５ ４ ３ ２ １\n+---------------------------+";
+                kif += minishogi ? "\n５ ４ ３ ２ １\n+---------------+" : "\n９ ８ ７ ６ ５ ４ ３ ２ １\n+---------------------------+";
                 for (int y = initialGame.Board.GetLength(1) - 1; y >= 0; y--)
                 {
                     kif += "\n|";
@@ -691,7 +693,7 @@ namespace Shogi
                     kif += $"|{(Board.GetLength(1) - y).ToJapaneseKanji()}";
                 }
 
-                kif += "\n+---------------------------+\n先手の持駒：";
+                kif += minishogi ? "\n+---------------+\n先手の持駒：" : "\n+---------------------------+\n先手の持駒：";
                 anyDrops = false;
                 foreach ((Type dropType, int count) in initialGame.SentePieceDrops)
                 {
@@ -757,11 +759,15 @@ namespace Shogi
             }
 
             string[] ranks = fields[0].Split('/');
-            if (ranks.Length != 9)
+            if (ranks.Length is not 9 and not 5)
             {
-                throw new FormatException("Board definitions must have 9 ranks separated by a forward slash");
+                throw new FormatException("Board definitions must have 9 or 5 ranks separated by a forward slash");
             }
-            Pieces.Piece?[,] board = new Pieces.Piece?[9, 9];
+
+            bool minishogi = ranks.Length == 5;
+            int maxIndex = minishogi ? 4 : 8;
+
+            Pieces.Piece?[,] board = minishogi ? new Pieces.Piece?[5, 5] : new Pieces.Piece?[9, 9];
             for (int r = 0; r < ranks.Length; r++)
             {
                 int fileIndex = 0;
@@ -774,76 +780,76 @@ namespace Shogi
                             promoteNextPiece = true;
                             continue;
                         case 'K':
-                            board[fileIndex, 8 - r] = new Pieces.King(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = new Pieces.King(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'G':
-                            board[fileIndex, 8 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = new Pieces.GoldGeneral(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'S':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.SilverGeneral(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.SilverGeneral(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'R':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedRook(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.Rook(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedRook(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.Rook(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'B':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedBishop(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.Bishop(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedBishop(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.Bishop(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'N':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedKnight(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.Knight(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedKnight(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.Knight(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'L':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedLance(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.Lance(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedLance(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.Lance(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'P':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedPawn(new Point(fileIndex, 8 - r), true)
-                                : new Pieces.Pawn(new Point(fileIndex, 8 - r), true);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedPawn(new Point(fileIndex, maxIndex - r), true)
+                                : new Pieces.Pawn(new Point(fileIndex, maxIndex - r), true);
                             break;
                         case 'k':
-                            board[fileIndex, 8 - r] = new Pieces.King(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = new Pieces.King(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'g':
-                            board[fileIndex, 8 - r] = new Pieces.GoldGeneral(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = new Pieces.GoldGeneral(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 's':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.SilverGeneral(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedSilverGeneral(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.SilverGeneral(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'r':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedRook(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.Rook(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedRook(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.Rook(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'b':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedBishop(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.Bishop(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedBishop(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.Bishop(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'n':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedKnight(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.Knight(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedKnight(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.Knight(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'l':
-                            board[fileIndex, 8 - r] = promoteNextPiece
-                                ? new Pieces.PromotedLance(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.Lance(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
+                                ? new Pieces.PromotedLance(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.Lance(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'p':
-                            board[fileIndex, 8 - r] = promoteNextPiece 
-                                ? new Pieces.PromotedPawn(new Point(fileIndex, 8 - r), false)
-                                : new Pieces.Pawn(new Point(fileIndex, 8 - r), false);
+                            board[fileIndex, maxIndex - r] = promoteNextPiece 
+                                ? new Pieces.PromotedPawn(new Point(fileIndex, maxIndex - r), false)
+                                : new Pieces.Pawn(new Point(fileIndex, maxIndex - r), false);
                             break;
                         default:
                             if (pieceChar is > '0' and <= '9')
@@ -862,9 +868,9 @@ namespace Shogi
                     fileIndex++;
                     promoteNextPiece = false;
                 }
-                if (fileIndex != 9)
+                if ((fileIndex != 9 && !minishogi) || (fileIndex != 5 && minishogi))
                 {
-                    throw new FormatException("Each rank in a board definition must contain definitions for 9 files");
+                    throw new FormatException("Each rank in a board definition must contain definitions for 9 or 5 files");
                 }
             }
 
