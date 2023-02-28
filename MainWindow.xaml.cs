@@ -18,7 +18,7 @@ namespace Shogi
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ShogiGame game = new();
+        private ShogiGame game = new(false);
         private readonly Settings config;
 
         private Pieces.Piece? grabbedPiece = null;
@@ -571,11 +571,11 @@ namespace Shogi
                     : game.Board[coord.X, coord.Y];
         }
 
-        private async Task NewGame()
+        private async Task NewGame(bool minishogi)
         {
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            game = new ShogiGame();
+            game = new ShogiGame(minishogi);
             currentBestMove = null;
             manuallyEvaluating = false;
             grabbedPiece = null;
@@ -802,28 +802,28 @@ namespace Shogi
         {
             senteIsComputer = false;
             goteIsComputer = false;
-            await NewGame();
+            await NewGame(false);
         }
 
         private async void NewGameCpuSente_Click(object sender, RoutedEventArgs e)
         {
             senteIsComputer = false;
             goteIsComputer = true;
-            await NewGame();
+            await NewGame(false);
         }
 
         private async void NewGameCpuGote_Click(object sender, RoutedEventArgs e)
         {
             senteIsComputer = true;
             goteIsComputer = false;
-            await NewGame();
+            await NewGame(false);
         }
 
         private async void NewGameCpuOnly_Click(object sender, RoutedEventArgs e)
         {
             senteIsComputer = true;
             goteIsComputer = true;
-            await NewGame();
+            await NewGame(false);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
