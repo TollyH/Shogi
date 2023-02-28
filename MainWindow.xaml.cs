@@ -826,6 +826,34 @@ namespace Shogi
             await NewGame(false);
         }
 
+        private async void NewMiniGame_Click(object sender, RoutedEventArgs e)
+        {
+            senteIsComputer = false;
+            goteIsComputer = false;
+            await NewGame(true);
+        }
+
+        private async void NewMiniGameCpuSente_Click(object sender, RoutedEventArgs e)
+        {
+            senteIsComputer = false;
+            goteIsComputer = true;
+            await NewGame(true);
+        }
+
+        private async void NewMiniGameCpuGote_Click(object sender, RoutedEventArgs e)
+        {
+            senteIsComputer = true;
+            goteIsComputer = false;
+            await NewGame(true);
+        }
+
+        private async void NewMiniGameCpuOnly_Click(object sender, RoutedEventArgs e)
+        {
+            senteIsComputer = true;
+            goteIsComputer = true;
+            await NewGame(true);
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             cancelMoveComputation.Cancel();

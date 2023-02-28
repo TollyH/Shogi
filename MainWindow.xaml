@@ -25,6 +25,11 @@
                 <MenuItem Header="New Game (1 Player - _Gote)" Click="NewGameCpuGote_Click"/>
                 <MenuItem Header="New Game (0 Player - _Computer Only)" Click="NewGameCpuOnly_Click"/>
                 <Separator/>
+                <MenuItem Header="New _Mini Game (2 Players)" Click="NewMiniGame_Click"/>
+                <MenuItem Header="New Mini Game (1 _Player - Sente)" Click="NewMiniGameCpuSente_Click"/>
+                <MenuItem Header="New Mini Game (_1 Player - Gote)" Click="NewMiniGameCpuGote_Click"/>
+                <MenuItem Header="New Mini Game (0 Player - Computer _Only)" Click="NewMiniGameCpuOnly_Click"/>
+                <Separator/>
                 <MenuItem Header="Custom _Game..." Click="CustomGame_Click"/>
                 <Separator/>
                 <MenuItem Header="Export to _KIF" Click="KIFExport_Click"/>
