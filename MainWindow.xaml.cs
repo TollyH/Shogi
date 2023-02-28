@@ -893,7 +893,31 @@ namespace Shogi
             manuallyEvaluating = false;
             cancelMoveComputation.Cancel();
             cancelMoveComputation = new CancellationTokenSource();
-            CustomGame customDialog = new(config);
+            CustomGame customDialog = new(config, false);
+            _ = customDialog.ShowDialog();
+            if (customDialog.GeneratedGame is not null)
+            {
+                game = customDialog.GeneratedGame;
+                senteIsComputer = customDialog.SenteIsComputer;
+                goteIsComputer = customDialog.GoteIsComputer;
+                grabbedPiece = null;
+                highlightGrabbedMoves = false;
+                selectedDropType = null;
+                currentBestMove = null;
+                senteEvaluation.Content = "?";
+                goteEvaluation.Content = "?";
+                UpdateGameDisplay();
+                PushEndgameMessage();
+            }
+            await CheckComputerMove();
+        }
+
+        private async void CustomMiniGame_Click(object sender, RoutedEventArgs e)
+        {
+            manuallyEvaluating = false;
+            cancelMoveComputation.Cancel();
+            cancelMoveComputation = new CancellationTokenSource();
+            CustomGame customDialog = new(config, true);
             _ = customDialog.ShowDialog();
             if (customDialog.GeneratedGame is not null)
             {

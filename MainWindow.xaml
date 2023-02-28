@@ -31,6 +31,7 @@
                 <MenuItem Header="New Mini Game (0 Player - Computer _Only)" Click="NewMiniGameCpuOnly_Click"/>
                 <Separator/>
                 <MenuItem Header="Custom _Game..." Click="CustomGame_Click"/>
+                <MenuItem Header="Custom Mini Game..." Click="CustomMiniGame_Click"/>
                 <Separator/>
                 <MenuItem Header="Export to _KIF" Click="KIFExport_Click"/>
                 <MenuItem Header="Copy SFEN _to Clipboard" Click="FENCopy_Click"/>

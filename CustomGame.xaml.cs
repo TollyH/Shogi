@@ -48,13 +48,23 @@ namespace Shogi
         private double tileWidth;
         private double tileHeight;
 
-        public CustomGame(Settings config)
+        public CustomGame(Settings config, bool minishogi)
         {
-            Board = new Pieces.Piece?[9, 9];
             GeneratedGame = null;
             this.config = config;
 
             InitializeComponent();
+
+            if (minishogi)
+            {
+                Board = new Pieces.Piece?[5, 5];
+                shogiBoardBackground.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Board = new Pieces.Piece?[9, 9];
+                miniShogiBoardBackground.Visibility = Visibility.Collapsed;
+            }
         }
 
         public void UpdateBoard()
