@@ -56,6 +56,7 @@ namespace Shogi
             InitializeComponent();
 
             shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
+            miniShogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
             flipBoardItem.IsChecked = config.FlipBoard;
             updateEvalAfterBotItem.IsChecked = config.UpdateEvalAfterBot;
             foreach (MenuItem item in pieceSetItem.Items)
@@ -76,8 +77,11 @@ namespace Shogi
             }
             shogiGameCanvas.Children.Clear();
             pieceViews.Clear();
+            shogiBoardBackground.Children.Remove(sizeReference);
+            miniShogiBoardBackground.Children.Remove(sizeReference);
 
             bool boardFlipped = config.FlipBoard && ((!game.CurrentTurnSente && !goteIsComputer) || (senteIsComputer && !goteIsComputer));
+            bool minishogi = game.Board.GetLength(0) == 5;
 
             tileWidth = shogiGameCanvas.ActualWidth / game.Board.GetLength(0);
             tileHeight = shogiGameCanvas.ActualHeight / game.Board.GetLength(1);
@@ -187,7 +191,7 @@ namespace Shogi
                 }
                 foreach (UIElement child in filesBottom.Children)
                 {
-                    DockPanel.SetDock(child, Dock.Right);
+                    DockPanel.SetDock(child, Dock.Left);
                 }
             }
             else
@@ -214,8 +218,21 @@ namespace Shogi
                 }
                 foreach (UIElement child in filesBottom.Children)
                 {
-                    DockPanel.SetDock(child, Dock.Left);
+                    DockPanel.SetDock(child, Dock.Right);
                 }
+            }
+
+            if (minishogi)
+            {
+                shogiBoardBackground.Visibility = Visibility.Collapsed;
+                miniShogiBoardBackground.Visibility = Visibility.Visible;
+                _ = miniShogiBoardBackground.Children.Add(sizeReference);
+            }
+            else
+            {
+                shogiBoardBackground.Visibility = Visibility.Visible;
+                miniShogiBoardBackground.Visibility = Visibility.Collapsed;
+                _ = shogiBoardBackground.Children.Add(sizeReference);
             }
 
             movesPanel.Children.Clear();
@@ -912,6 +929,7 @@ namespace Shogi
         {
             _ = new Customisation(config).ShowDialog();
             shogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
+            miniShogiBoardBackground.Background = new SolidColorBrush(config.BoardColor);
             UpdateGameDisplay();
         }
 
