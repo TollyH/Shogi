@@ -330,8 +330,8 @@ namespace Shogi
                     foreach (Point validMove in GetValidMovesForEval(game, piece))
                     {
                         if (Pieces.Piece.PromotionMap.ContainsKey(piece.GetType())
-                            && ((piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
-                                || (piece.IsSente ? piece.Position.Y >= 6 : piece.Position.Y <= 2)))
+                            && ((piece.IsSente ? validMove.Y >= game.PromotionZoneSenteStart : validMove.Y <= game.PromotionZoneGoteStart)
+                                || (piece.IsSente ? piece.Position.Y >= game.PromotionZoneSenteStart : piece.Position.Y <= game.PromotionZoneGoteStart)))
                         {
                             remainingThreads++;
                             Point promotionPosition = piece.Position;
@@ -356,8 +356,8 @@ namespace Shogi
                             });
                             promotionThread.Start();
                         }
-                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y != (piece.IsSente ? 8 : 0))
-                            && (piece is not Pieces.Knight || !(piece.IsSente ? validMove.Y >= 7 : validMove.Y <= 1)))
+                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y != (piece.IsSente ? game.Board.GetLength(1) - 1 : 0))
+                            && (piece is not Pieces.Knight || !(piece.IsSente ? validMove.Y >= game.Board.GetLength(1) - 2 : validMove.Y <= 1)))
                         {
                             remainingThreads++;
                             Point thisPosition = piece.Position;
@@ -490,12 +490,12 @@ namespace Shogi
                     {
                         List<bool> availablePromotions = new(2);
                         if (Pieces.Piece.PromotionMap.ContainsKey(piece.GetType())
-                            && piece.IsSente ? validMove.Y >= 6 : validMove.Y <= 2)
+                            && piece.IsSente ? validMove.Y >= game.PromotionZoneSenteStart : validMove.Y <= game.PromotionZoneGoteStart)
                         {
                             availablePromotions.Add(true);
                         }
-                        if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y is not 0 and not 8)
-                            && (piece is not Pieces.Knight || validMove.Y is not >= 7 and not <= 1))
+                        if ((piece is not Pieces.Pawn and not Pieces.Lance || (validMove.Y != 0 && validMove.Y != game.Board.GetLength(1) - 1))
+                            && (piece is not Pieces.Knight || (validMove.Y < game.Board.GetLength(1) - 2 && validMove.Y > 1)))
                         {
                             availablePromotions.Add(false);
                         }

@@ -60,6 +60,9 @@ namespace Shogi
         public Pieces.Piece?[,] Board { get; }
         public string InitialState { get; }
 
+        public int PromotionZoneSenteStart { get; }
+        public int PromotionZoneGoteStart { get; }
+
         public Pieces.King SenteKing { get; }
         public Pieces.King GoteKing { get; }
 
@@ -130,6 +133,8 @@ namespace Shogi
                 { new Pieces.Knight(new Point(7, 0), true), new Pieces.Rook(new Point(7, 1), true), new Pieces.Pawn(new Point(7, 2), true), null, null, null, new Pieces.Pawn(new Point(7, 6), false), new Pieces.Bishop(new Point(7, 7), false), new Pieces.Knight(new Point(7, 8), false) },
                 { new Pieces.Lance(new Point(8, 0), true), null, new Pieces.Pawn(new Point(8, 2), true), null, null, null, new Pieces.Pawn(new Point(8, 6), false), null, new Pieces.Lance(new Point(8, 8), false) }
             };
+            PromotionZoneSenteStart = 6;
+            PromotionZoneGoteStart = 2;
 
             InitialState = ToString();
         }
@@ -149,6 +154,8 @@ namespace Shogi
             }
 
             Board = board;
+            PromotionZoneSenteStart = 6;
+            PromotionZoneGoteStart = 2;
             SenteKing = Board.OfType<Pieces.King>().Where(k => k.IsSente).First();
             GoteKing = Board.OfType<Pieces.King>().Where(k => !k.IsSente).First();
 
@@ -281,9 +288,9 @@ namespace Shogi
                 return false;
             }
             if (((dropType == typeof(Pieces.Pawn) || dropType == typeof(Pieces.Lance))
-                    && (destination.Y == (CurrentTurnSente ? 8 : 0)))
+                    && (destination.Y == (CurrentTurnSente ? Board.GetLength(1) - 1 : 0)))
                 || (dropType == typeof(Pieces.Knight)
-                    && (CurrentTurnSente ? destination.Y >= 7 : destination.Y <= 1)))
+                    && (CurrentTurnSente ? destination.Y >= Board.GetLength(1) - 2 : destination.Y <= 1)))
             {
                 return false;
             }
@@ -413,12 +420,12 @@ namespace Shogi
                 Type pieceType = piece.GetType();
                 if (source.X != -1 && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
-                    if ((piece.IsSente ? destination.Y >= 6 : destination.Y <= 2)
-                        || (piece.IsSente ? source.Y >= 6 : source.Y <= 2))
+                    if ((piece.IsSente ? destination.Y >= PromotionZoneSenteStart : destination.Y <= PromotionZoneGoteStart)
+                        || (piece.IsSente ? source.Y >= PromotionZoneSenteStart : source.Y <= PromotionZoneGoteStart))
                     {
                         promotionPossible = true;
-                        if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? 8 : 0)))
-                            || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= 7 : destination.Y <= 1)))
+                        if ((piece is Pieces.Pawn or Pieces.Lance && (destination.Y == (piece.IsSente ? Board.GetLength(1) - 1 : 0)))
+                            || (piece is Pieces.Knight && (piece.IsSente ? destination.Y >= Board.GetLength(1) - 2 : destination.Y <= 1)))
                         {
                             // Always promote pawns and lances upon reaching the last rank
                             // Always promote knights upon reaching the last two ranks
@@ -475,7 +482,7 @@ namespace Shogi
                             && p.GetValidMoves(oldGame.Board, true).Contains(destination));
                     if (canReachDest.Any())
                     {
-                        newWesternMove += $"{9 - source.X}{9 - source.Y}";
+                        newWesternMove += $"{Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y}";
                         if (source.X == -1)
                         {
                             newJapaneseMove += '打';
@@ -509,7 +516,7 @@ namespace Shogi
                     newWesternMove += source.X == -1 ? '*'
                         : oldGame.Board[destination.X, destination.Y] is not null ? 'x'
                         : '-';
-                    newWesternMove += $"{9 - destination.X}{9 - destination.Y}";
+                    newWesternMove += $"{Board.GetLength(0) - destination.X}{Board.GetLength(1) - destination.Y}";
 
                     if (promotionPossible)
                     {
@@ -668,7 +675,7 @@ namespace Shogi
                         Pieces.Piece piece = initialGame.Board[x, y]!;
                         kif += $"{(piece.IsSente ? ' ' : 'v')}{piece.SingleLetter}";
                     }
-                    kif += $"|{(9 - y).ToJapaneseKanji()}";
+                    kif += $"|{(Board.GetLength(1) - y).ToJapaneseKanji()}";
                 }
 
                 kif += "\n+---------------------------+\n先手の持駒：";
@@ -708,7 +715,7 @@ namespace Shogi
                 }
                 else
                 {
-                    compiledMoveText += $"({9 - source.X}{9 - source.Y})";
+                    compiledMoveText += $"({Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y})";
                 }
                 lastDest = destination;
 
