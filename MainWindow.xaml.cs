@@ -516,7 +516,8 @@ namespace Shogi
         private async Task<BoardAnalysis.PossibleMove> GetEngineMove(CancellationToken cancellationToken)
         {
             BoardAnalysis.PossibleMove? bestMove = null;
-            bestMove ??= await BoardAnalysis.EstimateBestPossibleMove(game, 3, cancellationToken);
+            // Search deeper in minishogi games
+            bestMove ??= await BoardAnalysis.EstimateBestPossibleMove(game, game.Board.GetLength(0) == 5 ? 5 : 3, cancellationToken);
             return bestMove.Value;
         }
 
