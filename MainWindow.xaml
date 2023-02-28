@@ -39,6 +39,10 @@
                     <MenuItem Header="Japanese (_Simplified - 1 Kanji, Black with Red Promotions)" Click="PieceSetItem_Click" IsCheckable="True" Tag="1kanji"/>
                     <MenuItem Header="_Western (Symbols, Black with Red Promotions)" Click="PieceSetItem_Click" IsCheckable="True" Tag="western"/>
                 </MenuItem>
+                <MenuItem x:Name="notationSetItem" Header="_Move Notation">
+                    <MenuItem Header="Japanese" Click="NotationSetItem_Click" IsCheckable="True" Tag="japanese"/>
+                    <MenuItem Header="Western" Click="NotationSetItem_Click" IsCheckable="True" Tag="western"/>
+                </MenuItem>
                 <Separator/>
                 <MenuItem Header="Customise..." Click="CustomiseItem_Click"/>
             </MenuItem>

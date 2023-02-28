@@ -72,7 +72,8 @@ namespace Shogi
         /// (pieceLetter, sourcePosition, destinationPosition, promotionHappened, dropHappened)
         /// </summary>
         public List<(string, Point, Point, bool, bool)> Moves { get; }
-        public List<string> MoveText { get; }
+        public List<string> JapaneseMoveText { get; }
+        public List<string> WesternMoveText { get; }
         public Dictionary<Type, int> SentePieceDrops { get; }
         public Dictionary<Type, int> GotePieceDrops { get; }
 
@@ -92,7 +93,8 @@ namespace Shogi
             GoteKing = new Pieces.King(new Point(4, 8), false);
 
             Moves = new List<(string, Point, Point, bool, bool)>();
-            MoveText = new List<string>();
+            JapaneseMoveText = new List<string>();
+            WesternMoveText = new List<string>();
             SentePieceDrops = new Dictionary<Type, int>()
             {
                 { typeof(Pieces.GoldGeneral), 0 },
@@ -136,9 +138,10 @@ namespace Shogi
         /// Create a new instance of a shogi game, setting each game parameter to a non-default value
         /// </summary>
         public ShogiGame(Pieces.Piece?[,] board, bool currentTurnSente, bool gameOver,
-            List<(string, Point, Point, bool, bool)> moves, List<string> moveText,
-            Dictionary<Type, int>? sentePieceDrops, Dictionary<Type, int>? gotePieceDrops,
-            Dictionary<string, int> boardCounts, string? initialState)
+            List<(string, Point, Point, bool, bool)> moves, List<string> japaneseMoveText,
+            List<string> westernMoveText, Dictionary<Type, int>? sentePieceDrops,
+            Dictionary<Type, int>? gotePieceDrops, Dictionary<string, int> boardCounts,
+            string? initialState)
         {
             if (board.GetLength(0) != 9 || board.GetLength(1) != 9)
             {
@@ -152,7 +155,8 @@ namespace Shogi
             CurrentTurnSente = currentTurnSente;
             GameOver = gameOver;
             Moves = moves;
-            MoveText = moveText;
+            JapaneseMoveText = japaneseMoveText;
+            WesternMoveText = westernMoveText;
             SentePieceDrops = sentePieceDrops ?? new Dictionary<Type, int>()
             {
                 { typeof(Pieces.GoldGeneral), 0 },
@@ -192,9 +196,9 @@ namespace Shogi
                 }
             }
 
-            return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(MoveText),
-                new Dictionary<Type, int>(SentePieceDrops), new Dictionary<Type, int>(GotePieceDrops),
-                new(BoardCounts), InitialState);
+            return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(JapaneseMoveText),
+                new(WesternMoveText), new Dictionary<Type, int>(SentePieceDrops),
+                new Dictionary<Type, int>(GotePieceDrops), new(BoardCounts), InitialState);
         }
 
         /// <summary>
@@ -460,52 +464,61 @@ namespace Shogi
 
                 if (updateMoveText)
                 {
-                    string newMove = (CurrentTurnSente ? "☖" : "☗")
+                    string newJapaneseMove = (CurrentTurnSente ? "☖" : "☗")
                         + (Moves.Count > 1 && destination == Moves[^2].Item3 ? "同　" : destination.ToShogiCoordinate())
                         + beforePromotion.SymbolLetter;
+                    string newWesternMove = beforePromotion.SFENLetter;
 
                     // Disambiguate moving piece if two pieces of the same type can reach destination
                     IEnumerable<Pieces.Piece> canReachDest = oldGame!.Board.OfType<Pieces.Piece>().Where(
-                        p => piece.GetType() == p.GetType() && p.Position != source && p.IsSente == piece.IsSente
+                        p => beforePromotion.GetType() == p.GetType() && p.Position != source && p.IsSente == beforePromotion.IsSente
                             && p.GetValidMoves(oldGame.Board, true).Contains(destination));
                     if (canReachDest.Any())
                     {
+                        newWesternMove += $"{9 - source.X}{9 - source.Y}";
                         if (source.X == -1)
                         {
-                            newMove += '打';
+                            newJapaneseMove += '打';
                         }
                         else if (destination.Y > source.Y && !canReachDest.Where(p => destination.Y > p.Position.Y).Any())
                         {
-                            newMove += CurrentTurnSente ? '引' : '上';
+                            newJapaneseMove += CurrentTurnSente ? '引' : '上';
                         }
                         else if (destination.Y < source.Y && !canReachDest.Where(p => destination.Y < p.Position.Y).Any())
                         {
-                            newMove += CurrentTurnSente ? '上' : '引';
+                            newJapaneseMove += CurrentTurnSente ? '上' : '引';
                         }
                         else if (destination.Y == source.Y && !canReachDest.Where(p => destination.Y == p.Position.Y).Any())
                         {
-                            newMove += '寄';
+                            newJapaneseMove += '寄';
                         }
                         else if (destination.X > source.X && !canReachDest.Where(p => destination.X > p.Position.X).Any())
                         {
-                            newMove += CurrentTurnSente ? "右" : "左";
+                            newJapaneseMove += CurrentTurnSente ? "右" : "左";
                         }
                         else if (destination.X < source.X && !canReachDest.Where(p => destination.X < p.Position.X).Any())
                         {
-                            newMove += CurrentTurnSente ? "左" : "右";
+                            newJapaneseMove += CurrentTurnSente ? "左" : "右";
                         }
                         else
                         {
-                            newMove += "直";
+                            newJapaneseMove += "直";
                         }
                     }
 
+                    newWesternMove += source.X == -1 ? '*'
+                        : oldGame.Board[destination.X, destination.Y] is not null ? 'x'
+                        : '-';
+                    newWesternMove += $"{9 - destination.X}{9 - destination.Y}";
+
                     if (promotionPossible)
                     {
-                        newMove += promotionHappened ? "成" : "不成";
+                        newJapaneseMove += promotionHappened ? "成" : "不成";
+                        newWesternMove += promotionHappened ? '+' : '=';
                     }
 
-                    MoveText.Add(newMove);
+                    JapaneseMoveText.Add(newJapaneseMove);
+                    WesternMoveText.Add(newWesternMove);
                 }
 
                 return true;
@@ -937,7 +950,7 @@ namespace Shogi
 
             // Shogi Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
+                new(), new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
         }
     }
 }

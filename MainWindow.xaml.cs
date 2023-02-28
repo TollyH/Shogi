@@ -62,6 +62,10 @@ namespace Shogi
             {
                 item.IsChecked = config.PieceSet == (string)item.Tag;
             }
+            foreach (MenuItem item in notationSetItem.Items)
+            {
+                item.IsChecked = config.Notation == (string)item.Tag;
+            }
         }
 
         public void UpdateGameDisplay()
@@ -215,9 +219,12 @@ namespace Shogi
             }
 
             movesPanel.Children.Clear();
-            for (int i = 0; i < game.MoveText.Count; i++)
+            List<string> moves = config.Notation == "western"
+                ? game.WesternMoveText
+                : game.JapaneseMoveText;
+            for (int i = 0; i < moves.Count; i++)
             {
-                string text = $"{i + 1}. {game.MoveText[i]}";
+                string text = $"{i + 1}. {moves[i]}";
                 _ = movesPanel.Children.Add(new Label()
                 {
                     Content = text,
@@ -495,7 +502,7 @@ namespace Shogi
             foreach ((System.Drawing.Point source, System.Drawing.Point destination, bool doPromotion) in bestMove.Value.BestLine)
             {
                 _ = moveStringGenerator.MovePiece(source, destination, true, doPromotion);
-                convertedBestLine += " " + moveStringGenerator.MoveText[^1];
+                convertedBestLine += " " + moveStringGenerator.JapaneseMoveText[^1];
             }
             toUpdate.ToolTip = convertedBestLine.Trim();
         }
@@ -883,6 +890,17 @@ namespace Shogi
             foreach (MenuItem item in pieceSetItem.Items)
             {
                 item.IsChecked = chosenSet == (string)item.Tag;
+            }
+            UpdateGameDisplay();
+        }
+
+        private void NotationSetItem_Click(object sender, RoutedEventArgs e)
+        {
+            string chosenNotation = (string)((MenuItem)sender).Tag;
+            config.Notation = chosenNotation;
+            foreach (MenuItem item in notationSetItem.Items)
+            {
+                item.IsChecked = chosenNotation == (string)item.Tag;
             }
             UpdateGameDisplay();
         }

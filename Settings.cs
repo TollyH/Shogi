@@ -10,6 +10,7 @@ namespace Shogi
         public bool FlipBoard { get; set; }
         public bool UpdateEvalAfterBot { get; set; }
         public string PieceSet { get; set; }
+        public string Notation { get; set; }
 
         public Color BoardColor { get; set; }
         public Color CheckedKingColor { get; set; }
@@ -27,6 +28,7 @@ namespace Shogi
             FlipBoard = false;
             UpdateEvalAfterBot = true;
             PieceSet = "1kanji";
+            Notation = "japanese";
 
             BoardColor = Color.FromRgb(249, 184, 83);
             CheckedKingColor = Brushes.Red.Color;
@@ -41,7 +43,7 @@ namespace Shogi
         }
 
         [JsonConstructor]
-        public Settings(bool flipBoard, bool updateEvalAfterBot, string pieceSet,
+        public Settings(bool flipBoard, bool updateEvalAfterBot, string pieceSet, string notation,
             Color boardColor, Color checkedKingColor, Color selectedPieceColor, Color checkMateHighlightColor,
             Color lastMoveSourceColor, Color lastMoveDestinationColor, Color bestMoveSourceColor,
             Color bestMoveDestinationColor, Color availableMoveColor, Color availableCaptureColor)
@@ -49,6 +51,7 @@ namespace Shogi
             FlipBoard = flipBoard;
             UpdateEvalAfterBot = updateEvalAfterBot;
             PieceSet = pieceSet;
+            Notation = notation;
             BoardColor = boardColor;
             CheckedKingColor = checkedKingColor;
             SelectedPieceColor = selectedPieceColor;
