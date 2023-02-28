@@ -483,7 +483,7 @@ namespace Shogi
                 if (updateMoveText)
                 {
                     string newJapaneseMove = (CurrentTurnSente ? "☖" : "☗")
-                        + (Moves.Count > 1 && destination == Moves[^2].Item3 ? "同　" : destination.ToShogiCoordinate())
+                        + (Moves.Count > 1 && destination == Moves[^2].Item3 ? "同　" : destination.ToShogiCoordinate(Board.GetLength(0) == 5))
                         + beforePromotion.SymbolLetter;
                     string newWesternMove = beforePromotion.SFENLetter;
 
@@ -643,6 +643,8 @@ namespace Shogi
         public string ToKIF(string? eventName, string? siteName, DateOnly? startDate, string senteName, string goteName,
             bool senteIsComputer, bool goteIsComputer)
         {
+            bool minishogi = Board.GetLength(0) == 5;
+
             GameState state = DetermineGameState();
             string kif = $"先手：{senteName}\n" +
                 $"後手：{goteName}\n" +
@@ -715,7 +717,7 @@ namespace Shogi
             for (int i = 0; i < Moves.Count; i += 1)
             {
                 (string pieceLetter, Point source, Point destination, bool promotion, bool drop) = Moves[i];
-                compiledMoveText += $"\n {i + 1}  {(destination == lastDest ? "同　" : destination.ToShogiCoordinate())}{pieceLetter}";
+                compiledMoveText += $"\n {i + 1}  {(destination == lastDest ? "同　" : destination.ToShogiCoordinate(minishogi))}{pieceLetter}";
                 if (promotion)
                 {
                     compiledMoveText += '成';

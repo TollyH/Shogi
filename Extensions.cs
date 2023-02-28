@@ -18,8 +18,12 @@ namespace Shogi
 
         private const string files = "９８７６５４３２１";
         private const string ranks = "九八七六五四三二一";
-        public static string ToShogiCoordinate(this Point point)
+        public static string ToShogiCoordinate(this Point point, bool minishogi)
         {
+            if (minishogi)
+            {
+                point = new Point(point.X + 4, point.Y + 4);
+            }
             return $"{files[point.X]}{ranks[point.Y]}";
         }
 
