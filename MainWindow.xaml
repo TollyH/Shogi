@@ -30,6 +30,8 @@
                 <MenuItem Header="New Mini Game (_1 Player - Gote)" Click="NewMiniGameCpuGote_Click"/>
                 <MenuItem Header="New Mini Game (0 Player - Computer _Only)" Click="NewMiniGameCpuOnly_Click"/>
                 <Separator/>
+                <MenuItem Header="_Undo Move" Click="UndoMove_Click"/>
+                <Separator/>
                 <MenuItem Header="Custom _Game..." Click="CustomGame_Click"/>
                 <MenuItem Header="Custom Mini Game..." Click="CustomMiniGame_Click"/>
                 <Separator/>

@@ -125,7 +125,7 @@ namespace Shogi
             bool currentTurnSente = turnSelectSente.IsChecked ?? false;
             GeneratedGame = new ShogiGame(Board, currentTurnSente,
                 ShogiGame.EndingStates.Contains(BoardAnalysis.DetermineGameState(Board, currentTurnSente)),
-                new(), new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
+                new(), new(), new(), sentePieceDrops, gotePieceDrops, new(), null, null);
             Close();
         }
 

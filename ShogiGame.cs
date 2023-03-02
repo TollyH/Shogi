@@ -77,6 +77,7 @@ namespace Shogi
         public List<(string, Point, Point, bool, bool)> Moves { get; }
         public List<string> JapaneseMoveText { get; }
         public List<string> WesternMoveText { get; }
+        public ShogiGame? PreviousGameState { get; private set; }
         public Dictionary<Type, int> SentePieceDrops { get; }
         public Dictionary<Type, int> GotePieceDrops { get; }
 
@@ -155,7 +156,7 @@ namespace Shogi
             List<(string, Point, Point, bool, bool)> moves, List<string> japaneseMoveText,
             List<string> westernMoveText, Dictionary<Type, int>? sentePieceDrops,
             Dictionary<Type, int>? gotePieceDrops, Dictionary<string, int> boardCounts,
-            string? initialState)
+            string? initialState, ShogiGame? previousGameState)
         {
             if (board.GetLength(0) is not 9 and not 5 || board.GetLength(1) is not 9 and not 5)
             {
@@ -198,6 +199,7 @@ namespace Shogi
             BoardCounts = boardCounts;
 
             InitialState = initialState ?? ToString();
+            PreviousGameState = previousGameState;
         }
 
         /// <summary>
@@ -216,7 +218,7 @@ namespace Shogi
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(JapaneseMoveText),
                 new(WesternMoveText), new Dictionary<Type, int>(SentePieceDrops),
-                new Dictionary<Type, int>(GotePieceDrops), new(BoardCounts), InitialState);
+                new Dictionary<Type, int>(GotePieceDrops), new(BoardCounts), InitialState, PreviousGameState?.Clone());
         }
 
         /// <summary>
@@ -348,7 +350,7 @@ namespace Shogi
         /// If a piece can be promoted, should it be? <see langword="null"/> means the user should be prompted.
         /// </param>
         /// <param name="updateMoveText">
-        /// Whether the move should update the game move text. This should usually be <see langword="true"/>,
+        /// Whether the move should update the game move text and update <see cref="PreviousGameState"/>. This should usually be <see langword="true"/>,
         /// but may be set to <see langword="false"/> for performance optimisations in clone games for analysis.
         /// </param>
         /// <returns><see langword="true"/> if the move was valid and executed, <see langword="false"/> otherwise</returns>
@@ -393,11 +395,12 @@ namespace Shogi
                 }
             }
 
-            // Used for generating new move text
+            // Used for generating new move text and move undoing
             ShogiGame? oldGame = null;
             if (updateMoveText)
             {
                 oldGame = Clone();
+                PreviousGameState = oldGame;
             }
 
             bool pieceMoved = piece.Move(Board, destination, forceMove || source.X == -1);
@@ -976,7 +979,7 @@ namespace Shogi
 
             // Shogi Forsyth–Edwards doesn't define what the previous moves were, so they moves list starts empty
             return new ShogiGame(board, currentTurnSente, EndingStates.Contains(BoardAnalysis.DetermineGameState(board, currentTurnSente)),
-                new(), new(), new(), sentePieceDrops, gotePieceDrops, new(), null);
+                new(), new(), new(), sentePieceDrops, gotePieceDrops, new(), null, null);
         }
     }
 }

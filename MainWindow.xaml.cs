@@ -979,6 +979,22 @@ namespace Shogi
             UpdateGameDisplay();
         }
 
+        private async void UndoMove_Click(object sender, RoutedEventArgs e)
+        {
+            if (game.PreviousGameState is not null
+                && ((game.CurrentTurnSente && !senteIsComputer) || (!game.CurrentTurnSente && !goteIsComputer)))
+            {
+                game = game.PreviousGameState;
+                if (senteIsComputer || goteIsComputer)
+                {
+                    // Reverse two moves if the opponent is computer controlled
+                    game = game.PreviousGameState!;
+                }
+                UpdateGameDisplay();
+                await CheckComputerMove();
+            }
+        }
+
         private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left && !game.GameOver)
