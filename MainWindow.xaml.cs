@@ -615,6 +615,7 @@ namespace Shogi
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateGameDisplay();
+            moveListColumn.Width = ActualWidth < 900 ? new GridLength(0) : new GridLength(210);
         }
 
         private void Window_MouseMove(object sender, MouseEventArgs e)

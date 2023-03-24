@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Shogi"
         xmlns:pieces="clr-namespace:Shogi.Pieces"
         mc:Ignorable="d"
-        Title="Shogi" Height="970" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing">
+        Title="Shogi" Height="970" Width="960" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged" MouseMove="Window_MouseMove" MouseDown="Window_MouseDown" MouseUp="Window_MouseUp" MouseLeave="Window_MouseLeave" Closing="Window_Closing" MinWidth="700">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="210px"/>
+            <ColumnDefinition x:Name="moveListColumn" Width="210px"/>
         </Grid.ColumnDefinitions>
         <Menu Grid.ColumnSpan="2">
             <MenuItem Header="_Game" Margin="2">
