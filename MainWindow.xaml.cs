@@ -640,7 +640,8 @@ namespace Shogi
                     return;
                 }
 
-                if (selectedDropType is not null)
+                if (selectedDropType is not null && mousePos.X >= 0 && mousePos.Y >= 0 && mousePos.X <= shogiGameCanvas.ActualWidth
+                    && mousePos.Y <= shogiGameCanvas.ActualHeight)
                 {
                     System.Drawing.Point destination = GetCoordFromCanvasPoint(mousePos);
                     bool success = game.MovePiece(ShogiGame.PieceDropSources[selectedDropType], destination, doPromotion: null);
