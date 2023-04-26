@@ -5,7 +5,7 @@ A shogi game with a computer player made in C# with WPF
 ## Features
 
 - Graphical shogi game with all standard rules implemented
-- A move list using modern Japanese notation
+- A move list using modern Japanese and Western notation
 - Exporting to the Kifu format (KIF) and Shogi Forsyth–Edwards Notation (SFEN)
 - Custom position editor with SFEN import support
 - A computer player that can play as sente, gote, both, or neither
