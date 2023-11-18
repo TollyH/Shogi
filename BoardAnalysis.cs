@@ -408,8 +408,15 @@ namespace Shogi
             {
                 return Array.Empty<PossibleMove>();
             }
-            // Remove default moves from return value
-            return (await Task.WhenAll(evaluationTasks)).Where(m => m.Source != m.Destination).ToArray();
+            try
+            {
+                // Remove default moves from return value
+                return (await Task.WhenAll(evaluationTasks)).Where(m => m.Source != m.Destination).ToArray();
+            }
+            catch (TaskCanceledException)
+            {
+                return Array.Empty<PossibleMove>();
+            }
         }
 
         private static HashSet<Point> GetValidMovesForEval(ShogiGame game, Pieces.Piece piece)
