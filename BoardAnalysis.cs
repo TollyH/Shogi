@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -16,7 +15,7 @@ namespace Shogi
         /// <param name="board">The state of the board to check</param>
         /// <param name="isSente">Is the king to check sente?</param>
         /// <param name="target">Override the position of the king to check</param>
-        /// <remarks><paramref name="target"/> should always be given if checking a not-yet-peformed king move, as the king's internally stored position will be incorrect.</remarks>
+        /// <remarks><paramref name="target"/> should always be given if checking a not-yet-performed king move, as the king's internally stored position will be incorrect.</remarks>
         public static bool IsKingReachable(Pieces.Piece?[,] board, bool isSente, Point? target = null)
         {
             target ??= board.OfType<Pieces.King>().Where(x => x.IsSente == isSente).First().Position;
@@ -315,8 +314,7 @@ namespace Shogi
         /// <returns>An array of all possible moves, with information on board value and ability to checkmate</returns>
         public static async Task<PossibleMove[]> EvaluatePossibleMoves(ShogiGame game, int maxDepth, CancellationToken cancellationToken)
         {
-            ConcurrentBag<PossibleMove> possibleMoves = new();
-            int remainingThreads = 0;
+            List<Task<PossibleMove>> evaluationTasks = new();
 
             foreach (Pieces.Piece? piece in game.Board)
             {
@@ -333,54 +331,40 @@ namespace Shogi
                             && ((piece.IsSente ? validMove.Y >= game.PromotionZoneSenteStart : validMove.Y <= game.PromotionZoneGoteStart)
                                 || (piece.IsSente ? piece.Position.Y >= game.PromotionZoneSenteStart : piece.Position.Y <= game.PromotionZoneGoteStart)))
                         {
-                            remainingThreads++;
-                            Point promotionPosition = piece.Position;
                             Point promotionMove = validMove;
-                            ShogiGame promotionGameClone = game.Clone();
-                            List<(Point, Point, bool)> promotionLine = new() { (piece.Position, validMove, true) };
-                            _ = promotionGameClone.MovePiece(piece.Position, validMove, true,
-                                doPromotion: true, updateMoveText: false);
-
-                            Thread promotionThread = new(() =>
+                            evaluationTasks.Add(Task.Run(() =>
                             {
+                                ShogiGame promotionGameClone = game.Clone(false);
+                                List<(Point, Point, bool)> promotionLine = new() { (piece.Position, promotionMove, true) };
+                                _ = promotionGameClone.MovePiece(piece.Position, promotionMove, true,
+                                    doPromotion: true, updateMoveText: false);
+
                                 PossibleMove bestSubMove = MinimaxMove(promotionGameClone,
                                     double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, promotionLine, cancellationToken);
-                                // Don't include default value in results
-                                if (bestSubMove.Source != bestSubMove.Destination)
-                                {
-                                    possibleMoves.Add(new PossibleMove(promotionPosition, promotionMove, bestSubMove.EvaluatedFutureValue,
-                                        bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
-                                        bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, true, bestSubMove.BestLine));
-                                }
-                                remainingThreads--;
-                            });
-                            promotionThread.Start();
+
+                                return new PossibleMove(piece.Position, promotionMove, bestSubMove.EvaluatedFutureValue,
+                                    bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                    bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, true, bestSubMove.BestLine);
+                            }, cancellationToken));
                         }
                         if ((piece is not Pieces.Pawn and not Pieces.Lance || validMove.Y != (piece.IsSente ? game.Board.GetLength(1) - 1 : 0))
                             && (piece is not Pieces.Knight || !(piece.IsSente ? validMove.Y >= game.Board.GetLength(1) - 2 : validMove.Y <= 1)))
                         {
-                            remainingThreads++;
-                            Point thisPosition = piece.Position;
                             Point thisValidMove = validMove;
-                            ShogiGame gameClone = game.Clone();
-                            List<(Point, Point, bool)> thisLine = new() { (piece.Position, validMove, false) };
-                            _ = gameClone.MovePiece(piece.Position, validMove, true,
-                                doPromotion: false, updateMoveText: false);
-
-                            Thread processThread = new(() =>
+                            evaluationTasks.Add(Task.Run(() =>
                             {
+                                ShogiGame gameClone = game.Clone(false);
+                                List<(Point, Point, bool)> thisLine = new() { (piece.Position, thisValidMove, false) };
+                                _ = gameClone.MovePiece(piece.Position, thisValidMove, true,
+                                    doPromotion: false, updateMoveText: false);
+
                                 PossibleMove bestSubMove = MinimaxMove(gameClone,
                                     double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
-                                // Don't include default value in results
-                                if (bestSubMove.Source != bestSubMove.Destination)
-                                {
-                                    possibleMoves.Add(new PossibleMove(thisPosition, thisValidMove, bestSubMove.EvaluatedFutureValue,
-                                        bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
-                                        bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine));
-                                }
-                                remainingThreads--;
-                            });
-                            processThread.Start();
+                                
+                                return new PossibleMove(piece.Position, thisValidMove, bestSubMove.EvaluatedFutureValue,
+                                    bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                    bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine);
+                            }, cancellationToken));
                         }
                     }
                 }
@@ -398,47 +382,34 @@ namespace Shogi
                             Point pt = new(x, y);
                             if (game.IsDropPossible(dropType, pt))
                             {
-                                remainingThreads++;
                                 Point thisDropPoint = pt;
-                                Point thisDropSource = ShogiGame.PieceDropSources[dropType];
-                                ShogiGame gameClone = game.Clone();
-                                List<(Point, Point, bool)> thisLine = new() { (thisDropSource, thisDropPoint, false) };
-                                _ = gameClone.MovePiece(thisDropSource, thisDropPoint, true,
-                                    doPromotion: false, updateMoveText: false);
-
-                                Thread processThread = new(() =>
+                                evaluationTasks.Add(Task.Run(() =>
                                 {
+                                    Point thisDropSource = ShogiGame.PieceDropSources[dropType];
+                                    ShogiGame gameClone = game.Clone(false);
+                                    List<(Point, Point, bool)> thisLine = new() { (thisDropSource, thisDropPoint, false) };
+                                    _ = gameClone.MovePiece(thisDropSource, thisDropPoint, true,
+                                        doPromotion: false, updateMoveText: false);
+
                                     PossibleMove bestSubMove = MinimaxMove(gameClone,
                                         double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
-                                    // Don't include default value in results
-                                    if (bestSubMove.Source != bestSubMove.Destination)
-                                    {
-                                        possibleMoves.Add(new PossibleMove(thisDropSource, pt,
-                                            bestSubMove.EvaluatedFutureValue, bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
-                                            bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine));
-                                    }
-                                    remainingThreads--;
-                                });
-                                processThread.Start();
+                                    
+                                    return new PossibleMove(thisDropSource, pt,
+                                        bestSubMove.EvaluatedFutureValue, bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
+                                        bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine);
+                                }, cancellationToken));
                             }
                         }
                     }
                 }
             }
 
-            await Task.Run(async () =>
-            {
-                while (remainingThreads > 0 || cancellationToken.IsCancellationRequested)
-                {
-                    await Task.Delay(50);
-                }
-            }, cancellationToken);
-
             if (cancellationToken.IsCancellationRequested)
             {
                 return Array.Empty<PossibleMove>();
             }
-            return possibleMoves.ToArray();
+            // Remove default moves from return value
+            return (await Task.WhenAll(evaluationTasks)).Where(m => m.Source != m.Destination).ToArray();
         }
 
         private static HashSet<Point> GetValidMovesForEval(ShogiGame game, Pieces.Piece piece)
@@ -501,7 +472,7 @@ namespace Shogi
                         }
                         foreach (bool doPromotion in availablePromotions)
                         {
-                            ShogiGame gameClone = game.Clone();
+                            ShogiGame gameClone = game.Clone(false);
                             List<(Point, Point, bool)> newLine = new(currentLine) { (piece.Position, validMove, doPromotion) };
                             _ = gameClone.MovePiece(piece.Position, validMove, true,
                                 doPromotion: doPromotion, updateMoveText: false);
@@ -569,7 +540,7 @@ namespace Shogi
                             Point pt = new(x, y);
                             if (game.IsDropPossible(dropType, pt))
                             {
-                                ShogiGame gameClone = game.Clone();
+                                ShogiGame gameClone = game.Clone(false);
                                 Point dropPoint = pt;
                                 Point dropSource = ShogiGame.PieceDropSources[dropType];
                                 List<(Point, Point, bool)> newLine = new(currentLine) { (dropSource, dropPoint, false) };

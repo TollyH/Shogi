@@ -518,7 +518,7 @@ namespace Shogi
             }
 
             string convertedBestLine = "";
-            ShogiGame moveStringGenerator = game.Clone();
+            ShogiGame moveStringGenerator = game.Clone(false);
             foreach ((System.Drawing.Point source, System.Drawing.Point destination, bool doPromotion) in bestMove.Value.BestLine)
             {
                 _ = moveStringGenerator.MovePiece(source, destination, true, doPromotion);

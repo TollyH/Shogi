@@ -205,7 +205,7 @@ namespace Shogi
         /// <summary>
         /// Create a deep copy of all parameters to this shogi game
         /// </summary>
-        public ShogiGame Clone()
+        public ShogiGame Clone(bool clonePreviousState)
         {
             Pieces.Piece?[,] boardClone = new Pieces.Piece?[Board.GetLength(0), Board.GetLength(1)];
             for (int x = 0; x < boardClone.GetLength(0); x++)
@@ -218,7 +218,8 @@ namespace Shogi
 
             return new ShogiGame(boardClone, CurrentTurnSente, GameOver, new(Moves), new(JapaneseMoveText),
                 new(WesternMoveText), new Dictionary<Type, int>(SentePieceDrops),
-                new Dictionary<Type, int>(GotePieceDrops), new(BoardCounts), InitialState, PreviousGameState?.Clone());
+                new Dictionary<Type, int>(GotePieceDrops), new(BoardCounts), InitialState,
+                clonePreviousState ? PreviousGameState?.Clone(true) : PreviousGameState);
         }
 
         /// <summary>
@@ -308,7 +309,7 @@ namespace Shogi
                 return false;
             }
 
-            ShogiGame checkmateTest = Clone();
+            ShogiGame checkmateTest = Clone(false);
             _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
                 destination, forceMove: true, updateMoveText: false, determineGameState: false);
             GameState resultingGameState = BoardAnalysis.DetermineGameState(checkmateTest.Board, checkmateTest.CurrentTurnSente,
@@ -399,7 +400,7 @@ namespace Shogi
             ShogiGame? oldGame = null;
             if (updateMoveText)
             {
-                oldGame = Clone();
+                oldGame = Clone(true);
                 PreviousGameState = oldGame;
             }
 
