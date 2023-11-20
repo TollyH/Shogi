@@ -791,8 +791,8 @@ namespace Shogi
 
         private async void evaluation_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (currentBestMove is not null || (game.CurrentTurnSente && senteIsComputer)
-                || (!game.CurrentTurnSente && goteIsComputer))
+            if (currentBestMove is not null || game.GameOver
+                || (game.CurrentTurnSente && senteIsComputer) || (!game.CurrentTurnSente && goteIsComputer))
             {
                 return;
             }
@@ -992,6 +992,17 @@ namespace Shogi
                     // Reverse two moves if the opponent is computer controlled
                     game = game.PreviousGameState!;
                 }
+
+                grabbedPiece = null;
+                highlightGrabbedMoves = false;
+                selectedDropType = null;
+                currentBestMove = null;
+                senteEvaluation.Content = "?";
+                goteEvaluation.Content = "?";
+                manuallyEvaluating = false;
+                cancelMoveComputation.Cancel();
+                cancelMoveComputation = new CancellationTokenSource();
+
                 UpdateGameDisplay();
                 await CheckComputerMove();
             }
