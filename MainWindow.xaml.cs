@@ -534,7 +534,7 @@ namespace Shogi
         {
             BoardAnalysis.PossibleMove? bestMove = null;
             // Search deeper in minishogi games
-            bestMove ??= await BoardAnalysis.EstimateBestPossibleMove(game, game.Board.GetLength(0) == 5 ? 4 : 3, cancellationToken);
+            bestMove ??= await BoardAnalysis.EstimateBestPossibleMove(game, game.Board.GetLength(0) == 5 ? 4 : 3, true, cancellationToken);
             return bestMove.Value;
         }
 
