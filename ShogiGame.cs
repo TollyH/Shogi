@@ -363,26 +363,20 @@ namespace Shogi
             }
 
             Pieces.Piece? piece;
+            Type? dropType;
             if (source.X == -1)
             {
                 // Piece drop
-                Type dropType = DropTypeOrder[source.Y];
-                piece = (Pieces.Piece)Activator.CreateInstance(dropType, destination, CurrentTurnSente)!;
+                dropType = DropTypeOrder[source.Y];
                 if (!forceMove && !IsDropPossible(dropType, destination))
                 {
                     return false;
                 }
-                if (CurrentTurnSente && SentePieceDrops[dropType] > 0)
-                {
-                    SentePieceDrops[dropType]--;
-                }
-                else if (GotePieceDrops[dropType] > 0)
-                {
-                    GotePieceDrops[dropType]--;
-                }
+                piece = (Pieces.Piece)Activator.CreateInstance(dropType, destination, CurrentTurnSente)!;
             }
             else
             {
+                dropType = null;
                 piece = Board[source.X, source.Y];
                 if (piece is null)
                 {
@@ -402,11 +396,11 @@ namespace Shogi
                 PreviousGameState = oldGame;
             }
 
-            bool pieceMoved = piece.Move(Board, destination, forceMove || source.X == -1);
+            bool pieceMoved = piece.Move(Board, destination, forceMove || dropType is not null);
 
             if (pieceMoved)
             {
-                Moves.Add((piece.SymbolLetter, source, destination, false, source.X == -1));
+                Moves.Add((piece.SymbolLetter, source, destination, false, dropType is not null));
                 if (Board[destination.X, destination.Y] is not null)
                 {
                     Type targetPiece = Board[destination.X, destination.Y]!.GetType();
@@ -431,7 +425,7 @@ namespace Shogi
                 bool promotionHappened = false;
                 Pieces.Piece beforePromotion = piece;
                 Type pieceType = piece.GetType();
-                if (source.X != -1 && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
+                if (dropType is null && Pieces.Piece.PromotionMap.ContainsKey(pieceType))
                 {
                     if ((piece.IsSente ? destination.Y >= PromotionZoneSenteStart : destination.Y <= PromotionZoneGoteStart)
                         || (piece.IsSente ? source.Y >= PromotionZoneSenteStart : source.Y <= PromotionZoneGoteStart))
@@ -459,7 +453,18 @@ namespace Shogi
                 }
 
                 Board[destination.X, destination.Y] = piece;
-                if (source.X != -1)
+                if (dropType is not null)
+                {
+                    if (CurrentTurnSente && SentePieceDrops[dropType] > 0)
+                    {
+                        SentePieceDrops[dropType]--;
+                    }
+                    else if (GotePieceDrops[dropType] > 0)
+                    {
+                        GotePieceDrops[dropType]--;
+                    }
+                }
+                else
                 {
                     Board[source.X, source.Y] = null;
                 }
@@ -495,7 +500,7 @@ namespace Shogi
                     if (canReachDest.Any())
                     {
                         newWesternMove += $"{Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y}";
-                        if (source.X == -1)
+                        if (dropType is not null)
                         {
                             newJapaneseMove += '打';
                         }
@@ -525,7 +530,7 @@ namespace Shogi
                         }
                     }
 
-                    newWesternMove += source.X == -1 ? '*'
+                    newWesternMove += dropType is not null ? '*'
                         : oldGame.Board[destination.X, destination.Y] is not null ? 'x'
                         : '-';
                     newWesternMove += $"{Board.GetLength(0) - destination.X}{Board.GetLength(1) - destination.Y}";
