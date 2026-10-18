@@ -499,7 +499,11 @@ namespace Shogi
                             && p.GetValidMoves(oldGame.Board, true).Contains(destination)).ToArray();
                     if (canReachDest.Any())
                     {
-                        newWesternMove += $"{Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y}";
+                        if (dropType is null)
+                        {
+                            newWesternMove += $"{Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y}";
+                        }
+
                         if (dropType is not null)
                         {
                             newJapaneseMove += '打';
