@@ -68,7 +68,6 @@ namespace Shogi
 
         public bool CurrentTurnSente { get; private set; }
         public bool GameOver { get; private set; }
-        public bool AwaitingPromotionResponse { get; private set; }
 
         /// <summary>
         /// A list of the moves made this game as
@@ -91,7 +90,6 @@ namespace Shogi
         {
             CurrentTurnSente = true;
             GameOver = false;
-            AwaitingPromotionResponse = false;
 
             SenteKing = new Pieces.King(new Point(minishogi ? 0 : 4, 0), true);
             GoteKing = new Pieces.King(new Point(4, minishogi ? 4 : 8), false);
@@ -146,7 +144,7 @@ namespace Shogi
             PromotionZoneSenteStart = minishogi ? 4 : 6;
             PromotionZoneGoteStart = minishogi ? 0 : 2;
 
-            InitialState = ToString();
+            InitialState = ToString(false);
         }
 
         /// <summary>
@@ -198,7 +196,7 @@ namespace Shogi
             };
             BoardCounts = boardCounts;
 
-            InitialState = initialState ?? ToString();
+            InitialState = initialState ?? ToString(false);
             PreviousGameState = previousGameState;
         }
 
@@ -311,7 +309,7 @@ namespace Shogi
 
             ShogiGame checkmateTest = Clone(false);
             _ = checkmateTest.MovePiece(new Point(-1, Array.IndexOf(DropTypeOrder, dropType)),
-                destination, forceMove: true, updateMoveText: false, determineGameState: false);
+                destination, false, forceMove: true, updateMoveText: false, determineGameState: false);
             GameState resultingGameState = BoardAnalysis.DetermineGameState(checkmateTest.Board, checkmateTest.CurrentTurnSente,
                 checkmateTest.SenteKing.Position, checkmateTest.GoteKing.Position);
 
@@ -347,8 +345,8 @@ namespace Shogi
         /// Move a piece on the board from a <paramref name="source"/> coordinate to a <paramref name="destination"/> coordinate.
         /// To perform a piece drop, set <paramref name="source"/> to a value within <see cref="PieceDropSources"/>.
         /// </summary>
-        /// <param name="doPromotion">
-        /// If a piece can be promoted, should it be? <see langword="null"/> means the user should be prompted.
+        /// <param name="promotionType">
+        /// If a piece can be promoted, should it be? May be set to <see langword="null"/> only if this move would not result in a promotion, or if the promotion would be enforced.
         /// </param>
         /// <param name="updateMoveText">
         /// Whether the move should update the game move text and update <see cref="PreviousGameState"/>. This should usually be <see langword="true"/>,
@@ -356,7 +354,7 @@ namespace Shogi
         /// </param>
         /// <returns><see langword="true"/> if the move was valid and executed, <see langword="false"/> otherwise</returns>
         /// <remarks>This method will check if the move is completely valid, unless <paramref name="forceMove"/> is <see langword="true"/>. No other validity checks are required.</remarks>
-        public bool MovePiece(Point source, Point destination, bool forceMove = false, bool? doPromotion = null, bool updateMoveText = true,
+        public bool MovePiece(Point source, Point destination, bool? doPromotion, bool forceMove = false, bool updateMoveText = true,
             bool determineGameState = true)
         {
             if (!forceMove && GameOver)
@@ -446,12 +444,10 @@ namespace Shogi
                             // Always promote knights upon reaching the last two ranks
                             doPromotion = true;
                         }
-                        AwaitingPromotionResponse = true;
-                        doPromotion ??= System.Windows.MessageBox.Show(
-                            $"Do you want to promote the {piece.Name} you just moved?", "Promotion",
-                            System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question
-                        ) == System.Windows.MessageBoxResult.Yes;
-                        AwaitingPromotionResponse = false;
+                        if (doPromotion is null)
+                        {
+                            throw new ArgumentException("Whether or not to perform promotion must be provided if promotion is possible but not enforced.", nameof(doPromotion));
+                        }
                         if (doPromotion.Value)
                         {
                             promotionHappened = true;
@@ -492,9 +488,10 @@ namespace Shogi
                     string newWesternMove = beforePromotion.SFENLetter;
 
                     // Disambiguate moving piece if two pieces of the same type can reach destination
-                    IEnumerable<Pieces.Piece> canReachDest = oldGame!.Board.OfType<Pieces.Piece>().Where(
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    Pieces.Piece[] canReachDest = oldGame!.Board.OfType<Pieces.Piece>().Where(
                         p => beforePromotion.GetType() == p.GetType() && p.Position != source && p.IsSente == beforePromotion.IsSente
-                            && p.GetValidMoves(oldGame.Board, true).Contains(destination));
+                            && p.GetValidMoves(oldGame.Board, true).Contains(destination)).ToArray();
                     if (canReachDest.Any())
                     {
                         newWesternMove += $"{Board.GetLength(0) - source.X}{Board.GetLength(1) - source.Y}";
@@ -851,7 +848,7 @@ namespace Shogi
                                 : new Pieces.Lance(new Point(fileIndex, maxIndex - r), false);
                             break;
                         case 'p':
-                            board[fileIndex, maxIndex - r] = promoteNextPiece 
+                            board[fileIndex, maxIndex - r] = promoteNextPiece
                                 ? new Pieces.PromotedPawn(new Point(fileIndex, maxIndex - r), false)
                                 : new Pieces.Pawn(new Point(fileIndex, maxIndex - r), false);
                             break;
@@ -860,7 +857,7 @@ namespace Shogi
                             {
                                 // char - '0' gets numeric value of ASCII number
                                 // Leaves the specified number of squares as null
-                                fileIndex += pieceChar - '0' - 1; 
+                                fileIndex += pieceChar - '0' - 1;
                                 // Subtract 1 as fileIndex gets incremented by 1 as well later
                             }
                             else

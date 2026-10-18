@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Windows;
+using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 
 namespace Shogi
 {
@@ -35,25 +37,26 @@ namespace Shogi
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveDialog = new()
+            IStorageFile? file = await StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions()
             {
-                AddExtension = true,
-                DefaultExt = ".kifu",
-                Filter = "Kifu File|*.kifu",
-                CheckPathExists = true
-            };
-            if (!saveDialog.ShowDialog() ?? true)
+                DefaultExtension = ".kifu",
+                FileTypeChoices = new List<FilePickerFileType>()
+                {
+                    new("Kifu File") { Patterns = new List<string>() { "*.kifu"} }
+                }
+            });
+            if (file is null)
             {
                 return;
             }
-            string eventName = eventNameBox.Text.Trim();
-            string locationName = locationNameBox.Text.Trim();
-            DateOnly? date = dateBox.SelectedDate is null ? null : DateOnly.FromDateTime(dateBox.SelectedDate.Value);
-            string senteName = senteNameBox.Text.Trim();
-            string goteName = goteNameBox.Text.Trim();
-            File.WriteAllText(saveDialog.FileName, game.ToKIF(eventName != "" ? eventName : null,
+            string eventName = eventNameBox.Text?.Trim() ?? "";
+            string locationName = locationNameBox.Text?.Trim() ?? "";
+            DateOnly? date = dateBox.SelectedDate is null ? null : DateOnly.FromDateTime(dateBox.SelectedDate.Value.DateTime);
+            string senteName = senteNameBox.Text?.Trim() ?? "";
+            string goteName = goteNameBox.Text?.Trim() ?? "";
+            File.WriteAllText(file.Path.LocalPath, game.ToKIF(eventName != "" ? eventName : null,
                 locationName != "" ? locationName : null, date, senteName != "" ? senteName : "Player",
                 goteName != "" ? goteName : "Player", senteIsComputer, goteIsComputer));
             Close();

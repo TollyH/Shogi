@@ -200,8 +200,10 @@ namespace Shogi
         public static GameState DetermineGameState(Pieces.Piece?[,] board, bool currentTurnSente,
             Point? senteKingPos = null, Point? goteKingPos = null)
         {
-            IEnumerable<Pieces.Piece> sentePieces = board.OfType<Pieces.Piece>().Where(p => p.IsSente);
-            IEnumerable<Pieces.Piece> gotePieces = board.OfType<Pieces.Piece>().Where(p => !p.IsSente);
+            // ReSharper disable SuspiciousTypeConversion.Global
+            Pieces.Piece[] sentePieces = board.OfType<Pieces.Piece>().Where(p => p.IsSente).ToArray();
+            Pieces.Piece[] gotePieces = board.OfType<Pieces.Piece>().Where(p => !p.IsSente).ToArray();
+            // ReSharper restore SuspiciousTypeConversion.Global
 
             bool senteCheck = IsKingReachable(board, true, senteKingPos ?? null);
             // Sente and Gote cannot both be in check
@@ -237,6 +239,7 @@ namespace Shogi
             {
                 inHandTotal -= count * Pieces.Piece.DefaultPieces[dropType].Value;
             }
+            // ReSharper disable once SuspiciousTypeConversion.Global
             return inHandTotal + game.Board.OfType<Pieces.Piece>().Sum(p => p.IsSente ? p.Value : -p.Value);
         }
 
@@ -282,7 +285,7 @@ namespace Shogi
             {
                 if (game.CurrentTurnSente)
                 {
-                    if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
+                    if (double.IsNegativeInfinity(bestMove.EvaluatedFutureValue)
                         || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
                         || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
                         || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
@@ -293,7 +296,7 @@ namespace Shogi
                 }
                 else
                 {
-                    if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
+                    if (double.IsPositiveInfinity(bestMove.EvaluatedFutureValue)
                         || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
                         || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
                         || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
@@ -340,7 +343,7 @@ namespace Shogi
                             {
                                 ShogiGame promotionGameClone = game.Clone(false);
                                 List<(Point, Point, bool)> promotionLine = new() { (piece.Position, promotionMove, true) };
-                                _ = promotionGameClone.MovePiece(piece.Position, promotionMove, true,
+                                _ = promotionGameClone.MovePiece(piece.Position, promotionMove, forceMove: true,
                                     doPromotion: true, updateMoveText: false);
 
                                 PossibleMove bestSubMove = MinimaxMove(promotionGameClone,
@@ -359,12 +362,12 @@ namespace Shogi
                             {
                                 ShogiGame gameClone = game.Clone(false);
                                 List<(Point, Point, bool)> thisLine = new() { (piece.Position, thisValidMove, false) };
-                                _ = gameClone.MovePiece(piece.Position, thisValidMove, true,
+                                _ = gameClone.MovePiece(piece.Position, thisValidMove, forceMove: true,
                                     doPromotion: false, updateMoveText: false);
 
                                 PossibleMove bestSubMove = MinimaxMove(gameClone,
                                     double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
-                                
+
                                 return new PossibleMove(piece.Position, thisValidMove, bestSubMove.EvaluatedFutureValue,
                                     bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
                                     bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine);
@@ -392,12 +395,12 @@ namespace Shogi
                                     Point thisDropSource = ShogiGame.PieceDropSources[dropType];
                                     ShogiGame gameClone = game.Clone(false);
                                     List<(Point, Point, bool)> thisLine = new() { (thisDropSource, thisDropPoint, false) };
-                                    _ = gameClone.MovePiece(thisDropSource, thisDropPoint, true,
+                                    _ = gameClone.MovePiece(thisDropSource, thisDropPoint, forceMove: true,
                                         doPromotion: false, updateMoveText: false);
 
                                     PossibleMove bestSubMove = MinimaxMove(gameClone,
                                         double.NegativeInfinity, double.PositiveInfinity, 1, maxDepth, thisLine, cancellationToken);
-                                    
+
                                     return new PossibleMove(thisDropSource, pt,
                                         bestSubMove.EvaluatedFutureValue, bestSubMove.SenteMateLocated, bestSubMove.GoteMateLocated,
                                         bestSubMove.DepthToSenteMate, bestSubMove.DepthToGoteMate, false, bestSubMove.BestLine);
@@ -491,7 +494,7 @@ namespace Shogi
                         {
                             ShogiGame gameClone = game.Clone(false);
                             List<(Point, Point, bool)> newLine = new(currentLine) { (piece.Position, validMove, doPromotion) };
-                            _ = gameClone.MovePiece(piece.Position, validMove, true,
+                            _ = gameClone.MovePiece(piece.Position, validMove, forceMove: true,
                                 doPromotion: doPromotion, updateMoveText: false);
                             PossibleMove potentialMove = MinimaxMove(gameClone, alpha, beta, depth + 1, maxDepth, newLine, cancellationToken);
                             if (cancellationToken.IsCancellationRequested)
@@ -500,7 +503,7 @@ namespace Shogi
                             }
                             if (game.CurrentTurnSente)
                             {
-                                if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
+                                if (double.IsNegativeInfinity(bestMove.EvaluatedFutureValue)
                                     || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
                                     || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
                                     || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
@@ -521,7 +524,7 @@ namespace Shogi
                             }
                             else
                             {
-                                if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
+                                if (double.IsPositiveInfinity(bestMove.EvaluatedFutureValue)
                                     || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
                                     || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
                                     || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated
@@ -561,7 +564,7 @@ namespace Shogi
                                 Point dropPoint = pt;
                                 Point dropSource = ShogiGame.PieceDropSources[dropType];
                                 List<(Point, Point, bool)> newLine = new(currentLine) { (dropSource, dropPoint, false) };
-                                _ = gameClone.MovePiece(dropSource, dropPoint, true,
+                                _ = gameClone.MovePiece(dropSource, dropPoint, forceMove: true,
                                     doPromotion: true, updateMoveText: false);
                                 PossibleMove potentialMove = MinimaxMove(gameClone, alpha, beta, depth + 1, maxDepth, newLine, cancellationToken);
                                 if (cancellationToken.IsCancellationRequested)
@@ -570,7 +573,7 @@ namespace Shogi
                                 }
                                 if (game.CurrentTurnSente)
                                 {
-                                    if (bestMove.EvaluatedFutureValue == double.NegativeInfinity
+                                    if (double.IsNegativeInfinity(bestMove.EvaluatedFutureValue)
                                         || (!bestMove.GoteMateLocated && potentialMove.GoteMateLocated)
                                         || (!bestMove.GoteMateLocated && potentialMove.EvaluatedFutureValue > bestMove.EvaluatedFutureValue)
                                         || (bestMove.GoteMateLocated && potentialMove.GoteMateLocated
@@ -591,7 +594,7 @@ namespace Shogi
                                 }
                                 else
                                 {
-                                    if (bestMove.EvaluatedFutureValue == double.PositiveInfinity
+                                    if (double.IsPositiveInfinity(bestMove.EvaluatedFutureValue)
                                         || (!bestMove.SenteMateLocated && potentialMove.SenteMateLocated)
                                         || (!bestMove.SenteMateLocated && potentialMove.EvaluatedFutureValue < bestMove.EvaluatedFutureValue)
                                         || (bestMove.SenteMateLocated && potentialMove.SenteMateLocated

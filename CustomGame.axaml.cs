@@ -1,10 +1,13 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
 using System.Collections.Generic;
+using System.Linq;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 namespace Shogi
 {
@@ -58,19 +61,19 @@ namespace Shogi
             if (minishogi)
             {
                 Board = new Pieces.Piece?[5, 5];
-                shogiBoardBackground.Visibility = Visibility.Collapsed;
+                shogiBoardBackground.IsVisible = false;
             }
             else
             {
                 Board = new Pieces.Piece?[9, 9];
-                miniShogiBoardBackground.Visibility = Visibility.Collapsed;
+                miniShogiBoardBackground.IsVisible = false;
             }
         }
 
         public void UpdateBoard()
         {
-            tileWidth = shogiGameCanvas.ActualWidth / Board.GetLength(0);
-            tileHeight = shogiGameCanvas.ActualHeight / Board.GetLength(1);
+            tileWidth = shogiGameCanvas.Bounds.Width / Board.GetLength(0);
+            tileHeight = shogiGameCanvas.Bounds.Height / Board.GetLength(1);
 
             shogiGameCanvas.Children.Clear();
 
@@ -83,36 +86,42 @@ namespace Shogi
                     {
                         Image newPiece = new()
                         {
-                            Source = new BitmapImage(
-                                new Uri($"pack://application:,,,/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png")),
+                            Source = new Bitmap(AssetLoader.Open(
+                                new Uri($"avares://Shogi/Pieces/{config.PieceSet}/{(piece.IsSente ? "Sente" : "Gote")}/{piece.Name}.png"))),
                             Width = tileWidth,
                             Height = tileHeight
                         };
-                        RenderOptions.SetBitmapScalingMode(newPiece, BitmapScalingMode.HighQuality);
-                        _ = shogiGameCanvas.Children.Add(newPiece);
+                        RenderOptions.SetBitmapInterpolationMode(newPiece, BitmapInterpolationMode.HighQuality);
+                        shogiGameCanvas.Children.Add(newPiece);
                         Canvas.SetBottom(newPiece, y * tileHeight);
                         Canvas.SetLeft(newPiece, x * tileWidth);
                     }
                 }
             }
 
-            foreach (Grid dropItem in senteDropsPanel.Children)
+            foreach (Grid dropItem in senteDropsPanel.Children.OfType<Grid>())
             {
-                Type pieceType = (Type)dropItem.Tag;
+                if (dropItem.Tag is not Type pieceType)
+                {
+                    continue;
+                }
                 int heldCount = sentePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
                 ((Label)dropItem.Children[1]).Content = heldCount;
-                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
-                    $"pack://application:,,,/Pieces/{config.PieceSet}/Sente/{((Image)dropItem.Children[0]).Tag}.png"));
+                ((Image)dropItem.Children[0]).Source = new Bitmap(AssetLoader.Open(new Uri(
+                    $"avares://Shogi/Pieces/{config.PieceSet}/Sente/{((Image)dropItem.Children[0]).Tag}.png")));
             }
-            foreach (Grid dropItem in goteDropsPanel.Children)
+            foreach (Grid dropItem in goteDropsPanel.Children.OfType<Grid>())
             {
-                Type pieceType = (Type)dropItem.Tag;
+                if (dropItem.Tag is not Type pieceType)
+                {
+                    continue;
+                }
                 int heldCount = gotePieceDrops[pieceType];
                 dropItem.Opacity = heldCount == 0 ? 0.55 : 1;
                 ((Label)dropItem.Children[1]).Content = heldCount;
-                ((Image)dropItem.Children[0]).Source = new BitmapImage(new Uri(
-                    $"pack://application:,,,/Pieces/{config.PieceSet}/Gote/{((Image)dropItem.Children[0]).Tag}.png"));
+                ((Image)dropItem.Children[0]).Source = new Bitmap(AssetLoader.Open(new Uri(
+                    $"avares://Shogi/Pieces/{config.PieceSet}/Gote/{((Image)dropItem.Children[0]).Tag}.png")));
             }
 
             startButton.IsEnabled = senteKing is not null && goteKing is not null;
@@ -131,21 +140,21 @@ namespace Shogi
 
         private void importButton_Click(object sender, RoutedEventArgs e)
         {
-            importOverlay.Visibility = Visibility.Visible;
+            importOverlay.IsVisible = true;
         }
 
-        private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+        private void Window_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
-            Point mousePoint = Mouse.GetPosition(shogiGameCanvas);
+            Point mousePoint = e.GetPosition(shogiGameCanvas);
             if (mousePoint.X < 0 || mousePoint.Y < 0
-                || mousePoint.X > shogiGameCanvas.ActualWidth || mousePoint.Y > shogiGameCanvas.ActualHeight)
+                || mousePoint.X > shogiGameCanvas.Bounds.Width || mousePoint.Y > shogiGameCanvas.Bounds.Height)
             {
                 return;
             }
 
             // Canvas coordinates are relative to top-left, whereas shogi's are from bottom-left, so y is inverted
             System.Drawing.Point coord = new((int)(mousePoint.X / tileWidth),
-                (int)((shogiGameCanvas.ActualHeight - mousePoint.Y) / tileHeight));
+                (int)((shogiGameCanvas.Bounds.Height - mousePoint.Y) / tileHeight));
             if (coord.X < 0 || coord.Y < 0 || coord.X >= Board.GetLength(0) || coord.Y >= Board.GetLength(1))
             {
                 return;
@@ -153,7 +162,7 @@ namespace Shogi
 
             if (Board[coord.X, coord.Y] is null)
             {
-                bool sente = e.ChangedButton == MouseButton.Left;
+                bool sente = e.InitialPressMouseButton == MouseButton.Left;
                 if (pieceSelectKing.IsChecked ?? false)
                 {
                     // Only allow one king of each colour
@@ -245,25 +254,25 @@ namespace Shogi
             UpdateBoard();
         }
 
-        private void submitFenButton_Click(object sender, RoutedEventArgs e)
+        private async void submitFenButton_Click(object sender, RoutedEventArgs e)
         {
             SenteIsComputer = computerSelectSente.IsChecked ?? false;
             GoteIsComputer = computerSelectGote.IsChecked ?? false;
             try
             {
-                GeneratedGame = ShogiGame.FromShogiForsythEdwards(sfenInput.Text);
+                GeneratedGame = ShogiGame.FromShogiForsythEdwards(sfenInput?.Text ?? "");
                 Close();
             }
             catch (Exception ex)
             {
-                _ = MessageBox.Show(ex.Message, "Shogi Forsyth–Edwards Notation Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                await new MessageBox(ex.Message, "Shogi Forsyth–Edwards Notation Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error).ShowDialog(this);
             }
         }
 
         private void cancelFenButton_Click(object sender, RoutedEventArgs e)
         {
-            importOverlay.Visibility = Visibility.Hidden;
+            importOverlay.IsVisible = false;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -271,10 +280,13 @@ namespace Shogi
             UpdateBoard();
         }
 
-        private void GoteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        private void GoteDrop_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
-            Type clickedType = (Type)((Grid)sender).Tag;
-            if (e.ChangedButton == MouseButton.Left)
+            if (sender is not Grid { Tag: Type clickedType })
+            {
+                return;
+            }
+            if (e.InitialPressMouseButton == MouseButton.Left)
             {
                 gotePieceDrops[clickedType]++;
             }
@@ -285,10 +297,13 @@ namespace Shogi
             UpdateBoard();
         }
 
-        private void SenteDrop_MouseUp(object sender, MouseButtonEventArgs e)
+        private void SenteDrop_PointerReleased(object sender, PointerReleasedEventArgs e)
         {
-            Type clickedType = (Type)((Grid)sender).Tag;
-            if (e.ChangedButton == MouseButton.Left)
+            if (sender is not Grid { Tag: Type clickedType })
+            {
+                return;
+            }
+            if (e.InitialPressMouseButton == MouseButton.Left)
             {
                 sentePieceDrops[clickedType]++;
             }

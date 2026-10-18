@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 using System.Drawing;
 
 namespace Shogi.Pieces
@@ -51,8 +51,8 @@ namespace Shogi.Pieces
         public abstract char SingleLetter { get; }
         public abstract string SFENLetter { get; }
         public abstract double Value { get; }
-        public abstract bool IsSente { get; }
-        public abstract Point Position { get; protected set; }
+        public bool IsSente { get; protected init; }
+        public Point Position { get; protected set; }
 
         /// <summary>
         /// Get a set of all moves that this piece can perform on the given board
@@ -89,8 +89,6 @@ namespace Shogi.Pieces
         public override string SFENLetter => "K";
         // King should not contribute to overall board value, as it always present
         public override double Value => 0;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public King(Point position, bool isSente)
         {
@@ -136,8 +134,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '金';
         public override string SFENLetter => "G";
         public override double Value => 11;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public GoldGeneral(Point position, bool isSente)
         {
@@ -184,8 +180,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '銀';
         public override string SFENLetter => "S";
         public override double Value => 10;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public SilverGeneral(Point position, bool isSente)
         {
@@ -232,8 +226,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '全';
         public override string SFENLetter => "+S";
         public override double Value => 11;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedSilverGeneral(Point position, bool isSente)
         {
@@ -280,8 +272,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '飛';
         public override string SFENLetter => "R";
         public override double Value => 19;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public Rook(Point position, bool isSente)
         {
@@ -380,8 +370,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '龍';
         public override string SFENLetter => "+R";
         public override double Value => 22;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedRook(Point position, bool isSente)
         {
@@ -495,8 +483,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '角';
         public override string SFENLetter => "B";
         public override double Value => 17;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public Bishop(Point position, bool isSente)
         {
@@ -595,8 +581,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '馬';
         public override string SFENLetter => "+B";
         public override double Value => 20;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedBishop(Point position, bool isSente)
         {
@@ -710,8 +694,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '桂';
         public override string SFENLetter => "N";
         public override double Value => 6;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public Knight(Point position, bool isSente)
         {
@@ -758,8 +740,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '圭';
         public override string SFENLetter => "+N";
         public override double Value => 11;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedKnight(Point position, bool isSente)
         {
@@ -806,8 +786,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '香';
         public override string SFENLetter => "L";
         public override double Value => 6;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public Lance(Point position, bool isSente)
         {
@@ -855,8 +833,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '杏';
         public override string SFENLetter => "+L";
         public override double Value => 11;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedLance(Point position, bool isSente)
         {
@@ -903,8 +879,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => '歩';
         public override string SFENLetter => "P";
         public override double Value => 1;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public Pawn(Point position, bool isSente)
         {
@@ -940,8 +914,6 @@ namespace Shogi.Pieces
         public override char SingleLetter => 'と';
         public override string SFENLetter => "+P";
         public override double Value => 11;
-        public override bool IsSente { get; }
-        public override Point Position { get; protected set; }
 
         public PromotedPawn(Point position, bool isSente)
         {

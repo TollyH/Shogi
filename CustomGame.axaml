@@ -1,0 +1,332 @@
+<Window x:Class="Shogi.CustomGame"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:pieces="using:Shogi.Pieces"
+        mc:Ignorable="d"
+        Title="Custom Game Setup" Width="1000" Height="870" PointerReleased="Window_PointerReleased" Loaded="Window_Loaded" SizeChanged="Window_SizeChanged">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="12*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="12*"/>
+                <RowDefinition Height="1*"/>
+            </Grid.RowDefinitions>
+            <DockPanel x:Name="filesTop" Grid.Column="1" Grid.Row="0">
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}">
+                    <Label Content="９"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}">
+                    <Label Content="８"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}">
+                    <Label Content="７"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}">
+                    <Label Content="６"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}">
+                    <Label Content="５"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}">
+                    <Label Content="４"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}">
+                    <Label Content="３"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}">
+                    <Label Content="２"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}">
+                    <Label Content="１"/>
+                </Viewbox>
+            </DockPanel>
+            <DockPanel x:Name="ranksLeft" Grid.Column="0" Grid.Row="1">
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="一"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="二"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="三"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="四"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="五"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="六" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="七" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="八" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="九" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+            </DockPanel>
+            <DockPanel x:Name="filesBottom" Grid.Column="1" Grid.Row="2">
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="1"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="２"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="３"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="４"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="５"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="６" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="７" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="８" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Width="{Binding Bounds.Width, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Right">
+                    <Label Content="９" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+            </DockPanel>
+            <DockPanel x:Name="ranksRight" Grid.Column="2" Grid.Row="1">
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="一"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="二"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="三"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="四"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="五"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="六" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="七" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="八" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+                <Viewbox Height="{Binding Bounds.Height, ElementName=sizeReference, Mode=OneWay}" DockPanel.Dock="Top">
+                    <Label Content="九" IsVisible="{Binding IsVisible, ElementName=shogiBoardBackground}"/>
+                </Viewbox>
+            </DockPanel>
+            <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" Background="White" BorderThickness="1">
+                <Grid>
+                    <Grid x:Name="shogiBoardBackground" Background="#FFF9B853">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Rectangle x:Name="sizeReference" Grid.Column="0" Grid.Row="0" Opacity="0"/>
+                        <Ellipse Grid.Column="2" Grid.Row="2" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="5" Grid.Row="2" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="5" Grid.Row="5" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="2" Grid.Row="5" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="4" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="5" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="6" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="9" Grid.Column="7" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="4" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="5" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="6" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="9" Grid.Row="7" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    </Grid>
+                    <Grid x:Name="miniShogiBoardBackground" Background="#FFF9B853">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0" Grid.Row="0" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="3" Grid.Row="0" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="3" Grid.Row="3" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Ellipse Grid.Column="0" Grid.Row="3" Width="12" Height="12" Fill="#BF000000" StrokeThickness="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,-6,-6"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="5" Grid.Column="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="5" Grid.Column="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="5" Grid.Column="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Row="0" Grid.RowSpan="5" Grid.Column="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Height="{Binding Bounds.Height, ElementName=shogiGameCanvas, Mode=OneWay}" HorizontalAlignment="Right" Margin="0,0,-1,0" Width="2"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="0" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="1" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="2" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                        <Rectangle Grid.Column="0" Grid.ColumnSpan="5" Grid.Row="3" Fill="#BF000000" StrokeThickness="0" Stroke="#BF000000" Width="{Binding Bounds.Width, ElementName=shogiGameCanvas, Mode=OneWay}" VerticalAlignment="Bottom" Height="2" Margin="0,0,0,-1"/>
+                    </Grid>
+                </Grid>
+            </Border>
+            <Canvas x:Name="shogiGameCanvas" Grid.Column="1" Grid.Row="1" Margin="1"/>
+        </Grid>
+        <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" BorderBrush="Black" BorderThickness="1,0,0,0">
+            <StackPanel>
+                <Label Content="Piece Selection (Click on Board)" Margin="5,5,5,1" Padding="0,0,0,0" FontSize="14"/>
+                <Label Content="Left Click = Sente, Right Click = Gote" Margin="5,1,5,5" Padding="0,0,0,0" FontSize="11"/>
+                <RadioButton x:Name="pieceSelectKing" Margin="5,2,5,2" Content="King" GroupName="Piece" IsChecked="True"/>
+                <RadioButton x:Name="pieceSelectGoldGeneral" Margin="5,2,5,2" Content="Gold General" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectSilverGeneral" Margin="5,2,5,2" Content="Silver General" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedSilverGeneral" Margin="5,2,5,2" Content="Promoted Silver General" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectRook" Margin="5,2,5,2" Content="Rook" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedRook" Margin="5,2,5,2" Content="Promoted Rook" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectBishop" Margin="5,2,5,2" Content="Bishop" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedBishop" Margin="5,2,5,2" Content="Promoted Bishop" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectKnight" Margin="5,2,5,2" Content="Knight" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedKnight" Margin="5,2,5,2" Content="Promoted Knight" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectLance" Margin="5,2,5,2" Content="Lance" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedLance" Margin="5,2,5,2" Content="Promoted Lance" GroupName="Piece" Foreground="Red"/>
+                <RadioButton x:Name="pieceSelectPawn" Margin="5,2,5,2" Content="Pawn" GroupName="Piece"/>
+                <RadioButton x:Name="pieceSelectPromotedPawn" Margin="5,2,5,5" Content="Promoted Pawn" GroupName="Piece" Foreground="Red"/>
+                <Separator/>
+                <Label Content="Current Turn" Margin="5" Padding="0,0,0,0" FontSize="14"/>
+                <Grid>
+                    <RadioButton x:Name="turnSelectSente" Margin="5,2,5,2" Content="Sente" GroupName="CurrentTurn" IsChecked="True"/>
+                    <CheckBox x:Name="computerSelectSente" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
+                </Grid>
+                <Grid>
+                    <RadioButton x:Name="turnSelectGote" Margin="5,2,5,5" Content="Gote" GroupName="CurrentTurn"/>
+                    <CheckBox x:Name="computerSelectGote" Margin="5,2,10,2" HorizontalAlignment="Right" Content="Computer Player" IsChecked="False"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+        <Button x:Name="startButton" Content="Start" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="7" Width="50" IsEnabled="False" Click="startButton_Click"/>
+        <Button x:Name="importButton" Content="Load SFEN" Grid.Column="1" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="10,1,10,1" Margin="7" Click="importButton_Click"/>
+        <Border x:Name="goteDropsContainer" Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ToolTip.Tip="Left Click = Increment, Right Click = Decrement">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="goteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid x:Name="goteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Gold General.png" Tag="Gold General"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="goteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Silver General.png" Tag="Silver General"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="goteRookDrop" Tag="{x:Type pieces:Rook}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Rook.png" Tag="Rook"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="goteBishopDrop" Tag="{x:Type pieces:Bishop}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Bishop.png" Tag="Bishop"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="goteKnightDrop" Tag="{x:Type pieces:Knight}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Knight.png" Tag="Knight"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="goteLanceDrop" Tag="{x:Type pieces:Lance}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Lance.png" Tag="Lance"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="gotePawnDrop" Tag="{x:Type pieces:Pawn}" PointerReleased="GoteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Gote/Pawn.png" Tag="Pawn"/>
+                        <Label Content="0" VerticalAlignment="Bottom" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <Border x:Name="senteDropsContainer" Grid.Row="2" Grid.Column="0" BorderBrush="Black" BorderThickness="0,1,0,1" ToolTip.Tip="Left Click = Increment, Right Click = Decrement">
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                <StackPanel x:Name="senteDropsPanel" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid x:Name="senteGoldGeneralDrop" Tag="{x:Type pieces:GoldGeneral}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Gold General.png" Tag="Gold General"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="senteSilverGeneralDrop" Tag="{x:Type pieces:SilverGeneral}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Silver General.png" Tag="Silver General"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="senteRookDrop" Tag="{x:Type pieces:Rook}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Rook.png" Tag="Rook"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="senteBishopDrop" Tag="{x:Type pieces:Bishop}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Bishop.png" Tag="Bishop"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="senteKnightDrop" Tag="{x:Type pieces:Knight}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Knight.png" Tag="Knight"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="senteLanceDrop" Tag="{x:Type pieces:Lance}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Lance.png" Tag="Lance"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                    <Grid x:Name="sentePawnDrop" Tag="{x:Type pieces:Pawn}" PointerReleased="SenteDrop_PointerReleased">
+                        <Image Source="/Pieces/1kanji/Sente/Pawn.png" Tag="Pawn"/>
+                        <Label Content="0" VerticalAlignment="Top" HorizontalAlignment="Right" FontWeight="Bold" FontSize="15"/>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <Grid x:Name="importOverlay" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" Background="{DynamicResource SystemRegionBrush}" IsVisible="False">
+            <Label Content="Enter a Shogi Forsyth–Edwards Notation (SFEN) board position string:" Margin="10" VerticalAlignment="Top" HorizontalAlignment="Left" FontSize="16"/>
+            <TextBox x:Name="sfenInput" Margin="12,45,12,10" VerticalAlignment="Top" FontSize="15" Text="lnsgkgsnl/1r5b1/ppppppppp/9/9/9/PPPPPPPPP/1B5R1/LNSGKGSNL b -"/>
+            <Button x:Name="submitFenButton" Content="Submit" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10" Width="64" Click="submitFenButton_Click"/>
+            <Button x:Name="cancelFenButton" Content="Cancel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="10,10,84,10" Width="64" Click="cancelFenButton_Click"/>
+        </Grid>
+    </Grid>
+</Window>
